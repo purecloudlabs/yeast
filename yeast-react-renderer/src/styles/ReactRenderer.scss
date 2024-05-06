@@ -1,0 +1,69 @@
+@import './variables.scss';
+
+body {
+	// Standardized indentation
+	@mixin indent-tier($tier) {
+		.indent-#{$tier} {
+			margin-left: $tier * 30px;
+		}
+	}
+	@include indent-tier(1);
+	@include indent-tier(2);
+	@include indent-tier(3);
+	@include indent-tier(4);
+	@include indent-tier(5);
+	@include indent-tier(6);
+	@include indent-tier(7);
+	@include indent-tier(8);
+}
+
+.diff {
+	&-added {
+		background-color: #00bb0066;
+	}
+
+	&-removed {
+		background-color: #c4000066;
+	}
+
+	&-block {
+		&-old {
+			margin: 40px 0 0 0;
+			padding: 40px 0;
+		}
+	
+		&-new {
+			margin: 0 0 40px 0;
+			padding: 40px 0;
+		}
+	
+		&-padding {
+			padding: 10px;
+		}
+	}
+
+	&-modified {
+		&-old {
+			background-color: #ffadad66 !important;
+
+			&-wrapper {
+				background-color: #ffadad66;
+			}
+		}
+	
+		&-new {
+			background-color: #b5ffb566 !important;
+
+			&-wrapper {
+				background-color: #b5ffb566;
+			}
+		}
+	
+		&-full-wrapper {
+			display: flex;
+			gap: 0;
+			align-items: center;
+			justify-content: center;
+		}
+	}
+}
