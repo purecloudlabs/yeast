@@ -1,0 +1,1 @@
+{"version":3,"file":"BlockquoteNode.d.ts","sourceRoot":"","sources":["../../src/YeastNodeTypes/BlockquoteNode.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,gBAAgB,EAAE,MAAM,qBAAqB,CAAC;AACvD,OAAO,EAAE,cAAc,EAAE,MAAM,YAAY,CAAC;AAE5C,MAAM,CAAC,OAAO,UAAU,oBAAoB,CAAC,IAAI,EAAE,cAAc,EAAE,QAAQ,EAAE,gBAAgB,UAkB5F"}
