@@ -1,0 +1,1 @@
+{"version":3,"file":"ContentGroupParserPlugin.d.ts","sourceRoot":"","sources":["../../../src/plugins/block/ContentGroupParserPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,EACN,iBAAiB,EACjB,WAAW,EACX,uBAAuB,EAIvB,MAAM,YAAY,CAAC;AAMpB,qBAAa,wBAAyB,YAAW,iBAAiB;IACjE,KAAK,CAAC,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,WAAW,GAAG,IAAI,GAAG,uBAAuB;CAqGxE"}

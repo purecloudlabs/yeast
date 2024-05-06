@@ -1,0 +1,1 @@
+{"version":3,"file":"CalloutParserPlugin.d.ts","sourceRoot":"","sources":["../../../src/plugins/block/CalloutParserPlugin.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,iBAAiB,EAAE,WAAW,EAAE,uBAAuB,EAAoB,MAAM,YAAY,CAAC;AAcvG,qBAAa,mBAAoB,YAAW,iBAAiB;IAC5D,KAAK,CAAC,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,WAAW,GAAG,IAAI,GAAG,uBAAuB;CAgDxE"}

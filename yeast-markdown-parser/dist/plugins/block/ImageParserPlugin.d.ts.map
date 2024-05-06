@@ -1,0 +1,1 @@
+{"version":3,"file":"ImageParserPlugin.d.ts","sourceRoot":"","sources":["../../../src/plugins/block/ImageParserPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,EAAyB,WAAW,EAA2B,iBAAiB,EAAE,uBAAuB,EAAE,MAAM,YAAY,CAAC;AAIrI,qBAAa,iBAAkB,YAAW,iBAAiB;IAC1D,KAAK,CAAC,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,WAAW,GAAG,IAAI,GAAG,uBAAuB;CA6BxE"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"BlockquoteParserPlugin.d.ts","sourceRoot":"","sources":["../../../src/plugins/block/BlockquoteParserPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,iBAAiB,EAAE,WAAW,EAAE,uBAAuB,EAAoB,MAAM,YAAY,CAAC;AAIvG,qBAAa,sBAAuB,YAAW,iBAAiB;IAC/D,KAAK,CAAC,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,WAAW,GAAG,IAAI,GAAG,uBAAuB;CA6BxE"}
