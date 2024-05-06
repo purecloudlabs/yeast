@@ -1,6 +1,6 @@
 {
 	"name": "yeast-react-renderer",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "A React component to render a yeast document",
 	"type": "module",
 	"types": "dist/index.d.ts",
@@ -50,8 +50,8 @@
 		"uuid": "^9.0.0"
 	},
 	"peerDependencies": {
-		"genesys-dev-icons": "^0.3.0",
-		"genesys-react-components": "^0.4.3",
+		"genesys-dev-icons": "^1.0.0",
+		"genesys-react-components": "^1.0.0",
 		"moment": "^2.29.4",
 		"react": ">=18",
 		"react-dom": ">=18",
