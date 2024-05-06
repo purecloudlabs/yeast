@@ -1,0 +1,1 @@
+{"version":3,"file":"FrontmatterParserPlugin.d.ts","sourceRoot":"","sources":["../../../src/plugins/root/FrontmatterParserPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,EAAgB,oBAAoB,EAAE,0BAA0B,EAAuB,MAAM,YAAY,CAAC;AAQjH,qBAAa,uBAAwB,YAAW,oBAAoB;IACnE,KAAK,CAAC,IAAI,EAAE,MAAM,GAAG,0BAA0B;CA4B/C"}

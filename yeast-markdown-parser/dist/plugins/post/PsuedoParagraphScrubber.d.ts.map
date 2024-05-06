@@ -1,0 +1,1 @@
+{"version":3,"file":"PsuedoParagraphScrubber.d.ts","sourceRoot":"","sources":["../../../src/plugins/post/PsuedoParagraphScrubber.ts"],"names":[],"mappings":"AAAA,OAAO,EACN,YAAY,EACZ,mBAAmB,EAGnB,WAAW,EAGX,MAAM,YAAY,CAAC;AAKpB,qBAAa,uBAAwB,YAAW,mBAAmB;IAClE,KAAK,CAAC,MAAM,EAAE,YAAY,EAAE,MAAM,EAAE,WAAW,GAAG,YAAY;CAG9D"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"InlineLinkPlugin.d.ts","sourceRoot":"","sources":["../../../src/plugins/inline/InlineLinkPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,qBAAqB,EAAE,KAAK,EAAE,WAAW,EAAoB,MAAM,YAAY,CAAC;AAIzF,qBAAa,gBAAiB,YAAW,qBAAqB;IAC7D,QAAQ,CAAC,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,WAAW,GAAG,IAAI,GAAG,KAAK,EAAE;CA0B3D"}

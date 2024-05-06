@@ -1,0 +1,1 @@
+{"version":3,"file":"InlineCodePlugin.d.ts","sourceRoot":"","sources":["../../../src/plugins/inline/InlineCodePlugin.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,qBAAqB,EAAE,KAAK,EAAE,WAAW,EAAoB,MAAM,YAAY,CAAC;AAEzF,qBAAa,gBAAiB,YAAW,qBAAqB;IAC7D,QAAQ,CAAC,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,WAAW,GAAG,IAAI,GAAG,KAAK,EAAE;CA6E3D"}

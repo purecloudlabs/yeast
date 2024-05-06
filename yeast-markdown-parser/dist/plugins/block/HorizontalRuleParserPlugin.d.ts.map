@@ -1,0 +1,1 @@
+{"version":3,"file":"HorizontalRuleParserPlugin.d.ts","sourceRoot":"","sources":["../../../src/plugins/block/HorizontalRuleParserPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,iBAAiB,EAAE,WAAW,EAAE,uBAAuB,EAAoB,MAAM,YAAY,CAAC;AAMvG,qBAAa,0BAA2B,YAAW,iBAAiB;IACnE,KAAK,CAAC,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,WAAW,GAAG,IAAI,GAAG,uBAAuB;CAWxE"}

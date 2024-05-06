@@ -1,0 +1,1 @@
+{"version":3,"file":"InlineStrikeThroughPlugin.d.ts","sourceRoot":"","sources":["../../../src/plugins/inline/InlineStrikeThroughPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,qBAAqB,EAAE,KAAK,EAAoB,WAAW,EAAE,MAAM,YAAY,CAAC;AAOzF,qBAAa,yBAA0B,YAAW,qBAAqB;IACtE,QAAQ,CAAC,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,WAAW,GAAG,IAAI,GAAG,KAAK,EAAE;CAe3D"}
