@@ -1,0 +1,40 @@
+{
+	"name": "yeast-core",
+	"version": "1.0.0",
+	"description": "Core components for working with yeAST (Yuri's Empathetic Arbitrary Syntax Tree) documents",
+	"type": "module",
+	"types": "dist/index.d.ts",
+	"exports": {
+		"require": "./src/index.ts",
+		"default": "./dist/index.js"
+	},
+	"files": [
+		"dist",
+		"src"
+	],
+	"scripts": {
+		"build": "rm -rf dist/ && rollup -c rollup.config.js && rm -rf dist/__tests__/",
+		"test": "jest"
+	},
+	"author": "Genesys",
+	"license": "MIT",
+	"devDependencies": {
+		"@rollup/plugin-commonjs": "^21.0.3",
+		"@rollup/plugin-node-resolve": "^13.2.0",
+		"@types/jest": "^27.4.1",
+		"jest": "^27.5.1",
+		"prettier": "^2.6.2",
+		"rollup": "^2.70.1",
+		"rollup-plugin-peer-deps-external": "^2.2.4",
+		"rollup-plugin-typescript2": "^0.31.2",
+		"ts-jest": "^27.1.4",
+		"typescript": "^4.6.3"
+	},
+	"jest": {
+		"preset": "ts-jest",
+		"testEnvironment": "node",
+		"roots": [
+			"src/__tests__/tests/"
+		]
+	}
+}
