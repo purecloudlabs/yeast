@@ -4,10 +4,10 @@ Yuri's Empathetic Arbitrary Syntax Tree (yeast) is a common structure for descri
 
 ## Packages
 
-- [![npm version](https://badge.fury.io/js/yeast-core.svg)](https://badge.fury.io/js/yeast-core) - core components and common types for working with yeast documents
-- [![npm version](https://badge.fury.io/js/yeast-markdown-parser.svg)](https://badge.fury.io/js/yeast-markdown-parser) - parses markdown to a yeast document
-- [![npm version](https://badge.fury.io/js/yeast-markdown-renderer.svg)](https://badge.fury.io/js/yeast-markdown-renderer) - renders a yesat document to markdown
-- [![npm version](https://badge.fury.io/js/yeast-react-renderer.svg)](https://badge.fury.io/js/yeast-react-renderer) - renders a yeast document to react
+- [![yeast-core](https://badge.fury.io/js/yeast-core.svg)](https://badge.fury.io/js/yeast-core) - core components and common types for working with yeast documents
+- [![yeast-markdown-parser](https://badge.fury.io/js/yeast-markdown-parser.svg)](https://badge.fury.io/js/yeast-markdown-parser) - parses markdown to a yeast document
+- [![yeast-markdown-renderer](https://badge.fury.io/js/yeast-markdown-renderer.svg)](https://badge.fury.io/js/yeast-markdown-renderer) - renders a yesat document to markdown
+- [![yeast-react-renderer](https://badge.fury.io/js/yeast-react-renderer.svg)](https://badge.fury.io/js/yeast-react-renderer) - renders a yeast document to react
 
 ## Documentation
 
