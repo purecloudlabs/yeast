@@ -700,13 +700,7 @@ class CustomComponentParserPlugin {
                         if (k.includes(':@')) {
                             for (const attr in child[':@']) {
                                 const attribute = attr.slice(2);
-                                const attributeChildren = parser.parseInline(child[':@'][attr]);
-                                if (attributeChildren.length === 1 && attributeChildren[0]['text']) {
-                                    childNode[attribute] = child[':@'][attr];
-                                }
-                                else {
-                                    childNode[attribute] = attributeChildren;
-                                }
+                                childNode[attribute] = child[':@'][attr];
                             }
                         }
                     });
@@ -735,13 +729,7 @@ class CustomComponentParserPlugin {
             if (p.includes(':@')) {
                 for (const attr in rootNode[p]) {
                     const attribute = attr.slice(2);
-                    const attributeChildren = parser.parseInline(rootNode[p][attr]);
-                    if (attributeChildren.length === 1 && attributeChildren[0]['text']) {
-                        node[attribute] = rootNode[p][attr];
-                    }
-                    else {
-                        node[attribute] = attributeChildren;
-                    }
+                    node[attribute] = rootNode[p][attr];
                 }
             }
         }

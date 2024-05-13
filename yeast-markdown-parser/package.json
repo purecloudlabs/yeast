@@ -1,6 +1,6 @@
 {
 	"name": "yeast-markdown-parser",
-	"version": "1.4.0",
+	"version": "1.4.1",
 	"description": "Parses markdown to yeAST (Yuri's Empathetic Arbitrary Syntax Tree) documents",
 	"exports": {
 		"require": "./src/index.ts",
@@ -13,6 +13,7 @@
 	],
 	"type": "module",
 	"scripts": {
+		"snyk": "snyk test --file=package-lock.json --org=developer-engagement --severity-threshold=high --skip-unresolved=true",
 		"build": "rm -rf dist && rollup -c rollup.config.js && rm -rf dist/__tests__",
 		"test": "jest"
 	},
