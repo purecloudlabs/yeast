@@ -188,7 +188,7 @@ test('CreateImageNode defaults', () => {
 
 	// Check properties
 	expect(Object.keys(node)).toHaveLength(3);
-	expect(node.type).toBe(YeastBlockNodeTypes.Image);
+	expect(node.type).toBe(YeastInlineNodeTypes.Image);
 	expect(node.src).toBe('');
 	expect(node.alt).toBe('');
 });

@@ -15,7 +15,6 @@ export enum YeastBlockNodeTypes {
 	Document = 'document',
 	Heading = 'heading',
 	HorizontalRule = 'horizontalrule',
-	Image = 'image',
 	List = 'list',
 	ListItem = 'listitem',
 	Paragraph = 'paragraph',
@@ -32,6 +31,7 @@ export enum YeastInlineNodeTypes {
 	Link = 'link',
 	Strikethrough = 'strikethrough',
 	Code = 'inlinecode',
+	Image = 'image',
 }
 
 // displays to ContentGroup & ContentGroupItem nodes
@@ -42,15 +42,15 @@ export enum ContentGroupType {
 
 // DiffType enumerates the possible change types for yeast node during the changeset diffing process
 export enum DiffType {
-	Added = "added",
-	Modified = "modified",
-	Removed = "removed",
+	Added = 'added',
+	Modified = 'modified',
+	Removed = 'removed',
 }
 
 // DiffSource enumerates the possible sources of a node being diffed
 export enum DiffSource {
-	Old = "old",
-	New = "new",
+	Old = 'old',
+	New = 'new',
 }
 
 // DiffEntity contains the types that can be diffed
@@ -58,7 +58,7 @@ export type DiffEntity = YeastChild | string;
 
 // DiffPivotMap maps text properties within a node to the index in the value string that divides the old string from the new string for diff display purposes.
 export interface DiffPivotMap {
-    [textProperty: string]: number
+	[textProperty: string]: number;
 }
 
 // YeastChild is the most permissive definition for a child
@@ -70,10 +70,10 @@ export type YeastInlineChild = YeastInlineNode | YeastText;
 export interface YeastNode {
 	type: YeastBlockNodeTypes | YeastInlineNodeTypes | string;
 	children?: YeastChild[];
-    hasDiff?: boolean;
+	hasDiff?: boolean;
 	diffType?: DiffType;
-    diffMods?: ModificationDiffMap;
-    diffPivots?: DiffPivotMap;
+	diffMods?: ModificationDiffMap;
+	diffPivots?: DiffPivotMap;
 	isTextModification?: boolean;
 	containsTextModification?: boolean;
 	diffSource?: DiffSource;
@@ -89,7 +89,7 @@ export interface ModificationData {
 
 // ModificationDiffMap contains the ModificationAssignment data per text property
 export interface ModificationDiffMap {
-    [textProperty: string]: ModificationAssignment;
+	[textProperty: string]: ModificationAssignment;
 }
 
 // ModificationAssignment contains assignments for old and new ModificationData arrays
@@ -97,7 +97,6 @@ export interface ModificationAssignment {
 	oldModData: ModificationData[];
 	newModData: ModificationData[];
 }
-
 
 // YeastBlockNode implies the node is meant to be displayed as a block element (e.g. div)
 export interface YeastBlockNode extends YeastNode {
@@ -152,14 +151,6 @@ export interface HeadingNode extends YeastBlockNode {
 
 export interface HorizontalRuleNode extends YeastBlockNode {
 	type: YeastBlockNodeTypes.HorizontalRule;
-	children: never;
-}
-
-export interface ImageNode extends YeastBlockNode {
-	type: YeastBlockNodeTypes.Image;
-	src: string;
-	alt?: string;
-	title?: string;
 	children: never;
 }
 
@@ -278,6 +269,14 @@ export interface InlineCodeNode extends YeastInlineNode {
 	children: YeastInlineChild[];
 }
 
+export interface ImageNode extends YeastInlineNode {
+	type: YeastInlineNodeTypes.Image;
+	src: string;
+	alt?: string;
+	title?: string;
+	children: never;
+}
+
 /**
  * Non-nodes
  */
@@ -288,8 +287,8 @@ export interface YeastText {
 	hasDiff?: boolean;
 	diffSource?: DiffSource;
 	diffType?: DiffType;
-    diffMods?: ModificationDiffMap;
-    diffPivots?: DiffPivotMap;
+	diffMods?: ModificationDiffMap;
+	diffPivots?: DiffPivotMap;
 	isTextModification?: boolean;
 	containsTextModification?: boolean;
 	// bold?: boolean;

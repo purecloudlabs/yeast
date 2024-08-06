@@ -2,6 +2,7 @@ import {
     DocumentNode,
     YeastNode,
     YeastBlockNodeTypes,
+    YeastInlineNodeTypes,
     YeastChild,
     YeastText,
     DiffSource,
@@ -1070,7 +1071,7 @@ function isNodeMatch(oldNode: YeastNode, newNode: YeastNode, diffChildren: Yeast
     }
     
     // Image nodes have additional properties to check for text changes.
-    const areBothImages: boolean = oldNode.type === YeastBlockNodeTypes.Image && newNode.type === YeastBlockNodeTypes.Image;
+    const areBothImages: boolean = oldNode.type === YeastInlineNodeTypes.Image && newNode.type === YeastInlineNodeTypes.Image;
     if (areBothImages) {
         const oldImage: ImageNode = oldNode as ImageNode;
         const newImage: ImageNode = newNode as ImageNode;
