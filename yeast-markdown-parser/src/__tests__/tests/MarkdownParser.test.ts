@@ -37,6 +37,7 @@ import { TableParserPlugin } from '../../plugins/block/TableParser';
 import { BoldInlinePlugin } from '../../plugins/inline/BoldInlinePlugin';
 
 import { IMAGE_AST, IMAGE_LINKS_AST, IMAGE_LINKS_MARKDOWN, IMAGE_MARKDOWN } from '../resources/images';
+import { LINK_AST, LINK_MARKDOWN } from '../resources/links';
 
 const standardBlockPluginCount = 10;
 const standardInlinePluginCount = 8;
@@ -489,10 +490,9 @@ test('MarkdownParser parses hyperlink in text', () => {
 	checkParserPlugins(parser, standardBlockPluginCount, standardInlinePluginCount);
 
 	// Parse
-	const documentText = fs.readFileSync(path.join(__dirname, '../resources/links.md'), 'utf8');
-	const ast = parser.parse(documentText);
+	const ast = parser.parse(LINK_MARKDOWN);
 
-	expect((ast.children[0].children[2] as LinkNode).type).toBe('link');
+	expect(JSON.stringify(ast)).toBe(JSON.stringify(LINK_AST));
 });
 // /**
 //  * Helper functions

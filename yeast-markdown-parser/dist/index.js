@@ -1,4 +1,4 @@
-import { YeastBlockNodeTypes, YeastNodeFactory, ContentGroupType, isYeastNodeType, YeastParser } from 'yeast-core';
+import { YeastBlockNodeTypes, YeastNodeFactory, isYeastNodeType, YeastInlineNodeTypes, scrapeText, ContentGroupType, YeastParser } from 'yeast-core';
 import { parse } from 'yaml';
 import { XMLParser } from 'fast-xml-parser';
 
@@ -355,6 +355,12 @@ class InlineLinkPlugin {
             else {
                 node.children = [{ text: match[2] }];
             }
+            node.children = node.children.map((n) => {
+                if (isYeastNodeType(n, YeastInlineNodeTypes.Link))
+                    return { text: scrapeText(n) };
+                else
+                    return n;
+            });
             node.href = match[2];
             node.title = match[3] || 'Link';
             tokens.push({
