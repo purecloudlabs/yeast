@@ -152,15 +152,6 @@ class YeastNodeFactory {
                 applyAttributes(node, attributes);
                 return node;
             }
-            case YeastBlockNodeTypes.Image: {
-                const node = {
-                    type: YeastBlockNodeTypes.Image,
-                    src: '',
-                    alt: '',
-                };
-                applyAttributes(node, attributes);
-                return node;
-            }
             case YeastBlockNodeTypes.HorizontalRule: {
                 const node = {
                     type: YeastBlockNodeTypes.HorizontalRule,
@@ -258,6 +249,15 @@ class YeastNodeFactory {
                 applyAttributes(node, attributes);
                 return node;
             }
+            case YeastInlineNodeTypes.Image: {
+                const node = {
+                    type: YeastInlineNodeTypes.Image,
+                    src: '',
+                    alt: '',
+                };
+                applyAttributes(node, attributes);
+                return node;
+            }
             case 'text': {
                 return { text: (attributes === null || attributes === void 0 ? void 0 : attributes.text) || '' };
             }
@@ -288,7 +288,7 @@ class YeastNodeFactory {
         return this.Create(YeastBlockNodeTypes.Heading, from);
     }
     CreateImageNode(from) {
-        return this.Create(YeastBlockNodeTypes.Image, from);
+        return this.Create(YeastInlineNodeTypes.Image, from);
     }
     CreateHorizontalRuleNode(from) {
         return this.Create(YeastBlockNodeTypes.HorizontalRule, from);
@@ -1154,7 +1154,7 @@ function isNodeMatch(oldNode, newNode, diffChildren) {
         if (!doTitlesMatch || !doAuthorsMatch)
             isMatch = false;
     }
-    const areBothImages = oldNode.type === YeastBlockNodeTypes.Image && newNode.type === YeastBlockNodeTypes.Image;
+    const areBothImages = oldNode.type === YeastInlineNodeTypes.Image && newNode.type === YeastInlineNodeTypes.Image;
     if (areBothImages) {
         const oldImage = oldNode;
         const newImage = newNode;
@@ -1327,7 +1327,6 @@ var YeastBlockNodeTypes;
     YeastBlockNodeTypes["Document"] = "document";
     YeastBlockNodeTypes["Heading"] = "heading";
     YeastBlockNodeTypes["HorizontalRule"] = "horizontalrule";
-    YeastBlockNodeTypes["Image"] = "image";
     YeastBlockNodeTypes["List"] = "list";
     YeastBlockNodeTypes["ListItem"] = "listitem";
     YeastBlockNodeTypes["Paragraph"] = "paragraph";
@@ -1343,6 +1342,7 @@ var YeastInlineNodeTypes;
     YeastInlineNodeTypes["Link"] = "link";
     YeastInlineNodeTypes["Strikethrough"] = "strikethrough";
     YeastInlineNodeTypes["Code"] = "inlinecode";
+    YeastInlineNodeTypes["Image"] = "image";
 })(YeastInlineNodeTypes || (YeastInlineNodeTypes = {}));
 var ContentGroupType;
 (function (ContentGroupType) {
