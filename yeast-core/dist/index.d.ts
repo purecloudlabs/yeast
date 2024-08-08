@@ -12,7 +12,6 @@ export declare enum YeastBlockNodeTypes {
     Document = "document",
     Heading = "heading",
     HorizontalRule = "horizontalrule",
-    Image = "image",
     List = "list",
     ListItem = "listitem",
     Paragraph = "paragraph",
@@ -26,7 +25,8 @@ export declare enum YeastInlineNodeTypes {
     Italic = "italic",
     Link = "link",
     Strikethrough = "strikethrough",
-    Code = "inlinecode"
+    Code = "inlinecode",
+    Image = "image"
 }
 export declare enum ContentGroupType {
     accordion = "accordion",
@@ -108,13 +108,6 @@ export interface HeadingNode extends YeastBlockNode {
 }
 export interface HorizontalRuleNode extends YeastBlockNode {
     type: YeastBlockNodeTypes.HorizontalRule;
-    children: never;
-}
-export interface ImageNode extends YeastBlockNode {
-    type: YeastBlockNodeTypes.Image;
-    src: string;
-    alt?: string;
-    title?: string;
     children: never;
 }
 export interface ListNode extends YeastBlockNode {
@@ -211,6 +204,13 @@ export interface ItalicNode extends YeastInlineNode {
 export interface InlineCodeNode extends YeastInlineNode {
     type: YeastInlineNodeTypes.Code;
     children: YeastInlineChild[];
+}
+export interface ImageNode extends YeastInlineNode {
+    type: YeastInlineNodeTypes.Image;
+    src: string;
+    alt?: string;
+    title?: string;
+    children: never;
 }
 export interface YeastText {
     text: string;

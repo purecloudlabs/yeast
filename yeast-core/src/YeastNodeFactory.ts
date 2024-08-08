@@ -95,17 +95,6 @@ class YeastNodeFactory {
 				applyAttributes(node, attributes);
 				return node;
 			}
-			case YeastBlockNodeTypes.Image: {
-				const node = {
-					type: YeastBlockNodeTypes.Image,
-					src: '',
-					alt: '',
-					// Note: Images don't have children!
-					// children: [],
-				} as ImageNode;
-				applyAttributes(node, attributes);
-				return node;
-			}
 			case YeastBlockNodeTypes.HorizontalRule: {
 				const node = {
 					type: YeastBlockNodeTypes.HorizontalRule,
@@ -207,6 +196,17 @@ class YeastNodeFactory {
 				applyAttributes(node, attributes);
 				return node;
 			}
+			case YeastInlineNodeTypes.Image: {
+				const node = {
+					type: YeastInlineNodeTypes.Image,
+					src: '',
+					alt: '',
+					// Note: Images don't have children!
+					// children: [],
+				} as ImageNode;
+				applyAttributes(node, attributes);
+				return node;
+			}
 
 			/* Text */
 			case 'text': {
@@ -253,7 +253,7 @@ class YeastNodeFactory {
 	}
 	// CreateImage creates a ImageNode node, optionally copying attributes from an existing node
 	public CreateImageNode(from?: ImageNode): ImageNode {
-		return this.Create(YeastBlockNodeTypes.Image, from) as ImageNode;
+		return this.Create(YeastInlineNodeTypes.Image, from) as ImageNode;
 	}
 	// CreateHorizontalRule creates a HorizontalRuleNode node, optionally copying attributes from an existing node
 	public CreateHorizontalRuleNode(from?: HorizontalRuleNode): HorizontalRuleNode {
