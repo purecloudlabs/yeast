@@ -21,7 +21,7 @@ export class InlineImagePlugin implements InlineTokenizerPlugin {
 				start: match.index,
 				end: match.index + match[0].length,
 				from: 'InlineImagePlugin',
-				nodes: [node as any],
+				nodes: [node],
 			});
 		}
 		return tokens;

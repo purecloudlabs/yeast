@@ -24,13 +24,13 @@ export class InlineImageLinkPlugin implements InlineTokenizerPlugin {
 			const linkNode = YeastNodeFactory.CreateLinkNode();
 			linkNode.href = match[4];
 			linkNode.title = match[5];
-			linkNode.children = [imageNode as any];
+			linkNode.children = [imageNode];
 
 			tokens.push({
 				start: match.index,
 				end: match.index + match[0].length,
 				from: 'InlineImageLinkParserPlugin',
-				nodes: [linkNode as any],
+				nodes: [linkNode],
 			});
 		}
 		return tokens;
