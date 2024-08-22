@@ -612,7 +612,7 @@ class ReactRenderer {
             [YeastBlockNodeTypes.Table]: (node, renderer) => {
                 return React.createElement(TableNodeRenderer, { key: v4(), node: node, renderer: renderer });
             },
-            [YeastBlockNodeTypes.Image]: (node, renderer) => {
+            [YeastInlineNodeTypes.Image]: (node, renderer) => {
                 return React.createElement(ImageNodeRenderer, { key: v4(), node: node, renderer: renderer });
             },
             [YeastBlockNodeTypes.HorizontalRule]: (node, renderer) => {

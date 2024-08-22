@@ -99,7 +99,7 @@ export class MarkdownRenderer {
 		[YeastBlockNodeTypes.HorizontalRule]: () => {
 			return renderHorizontalRuleNode();
 		},
-		[YeastBlockNodeTypes.Image]: (node: ImageNode, renderer: MarkdownRenderer) => {
+		[YeastInlineNodeTypes.Image]: (node: ImageNode, renderer: MarkdownRenderer) => {
 			return renderImageNode(node, renderer);
 		},
 		[YeastBlockNodeTypes.List]: (node: ListNode, renderer: MarkdownRenderer) => {

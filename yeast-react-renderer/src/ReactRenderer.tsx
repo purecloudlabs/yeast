@@ -95,7 +95,7 @@ export class ReactRenderer {
 		[YeastBlockNodeTypes.Table]: (node: TableNode, renderer: ReactRenderer) => {
 			return <TableNodeRenderer key={uuidv4()} node={node} renderer={renderer} />;
 		},
-		[YeastBlockNodeTypes.Image]: (node: ImageNode, renderer: ReactRenderer) => {
+		[YeastInlineNodeTypes.Image]: (node: ImageNode, renderer: ReactRenderer) => {
 			return <ImageNodeRenderer key={uuidv4()} node={node} renderer={renderer} />;
 		},
 		[YeastBlockNodeTypes.HorizontalRule]: (node: HorizontalRuleNode, renderer: ReactRenderer) => {
