@@ -6,7 +6,6 @@ import { ItalicsInlinePlugin } from './plugins/inline/ItalicsInlinePlugin';
 import { BoldInlinePlugin } from './plugins/inline/BoldInlinePlugin';
 import { HeadingParserPlugin } from './plugins/block/HeadingParserPlugin';
 import { ListParserPlugin } from './plugins/block/ListParserPlugin';
-import { ImageParserPlugin } from './plugins/block/ImageParserPlugin';
 import { InlineStrikeThroughPlugin } from './plugins/inline/InlineStrikeThroughPlugin';
 import { InlineCodePlugin } from './plugins/inline/InlineCodePlugin';
 import { InlineLinkPlugin } from './plugins/inline/InlineLinkPlugin';
@@ -20,6 +19,8 @@ import { TableParserPlugin } from './plugins/block/TableParser';
 import { PsuedoParagraphScrubber } from './plugins/post/PsuedoParagraphScrubber';
 import { ParagraphDenester } from './plugins/post/ParagraphDenester';
 import { InlineTextLinkPlugin } from './plugins/inline/InlineTextLinkPlugin';
+import { InlineImagePlugin } from './plugins/inline/InlineImagePlugin';
+import { InlineImageLinkPlugin } from './plugins/inline/InlineImageLinkPlugin';
 
 export class MarkdownParser extends YeastParser {
 	constructor() {
@@ -38,7 +39,6 @@ export class MarkdownParser extends YeastParser {
 		this.registerBlockPlugin(new BlockquoteParserPlugin());
 		this.registerBlockPlugin(new ListParserPlugin());
 		this.registerBlockPlugin(new TableParserPlugin());
-		this.registerBlockPlugin(new ImageParserPlugin());
 		this.registerBlockPlugin(new CustomComponentParserPlugin());
 		this.registerBlockPlugin(new ParagraphParserPlugin()); // ParagraphParserPlugin must always be last
 
@@ -46,6 +46,8 @@ export class MarkdownParser extends YeastParser {
 		this.registerInlinePlugin(new InlineStrikeThroughPlugin());
 		this.registerInlinePlugin(new ItalicsInlinePlugin());
 		this.registerInlinePlugin(new BoldInlinePlugin());
+		this.registerInlinePlugin(new InlineImageLinkPlugin());
+		this.registerInlinePlugin(new InlineImagePlugin());
 		this.registerInlinePlugin(new InlineLinkPlugin());
 		this.registerInlinePlugin(new InlineTextLinkPlugin());
 	}

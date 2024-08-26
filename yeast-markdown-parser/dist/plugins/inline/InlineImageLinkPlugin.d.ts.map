@@ -1,0 +1,1 @@
+{"version":3,"file":"InlineImageLinkPlugin.d.ts","sourceRoot":"","sources":["../../../src/plugins/inline/InlineImageLinkPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,qBAAqB,EAAE,WAAW,EAAE,KAAK,EAAoB,MAAM,YAAY,CAAC;AAIzF,qBAAa,qBAAsB,YAAW,qBAAqB;IAClE,QAAQ,CAAC,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,WAAW,GAAG,IAAI,GAAG,KAAK,EAAE;CAgC3D"}

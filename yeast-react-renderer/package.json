@@ -1,6 +1,6 @@
 {
 	"name": "yeast-react-renderer",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"description": "A React component to render a yeast document",
 	"type": "module",
 	"types": "dist/index.d.ts",
@@ -58,6 +58,6 @@
 		"react-dom": ">=18",
 		"react-syntax-highlighter": "^15.5.0",
 		"uuid": "^9.0.0",
-		"yeast-core": "^1.0.0"
+		"yeast-core": "^1.1.0"
 	}
 }

@@ -1,4 +1,13 @@
-import { InlineTokenizerPlugin, Token, YeastParser, YeastNodeFactory } from 'yeast-core';
+import {
+	InlineTokenizerPlugin,
+	Token,
+	YeastParser,
+	YeastNodeFactory,
+	YeastInlineNode,
+	isYeastNodeType,
+	YeastInlineNodeTypes,
+	scrapeText,
+} from 'yeast-core';
 
 const LINK_REGEX = /\[([^\[\]]*)\]\((.+?)(?:\s["'](.*?)["'])?\)/gi;
 
@@ -17,6 +26,12 @@ export class InlineLinkPlugin implements InlineTokenizerPlugin {
 			} else {
 				node.children = [{ text: match[2] }];
 			}
+
+			// If any children are links, use their plain text instead. This happens when the link text is a URL.
+			node.children = node.children.map((n) => {
+				if (isYeastNodeType(n, YeastInlineNodeTypes.Link)) return { text: scrapeText(n) };
+				else return n;
+			});
 
 			node.href = match[2];
 			node.title = match[3] || 'Link';

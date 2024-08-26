@@ -1,4 +1,4 @@
-import { YeastBlockNodeTypes, YeastNodeFactory, ContentGroupType, isYeastNodeType, YeastParser } from 'yeast-core';
+import { YeastBlockNodeTypes, YeastNodeFactory, isYeastNodeType, YeastInlineNodeTypes, scrapeText, ContentGroupType, YeastParser } from 'yeast-core';
 import { parse } from 'yaml';
 import { XMLParser } from 'fast-xml-parser';
 
@@ -247,25 +247,6 @@ function processListItems(items, targetNode) {
     } while (items.length > 0);
 }
 
-const IMAGE_REGEX = /^\s*(.*)!\[([^\[\]]*)\]\((.+?)(?:\s["'](.*?)["'])?\)(.*)(?:\n|$)([\s\S]*)/i;
-class ImageParserPlugin {
-    parse(text, parser) {
-        const match = text.match(IMAGE_REGEX);
-        if (!match || !match[3])
-            return;
-        const imageNode = YeastNodeFactory.CreateImageNode();
-        imageNode.title = match[2];
-        imageNode.src = match[3];
-        imageNode.alt = match[4];
-        const beforeNodes = parser.parseBlock(match[1]);
-        const afterNodes = parser.parseBlock(match[5]);
-        return {
-            remainingText: match[6],
-            nodes: [...beforeNodes, imageNode, ...afterNodes],
-        };
-    }
-}
-
 const STRIKETHROUGH_REGEX = /~(\S.+?)~/gi;
 class InlineStrikeThroughPlugin {
     tokenize(text, parser) {
@@ -374,6 +355,12 @@ class InlineLinkPlugin {
             else {
                 node.children = [{ text: match[2] }];
             }
+            node.children = node.children.map((n) => {
+                if (isYeastNodeType(n, YeastInlineNodeTypes.Link))
+                    return { text: scrapeText(n) };
+                else
+                    return n;
+            });
             node.href = match[2];
             node.title = match[3] || 'Link';
             tokens.push({
@@ -1004,6 +991,50 @@ class InlineTextLinkPlugin {
     }
 }
 
+const IMAGE_REGEX$1 = /!\[([^\[\]]*)\]\((.+?)(?:\s["'](.*?)["'])?\)/gi;
+class InlineImagePlugin {
+    tokenize(text, parser) {
+        const tokens = [];
+        for (const match of text.matchAll(IMAGE_REGEX$1)) {
+            const node = YeastNodeFactory.CreateImageNode();
+            node.title = match[1];
+            node.src = match[2];
+            node.alt = match[3];
+            tokens.push({
+                start: match.index,
+                end: match.index + match[0].length,
+                from: 'InlineImagePlugin',
+                nodes: [node],
+            });
+        }
+        return tokens;
+    }
+}
+
+const IMAGE_LINK_REGEX = /\[[\t ]*!\[([^\[\]]*)\]\((.+?)(?:\s["'](.*?)["'])?\)\]\((.+?)(?:\s["'](.*?)["'])?\)/gi;
+class InlineImageLinkPlugin {
+    tokenize(text, parser) {
+        const tokens = [];
+        for (const match of text.matchAll(IMAGE_LINK_REGEX)) {
+            const imageNode = YeastNodeFactory.CreateImageNode();
+            imageNode.title = match[1];
+            imageNode.src = match[2];
+            imageNode.alt = match[3];
+            const linkNode = YeastNodeFactory.CreateLinkNode();
+            linkNode.href = match[4];
+            linkNode.title = match[5];
+            linkNode.children = [imageNode];
+            tokens.push({
+                start: match.index,
+                end: match.index + match[0].length,
+                from: 'InlineImageLinkParserPlugin',
+                nodes: [linkNode],
+            });
+        }
+        return tokens;
+    }
+}
+
 class MarkdownParser extends YeastParser {
     constructor() {
         super();
@@ -1018,17 +1049,37 @@ class MarkdownParser extends YeastParser {
         this.registerBlockPlugin(new BlockquoteParserPlugin());
         this.registerBlockPlugin(new ListParserPlugin());
         this.registerBlockPlugin(new TableParserPlugin());
-        this.registerBlockPlugin(new ImageParserPlugin());
         this.registerBlockPlugin(new CustomComponentParserPlugin());
         this.registerBlockPlugin(new ParagraphParserPlugin());
         this.registerInlinePlugin(new InlineCodePlugin());
         this.registerInlinePlugin(new InlineStrikeThroughPlugin());
         this.registerInlinePlugin(new ItalicsInlinePlugin());
         this.registerInlinePlugin(new BoldInlinePlugin());
+        this.registerInlinePlugin(new InlineImageLinkPlugin());
+        this.registerInlinePlugin(new InlineImagePlugin());
         this.registerInlinePlugin(new InlineLinkPlugin());
         this.registerInlinePlugin(new InlineTextLinkPlugin());
     }
 }
 
-export { BlockquoteParserPlugin, BoldInlinePlugin, CalloutParserPlugin, CodeParserPlugin, ContentGroupParserPlugin, CustomComponentParserPlugin, FrontmatterParserPlugin, HeadingParserPlugin, HorizontalRuleParserPlugin, ImageParserPlugin, InlineCodePlugin, InlineLinkPlugin, InlineStrikeThroughPlugin, ItalicsInlinePlugin, ListParserPlugin, MarkdownParser, ParagraphParserPlugin, TableParserPlugin };
+const IMAGE_REGEX = /^\s*(.*)!\[([^\[\]]*)\]\((.+?)(?:\s["'](.*?)["'])?\)(.*)(?:\n|$)([\s\S]*)/i;
+class ImageParserPlugin {
+    parse(text, parser) {
+        const match = text.match(IMAGE_REGEX);
+        if (!match || !match[3])
+            return;
+        const imageNode = YeastNodeFactory.CreateImageNode();
+        imageNode.title = match[2];
+        imageNode.src = match[3];
+        imageNode.alt = match[4];
+        const beforeNodes = parser.parseBlock(match[1]);
+        const afterNodes = parser.parseBlock(match[5]);
+        return {
+            remainingText: match[6],
+            nodes: [...beforeNodes, imageNode, ...afterNodes],
+        };
+    }
+}
+
+export { BlockquoteParserPlugin, BoldInlinePlugin, CalloutParserPlugin, CodeParserPlugin, ContentGroupParserPlugin, CustomComponentParserPlugin, FrontmatterParserPlugin, HeadingParserPlugin, HorizontalRuleParserPlugin, ImageParserPlugin, InlineCodePlugin, InlineImageLinkPlugin, InlineLinkPlugin, InlineStrikeThroughPlugin, ItalicsInlinePlugin, ListParserPlugin, MarkdownParser, ParagraphParserPlugin, TableParserPlugin };
 //# sourceMappingURL=index.js.map

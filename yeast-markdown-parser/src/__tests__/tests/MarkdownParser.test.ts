@@ -36,7 +36,11 @@ import { ParagraphParserPlugin } from '../../plugins/block/ParagraphParserPlugin
 import { TableParserPlugin } from '../../plugins/block/TableParser';
 import { BoldInlinePlugin } from '../../plugins/inline/BoldInlinePlugin';
 
-import { IMAGE_AST, IMAGE_MARKDOWN } from '../resources/images';
+import { IMAGE_AST, IMAGE_LINKS_AST, IMAGE_LINKS_MARKDOWN, IMAGE_MARKDOWN } from '../resources/images';
+import { LINK_AST, LINK_MARKDOWN } from '../resources/links';
+
+const standardBlockPluginCount = 10;
+const standardInlinePluginCount = 8;
 
 test('MarkdownParser with no plugins should create root document with frontmatter', () => {
 	// Initialize parser
@@ -145,7 +149,7 @@ test('MarkdownParser using TableParserPlugin', () => {
 	parser.registerBlockPlugin(new ParagraphParserPlugin());
 
 	// Check plugins
-	checkParserPlugins(parser, 14, 6);
+	checkParserPlugins(parser, 13, 8);
 
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/tables.md'), 'utf8');
 	const ast = parser.parse(documentText);
@@ -363,7 +367,7 @@ test('MarkdownParser using ParagraphDenester', () => {
 	const parser = new MarkdownParser();
 
 	// Check plugins
-	checkParserPlugins(parser, 11, 6);
+	checkParserPlugins(parser, standardBlockPluginCount, standardInlinePluginCount);
 
 	// Parse
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/nested-paragraphs.md'), 'utf8');
@@ -385,7 +389,7 @@ test('MarkdownParser using all inline plugins', () => {
 	parser.registerBlockPlugin(new ParagraphParserPlugin());
 
 	// Check plugins
-	checkParserPlugins(parser, 1, 6);
+	checkParserPlugins(parser, 1, standardInlinePluginCount);
 
 	// Parse
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/everythinginline.md'), 'utf8');
@@ -394,17 +398,20 @@ test('MarkdownParser using all inline plugins', () => {
 	// Check document
 	checkAstStructureForDefaultDocument(ast, 1);
 	expect(ast.children.length).toBe(1);
-	expect(ast.children[0].children.length).toBe(20);
+	expect(ast.children[0].children.length).toBe(26);
 	expect((ast.children[0].children[1] as StrikethroughNode).type).toBe('strikethrough');
 	expect((ast.children[0].children[3] as InlineCodeNode).type).toBe('inlinecode');
 	expect((ast.children[0].children[5] as ItalicNode).type).toBe('italic');
 	expect((ast.children[0].children[7] as ItalicNode).type).toBe('italic');
 	expect((ast.children[0].children[9] as BoldNode).type).toBe('bold');
 	expect((ast.children[0].children[11] as InlineCodeNode).type).toBe('inlinecode');
-	expect((ast.children[0].children[13] as LinkNode).type).toBe('link');
-	expect((ast.children[0].children[15] as LinkNode).type).toBe('link');
-	expect((ast.children[0].children[17] as LinkNode).type).toBe('link');
+	expect((ast.children[0].children[13] as ImageNode).type).toBe('image');
+	expect((ast.children[0].children[15] as ImageNode).type).toBe('image');
+	expect((ast.children[0].children[17] as ImageNode).type).toBe('image');
 	expect((ast.children[0].children[19] as LinkNode).type).toBe('link');
+	expect((ast.children[0].children[21] as LinkNode).type).toBe('link');
+	expect((ast.children[0].children[23] as LinkNode).type).toBe('link');
+	expect((ast.children[0].children[25] as LinkNode).type).toBe('link');
 });
 
 test('MarkdownParser using all defaults', () => {
@@ -412,7 +419,7 @@ test('MarkdownParser using all defaults', () => {
 	const parser = new MarkdownParser();
 
 	// Check plugins
-	checkParserPlugins(parser, 11, 6);
+	checkParserPlugins(parser, standardBlockPluginCount, standardInlinePluginCount);
 
 	// Parse
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/everything.md'), 'utf8');
@@ -440,8 +447,23 @@ test('MarkdownParser parses image formats', () => {
 	expect(ast.type).toBe('document');
 	expect(ast.title).toBe('Image test page');
 	expect(ast.children).not.toBeUndefined();
-	expect(ast.children.length).toBe(33);
+	expect(ast.children.length).toBe(24);
 	expect(JSON.stringify(ast)).toBe(JSON.stringify(IMAGE_AST));
+});
+
+test('MarkdownParser parses image links', () => {
+	// Initialize parser
+	const parser = new MarkdownParser();
+
+	// Parse
+	const ast = parser.parse(IMAGE_LINKS_MARKDOWN);
+
+	// Check result
+	expect(ast.type).toBe('document');
+	expect(ast.title).toBe('Platform API Client SDK - Java');
+	expect(ast.children).not.toBeUndefined();
+	expect(ast.children.length).toBe(4);
+	expect(JSON.stringify(ast)).toBe(JSON.stringify(IMAGE_LINKS_AST));
 });
 
 test('Inline content should not be parsed', () => {
@@ -449,7 +471,7 @@ test('Inline content should not be parsed', () => {
 	const parser = new MarkdownParser();
 
 	// Check plugins
-	checkParserPlugins(parser, 11, 6);
+	checkParserPlugins(parser, standardBlockPluginCount, standardInlinePluginCount);
 
 	// Parse
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/inlinecode.md'), 'utf8');
@@ -465,13 +487,12 @@ test('MarkdownParser parses hyperlink in text', () => {
 	const parser = new MarkdownParser();
 
 	// Check plugins
-	checkParserPlugins(parser, 11, 6);
+	checkParserPlugins(parser, standardBlockPluginCount, standardInlinePluginCount);
 
 	// Parse
-	const documentText = fs.readFileSync(path.join(__dirname, '../resources/links.md'), 'utf8');
-	const ast = parser.parse(documentText);
+	const ast = parser.parse(LINK_MARKDOWN);
 
-	expect((ast.children[0].children[2] as LinkNode).type).toBe('link');
+	expect(JSON.stringify(ast)).toBe(JSON.stringify(LINK_AST));
 });
 // /**
 //  * Helper functions
