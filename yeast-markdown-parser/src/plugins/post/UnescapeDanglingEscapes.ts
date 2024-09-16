@@ -8,7 +8,7 @@ export class UnescapeDanglingEscapes implements PostProcessorPlugin {
 }
 
 // Matches a backslash before double: underscores, double asterisks, single underscores, single asterisks, pipes
-const ESCAPED_STUFF_REGEX = /\\(__|\*\*|_|\*|\|)/g;
+const ESCAPED_STUFF_REGEX = /\\(__|\*\*|_|\*|\||\[|\])/g;
 
 function unescapeStuff(nodes?: YeastChild[]) {
 	if (!nodes) return undefined;

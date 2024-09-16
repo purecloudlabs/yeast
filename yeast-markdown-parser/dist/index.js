@@ -344,7 +344,7 @@ class InlineCodePlugin {
     }
 }
 
-const LINK_REGEX = /\[([^\[\]]*)\]\((.+?)(?:\s["'](.*?)["'])?\)/gi;
+const LINK_REGEX = /\[([^\[\]]*(?:\\.[^\[\]]*)*)\]\((.+?)(?:\s["'](.*?)["'])?\)/gi;
 class InlineLinkPlugin {
     tokenize(text, parser) {
         const tokens = [];
@@ -1006,7 +1006,7 @@ class UnescapeDanglingEscapes {
         return document;
     }
 }
-const ESCAPED_STUFF_REGEX = /\\(__|\*\*|_|\*|\|)/g;
+const ESCAPED_STUFF_REGEX = /\\(__|\*\*|_|\*|\||\[|\])/g;
 function unescapeStuff(nodes) {
     if (!nodes)
         return undefined;
@@ -1021,18 +1021,25 @@ function unescapeStuff(nodes) {
     return nodes;
 }
 
-const TEXT_LINK_REGEX = /https:\/\/[^ )]+/gi;
+const TEXT_LINK_REGEX = /https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
 class InlineTextLinkPlugin {
     tokenize(text, parser) {
         const tokens = [];
         for (const match of text.matchAll(TEXT_LINK_REGEX)) {
+            let linkText = match[0];
+            let offset = 0;
+            let lastChar = linkText.substring(linkText.length - 1);
+            while (['.', ',', '!', '?', ';'].includes(lastChar)) {
+                linkText = linkText.substring(0, linkText.length - 1);
+                lastChar = linkText.substring(linkText.length - 1);
+                offset++;
+            }
             const node = YeastNodeFactory.CreateLinkNode();
-            const linkText = { text: match[0] };
-            node.children = [linkText];
-            node.href = match[0];
+            node.children = [{ text: linkText }];
+            node.href = linkText;
             tokens.push({
                 start: match.index,
-                end: match.index + match[0].length,
+                end: match.index + match[0].length - offset,
                 from: 'InlineLinkPlugin',
                 nodes: [node],
             });

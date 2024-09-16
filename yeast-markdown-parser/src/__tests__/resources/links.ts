@@ -5,6 +5,8 @@ Here's a recursive link: [https://genesys.com](https://genesys.com)
 Parsing a URL as a link https://genesys.com mid-text.
 
 URL with a trailing period: https://genesys.com/asdf. Or https://genesys.com/asdf/. Or even https://genesys.com/asdf.html. Or even this nonsense: https://a.bc.?;,!
+
+Not parsing escaped [brackets \\[inside\\] links](#asdf).
 `;
 
 export const LINK_AST = {
@@ -132,6 +134,28 @@ export const LINK_AST = {
 				},
 				{
 					text: '.?;,!',
+				},
+			],
+			indentation: 0,
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					text: 'Not parsing escaped ',
+				},
+				{
+					type: 'link',
+					children: [
+						{
+							text: 'brackets [inside] links',
+						},
+					],
+					href: '#asdf',
+					title: 'Link',
+				},
+				{
+					text: '.',
 				},
 			],
 			indentation: 0,
