@@ -29,7 +29,6 @@ export class InlineEmphasisPlugin implements InlineTokenizerPlugin {
 		 */
 		const parseMatch = (match: RegExpMatchArray, nodeType: YeastInlineNodeTypes) => {
 			let node: YeastInlineChild;
-			console.log(JSON.stringify(match));
 			if (match.length == 6 && match[1] && match[4]) {
 				node = YeastNodeFactory.CreateText();
 				node.text = `${match[2]}${match[3]}${match[5]}`;

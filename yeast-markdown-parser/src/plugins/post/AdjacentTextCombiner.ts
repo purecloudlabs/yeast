@@ -1,17 +1,4 @@
-import {
-	DocumentNode,
-	isYeastBlockNode,
-	isYeastNodeType,
-	isYeastTextNode,
-	ParagraphNode,
-	PostProcessorPlugin,
-	YeastBlockNodeTypes,
-	YeastChild,
-	YeastInlineNodeTypes,
-	YeastNode,
-	YeastParser,
-	YeastText,
-} from 'yeast-core';
+import { DocumentNode, isYeastNode, isYeastTextNode, PostProcessorPlugin, YeastChild, YeastNode, YeastParser, YeastText } from 'yeast-core';
 
 export class AdjacentTextCombiner implements PostProcessorPlugin {
 	parse(document: DocumentNode, parser: YeastParser): DocumentNode {
@@ -32,7 +19,7 @@ function combine(nodes?: YeastChild[]) {
 			(newNodes[newNodes.length - 1] as YeastText).text += (node as YeastText).text;
 		} else {
 			// Process node's children
-			if (isYeastBlockNode(node)) {
+			if (isYeastNode(node)) {
 				node.children = combine(node.children);
 			}
 

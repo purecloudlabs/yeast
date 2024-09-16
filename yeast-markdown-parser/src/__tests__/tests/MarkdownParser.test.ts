@@ -397,7 +397,7 @@ test('MarkdownParser using all inline plugins', () => {
 	const ast = parser.parse(documentText);
 
 	// Check document
-	checkAstStructureForDefaultDocument(ast, 2);
+	checkAstStructureForDefaultDocument(ast, 3);
 
 	// Paragraph 1
 	expect(ast.children[0].children.length).toBe(26);
@@ -415,7 +415,7 @@ test('MarkdownParser using all inline plugins', () => {
 	expect((ast.children[0].children[23] as LinkNode).type).toBe(YeastInlineNodeTypes.Link);
 	expect((ast.children[0].children[25] as LinkNode).type).toBe(YeastInlineNodeTypes.Link);
 
-	// Paragraph 2
+	// Paragraph 2 - test bold and italic formats and escaping
 	expect(ast.children[1].children.length).toBe(27);
 	expect((ast.children[1].children[1] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
 	expect((ast.children[1].children[3] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
@@ -430,6 +430,14 @@ test('MarkdownParser using all inline plugins', () => {
 	expect((ast.children[1].children[21] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
 	expect((ast.children[1].children[23] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
 	expect((ast.children[1].children[25] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
+
+	// Paragraph 3 -- make sure text reassembly works for inline elements (paragraph above tests for blocks)
+	expect(ast.children[2].children.length).toBe(3);
+	expect((ast.children[2].children[0] as YeastText).text).toBeTruthy();
+	expect((ast.children[2].children[1] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
+	expect((ast.children[2].children[1] as BoldNode).children.length).toBe(1);
+	expect(((ast.children[2].children[1] as BoldNode).children[0] as YeastText).text).toBeTruthy();
+	expect((ast.children[2].children[2] as YeastText).text).toBeTruthy();
 });
 
 test('MarkdownParser using all defaults', () => {
