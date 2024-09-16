@@ -1,9 +1,17 @@
-import { InlineTokenizerPlugin, Token, YeastParser, YeastNodeFactory, YeastInlineNode, YeastInlineNodeTypes } from 'yeast-core';
+import {
+	InlineTokenizerPlugin,
+	Token,
+	YeastParser,
+	YeastNodeFactory,
+	YeastInlineNode,
+	YeastInlineNodeTypes,
+	YeastInlineChild,
+} from 'yeast-core';
 
-const ITALICS_REGEX_UNDERSCORES = /_([^\s_]|\S.*?\S)_/gi;
-const ITALICS_REGEX_ASTERISKS = /\*([^\s_]|\S.*?\S)\*/gi;
-const BOLD_REGEX_UNDERSCORES = /__([^\s_]|\S.*?\S)__/gi;
-const BOLD_REGEX_ASTERISKS = /\*\*([^\s_]|\S.*?\S)\*\*/gi;
+const ITALICS_REGEX_UNDERSCORES = /(\\?)(_)([^\s_]|\S.*?\S)(\\?)(_)/gi;
+const ITALICS_REGEX_ASTERISKS = /(\\?)(\*)([^\s_]|\S.*?\S)(\\?)(\*)/gi;
+const BOLD_REGEX_UNDERSCORES = /(\\?)(__)([^\s_]|\S.*?\S)(\\?)(__)/gi;
+const BOLD_REGEX_ASTERISKS = /(\\?)(\*\*)([^\s_]|\S.*?\S)(\\?)(\*\*)/gi;
 
 /**
  * InlineEmphasisPlugin tokenizes basic markdown syntax for italic text (i.e. underscore).
@@ -11,9 +19,24 @@ const BOLD_REGEX_ASTERISKS = /\*\*([^\s_]|\S.*?\S)\*\*/gi;
 export class InlineEmphasisPlugin implements InlineTokenizerPlugin {
 	tokenize(text: string, parser: YeastParser): void | Token[] {
 		const tokens: Token[] = [];
+
+		/**
+		 * match[1] -> (optional) escape slash
+		 * match[2] -> opening characters
+		 * match[3] -> encased text
+		 * match[4] -> (optional) escape slash
+		 * match[5] -> closing characters
+		 */
 		const parseMatch = (match: RegExpMatchArray, nodeType: YeastInlineNodeTypes) => {
-			const node = YeastNodeFactory.Create(nodeType) as YeastInlineNode;
-			node.children = parser.parseInline(match[1]);
+			let node: YeastInlineChild;
+			console.log(JSON.stringify(match));
+			if (match.length == 6 && match[1] && match[4]) {
+				node = YeastNodeFactory.CreateText();
+				node.text = `${match[2]}${match[3]}${match[5]}`;
+			} else {
+				node = YeastNodeFactory.Create(nodeType) as YeastInlineNode;
+				node.children = parser.parseInline(match[3]);
+			}
 			tokens.push({
 				start: match.index,
 				end: match.index + match[0].length,

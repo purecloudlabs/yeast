@@ -1,4 +1,4 @@
-import { YeastBlockNodeTypes, YeastNodeFactory, YeastInlineNodeTypes, isYeastNodeType, scrapeText, ContentGroupType, YeastParser } from 'yeast-core';
+import { YeastBlockNodeTypes, YeastNodeFactory, YeastInlineNodeTypes, isYeastNodeType, scrapeText, ContentGroupType, isYeastTextNode, isYeastBlockNode, YeastParser } from 'yeast-core';
 import { parse } from 'yaml';
 import { XMLParser } from 'fast-xml-parser';
 
@@ -66,16 +66,24 @@ class ParagraphParserPlugin {
     }
 }
 
-const ITALICS_REGEX_UNDERSCORES = /_([^\s_]|\S.*?\S)_/gi;
-const ITALICS_REGEX_ASTERISKS = /\*([^\s_]|\S.*?\S)\*/gi;
-const BOLD_REGEX_UNDERSCORES = /__([^\s_]|\S.*?\S)__/gi;
-const BOLD_REGEX_ASTERISKS = /\*\*([^\s_]|\S.*?\S)\*\*/gi;
+const ITALICS_REGEX_UNDERSCORES = /(\\?)(_)([^\s_]|\S.*?\S)(\\?)(_)/gi;
+const ITALICS_REGEX_ASTERISKS = /(\\?)(\*)([^\s_]|\S.*?\S)(\\?)(\*)/gi;
+const BOLD_REGEX_UNDERSCORES = /(\\?)(__)([^\s_]|\S.*?\S)(\\?)(__)/gi;
+const BOLD_REGEX_ASTERISKS = /(\\?)(\*\*)([^\s_]|\S.*?\S)(\\?)(\*\*)/gi;
 class InlineEmphasisPlugin {
     tokenize(text, parser) {
         const tokens = [];
         const parseMatch = (match, nodeType) => {
-            const node = YeastNodeFactory.Create(nodeType);
-            node.children = parser.parseInline(match[1]);
+            let node;
+            console.log(JSON.stringify(match));
+            if (match.length == 6 && match[1] && match[4]) {
+                node = YeastNodeFactory.CreateText();
+                node.text = `${match[2]}${match[3]}${match[5]}`;
+            }
+            else {
+                node = YeastNodeFactory.Create(nodeType);
+                node.children = parser.parseInline(match[3]);
+            }
             tokens.push({
                 start: match.index,
                 end: match.index + match[0].length,
@@ -968,6 +976,30 @@ function denest(nodes) {
     return nodes;
 }
 
+class AdjacentTextCombiner {
+    parse(document, parser) {
+        document.children = combine(document.children);
+        return document;
+    }
+}
+function combine(nodes) {
+    if (!nodes)
+        return undefined;
+    let newNodes = [];
+    nodes.forEach((node) => {
+        if (newNodes.length > 0 && isYeastTextNode(node) && isYeastTextNode(newNodes[newNodes.length - 1])) {
+            newNodes[newNodes.length - 1].text += node.text;
+        }
+        else {
+            if (isYeastBlockNode(node)) {
+                node.children = combine(node.children);
+            }
+            newNodes.push(node);
+        }
+    });
+    return newNodes;
+}
+
 const TEXT_LINK_REGEX = /https:\/\/[^ )]+/gi;
 class InlineTextLinkPlugin {
     tokenize(text, parser) {
@@ -1038,6 +1070,7 @@ class MarkdownParser extends YeastParser {
         this.registerRootPlugin(new FrontmatterParserPlugin());
         this.registerPostProcessorPlugin(new PsuedoParagraphScrubber());
         this.registerPostProcessorPlugin(new ParagraphDenester());
+        this.registerPostProcessorPlugin(new AdjacentTextCombiner());
         this.registerBlockPlugin(new HeadingParserPlugin());
         this.registerBlockPlugin(new HorizontalRuleParserPlugin());
         this.registerBlockPlugin(new CalloutParserPlugin());
