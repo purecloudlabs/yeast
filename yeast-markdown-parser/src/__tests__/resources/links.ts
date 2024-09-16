@@ -9,6 +9,10 @@ URL with a trailing period: https://genesys.com/asdf. Or https://genesys.com/asd
 Not parsing escaped [brackets \\[inside\\] links](#asdf).
 
 This is not a link because it's not escaped: \\[brackets \\[inside\\] NOT links](#asdf). why \] ok.
+
+Links with whitespace [ why do you do this   ](    #somewhere  ).
+
+and alt text [     lots more poor spacing   ](    #somewhere   "  goes to somewhere's special. '    ).
 `;
 
 export const LINK_AST = {
@@ -167,6 +171,50 @@ export const LINK_AST = {
 			children: [
 				{
 					text: "This is not a link because it's not escaped: [brackets [inside] NOT links](#asdf). why ] ok.",
+				},
+			],
+			indentation: 0,
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					text: 'Links with whitespace ',
+				},
+				{
+					type: 'link',
+					children: [
+						{
+							text: 'why do you do this',
+						},
+					],
+					href: '#somewhere',
+					title: 'Link',
+				},
+				{
+					text: '.',
+				},
+			],
+			indentation: 0,
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					text: 'and alt text ',
+				},
+				{
+					type: 'link',
+					children: [
+						{
+							text: 'lots more poor spacing',
+						},
+					],
+					href: '#somewhere',
+					title: "goes to somewhere's special.",
+				},
+				{
+					text: '.',
 				},
 			],
 			indentation: 0,

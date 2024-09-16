@@ -344,13 +344,12 @@ class InlineCodePlugin {
     }
 }
 
-const LINK_REGEX = /\[([^\[\]]*(?:\\.[^\[\]]*)*)\]\((.+?)(?:\s["'](.*?)["'])?\)/gi;
+const LINK_REGEX = /\[\s*([^\[\]]*?(?:\\.[^\[\]]*?)*?)\s*\]\(\s*(\S+)(?:\s+["']\s*(.*?)\s*["'])?\s*\)/gi;
 class InlineLinkPlugin {
     tokenize(text, parser) {
         const tokens = [];
         for (const match of text.matchAll(LINK_REGEX)) {
             const charBefore = text.charAt(match.index - 1);
-            console.log(`%%${charBefore}%%`, match[0]);
             if (charBefore === '!' || charBefore === '\\') {
                 continue;
             }

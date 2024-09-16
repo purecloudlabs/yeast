@@ -1,6 +1,6 @@
 import { InlineTokenizerPlugin, Token, YeastParser, YeastNodeFactory, isYeastNodeType, YeastInlineNodeTypes, scrapeText } from 'yeast-core';
 
-const LINK_REGEX = /\[([^\[\]]*(?:\\.[^\[\]]*)*)\]\((.+?)(?:\s["'](.*?)["'])?\)/gi;
+const LINK_REGEX = /\[\s*([^\[\]]*?(?:\\.[^\[\]]*?)*?)\s*\]\(\s*(\S+)(?:\s+["']\s*(.*?)\s*["'])?\s*\)/gi;
 
 export class InlineLinkPlugin implements InlineTokenizerPlugin {
 	tokenize(text: string, parser: YeastParser): void | Token[] {
