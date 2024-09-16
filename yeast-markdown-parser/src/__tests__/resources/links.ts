@@ -1,6 +1,11 @@
 export const LINK_MARKDOWN = `[/Genesys/developercenter](https://developer.genesys.cloud/ 'single quote text')tellus et pretium tempus, https://developer.genesys.cloud/
 
-Here's a recursive link: [https://genesys.com](https://genesys.com)`;
+Here's a recursive link: [https://genesys.com](https://genesys.com)
+
+Parsing a URL as a link https://genesys.com mid-text.
+
+URL with a trailing period: https://genesys.com/asdf. Or https://genesys.com/asdf/. Or even https://genesys.com/asdf.html. Or even this nonsense: https://a.bc.?;,!
+`;
 
 export const LINK_AST = {
 	type: 'document',
@@ -49,6 +54,84 @@ export const LINK_AST = {
 					],
 					href: 'https://genesys.com',
 					title: 'Link',
+				},
+			],
+			indentation: 0,
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					text: 'Parsing a URL as a link ',
+				},
+				{
+					type: 'link',
+					children: [
+						{
+							text: 'https://genesys.com',
+						},
+					],
+					href: 'https://genesys.com',
+				},
+				{
+					text: ' mid-text.',
+				},
+			],
+			indentation: 0,
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					text: 'URL with a trailing period: ',
+				},
+				{
+					type: 'link',
+					children: [
+						{
+							text: 'https://genesys.com/asdf',
+						},
+					],
+					href: 'https://genesys.com/asdf',
+				},
+				{
+					text: '. Or ',
+				},
+				{
+					type: 'link',
+					children: [
+						{
+							text: 'https://genesys.com/asdf/',
+						},
+					],
+					href: 'https://genesys.com/asdf/',
+				},
+				{
+					text: '. Or even ',
+				},
+				{
+					type: 'link',
+					children: [
+						{
+							text: 'https://genesys.com/asdf.html',
+						},
+					],
+					href: 'https://genesys.com/asdf.html',
+				},
+				{
+					text: '. Or even this nonsense: ',
+				},
+				{
+					type: 'link',
+					children: [
+						{
+							text: 'https://a.bc',
+						},
+					],
+					href: 'https://a.bc',
+				},
+				{
+					text: '.?;,!',
 				},
 			],
 			indentation: 0,

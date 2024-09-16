@@ -510,6 +510,7 @@ test('MarkdownParser parses hyperlink in text', () => {
 
 	// Parse
 	const ast = parser.parse(LINK_MARKDOWN);
+	// debugAST('links', ast);
 
 	expect(JSON.stringify(ast)).toBe(JSON.stringify(LINK_AST));
 });
