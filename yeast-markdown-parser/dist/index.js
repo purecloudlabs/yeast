@@ -349,7 +349,9 @@ class InlineLinkPlugin {
     tokenize(text, parser) {
         const tokens = [];
         for (const match of text.matchAll(LINK_REGEX)) {
-            if (text.charAt(match.index - 1) === '!') {
+            const charBefore = text.charAt(match.index - 1);
+            console.log(`%%${charBefore}%%`, match[0]);
+            if (charBefore === '!' || charBefore === '\\') {
                 continue;
             }
             const node = YeastNodeFactory.CreateLinkNode();
