@@ -1,4 +1,4 @@
-import { YeastBlockNodeTypes, YeastNodeFactory, YeastInlineNodeTypes, isYeastNodeType, scrapeText, ContentGroupType, isYeastTextNode, isYeastBlockNode, YeastParser } from 'yeast-core';
+import { YeastBlockNodeTypes, YeastNodeFactory, YeastInlineNodeTypes, isYeastNodeType, scrapeText, ContentGroupType, isYeastTextNode, isYeastNode, YeastParser } from 'yeast-core';
 import { parse } from 'yaml';
 import { XMLParser } from 'fast-xml-parser';
 
@@ -75,7 +75,6 @@ class InlineEmphasisPlugin {
         const tokens = [];
         const parseMatch = (match, nodeType) => {
             let node;
-            console.log(JSON.stringify(match));
             if (match.length == 6 && match[1] && match[4]) {
                 node = YeastNodeFactory.CreateText();
                 node.text = `${match[2]}${match[3]}${match[5]}`;
@@ -741,7 +740,8 @@ const keyExists = (arr, key) => {
 const IS_TABLE = /^\s*(.+?)\s*\|\s*(.+)(?:\||$)/;
 const IS_ALIGNMENT_ROW = /^.*\s*:*-+:*\s*\|\s*:*-+:*\s*\|{0,1}$/;
 const ALIGNMENT_CELL = /^\s*\|{0,1}\s*(:*)-+(:*)\s*(?:\||$)/;
-const CELL_CONTENT = /^\s*([^|\\]+?)\s*(\||\\\s*$|$)/;
+const CELL_CONTENT = /^\s*((?:\\\||[^|])+?)\s*(\||\\\s*$|$)/;
+const CELL_PIPE_FINDER = /\\\|/g;
 const CELL_NORMALIZER = /^\s*\|{0,1}/;
 const TABLE_CLASS = /^\s*\{:\s*class\s*=\s*["'](.+?)["']\s*\}/i;
 class TableParserPlugin {
@@ -829,7 +829,7 @@ const parseLine = (line, alignment, parser) => {
         if (!isCell)
             continue;
         const cell = YeastNodeFactory.CreateTableCellNode();
-        cell.children = parser.parseBlock(cellContentMatch[1]);
+        cell.children = parser.parseBlock(cellContentMatch[1].replaceAll(CELL_PIPE_FINDER, '|'));
         if (cell.children.length === 0)
             cell.children.push(YeastNodeFactory.CreateParagraphNode());
         cell.align = alignment ? alignment[columnNumber] : 'left';
@@ -991,7 +991,7 @@ function combine(nodes) {
             newNodes[newNodes.length - 1].text += node.text;
         }
         else {
-            if (isYeastBlockNode(node)) {
+            if (isYeastNode(node)) {
                 node.children = combine(node.children);
             }
             newNodes.push(node);

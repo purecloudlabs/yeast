@@ -39,6 +39,7 @@ import { InlineEmphasisPlugin } from '../../plugins/inline/InlineEmphasisPlugin'
 
 import { IMAGE_AST, IMAGE_LINKS_AST, IMAGE_LINKS_MARKDOWN, IMAGE_MARKDOWN } from '../resources/images';
 import { LINK_AST, LINK_MARKDOWN } from '../resources/links';
+import { TABLE_AST } from '../resources/table-data';
 
 const standardBlockPluginCount = 10;
 const standardInlinePluginCount = 7;
@@ -152,26 +153,13 @@ test('MarkdownParser using TableParserPlugin', () => {
 	// Check plugins
 	checkParserPlugins(parser, 13, standardInlinePluginCount);
 
+	// Parse
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/tables.md'), 'utf8');
 	const ast = parser.parse(documentText);
-	expect(ast.children[0].children.length).toBe(3);
-	expect((ast.children[0] as TableNode).children[0].header).toBeTruthy();
-	// table > tablerow > tablecell > paragraph > text
-	expect((((ast.children[0] as TableNode).children[1].children[0].children[0] as YeastNode).children[0] as YeastText).text).toBe('Header');
-	expect(((ast.children[0] as TableNode).children[2].children[1].children[0] as BoldNode).type).toBe('bold');
-	expect((ast.children[1] as TableNode).children[0].header).toBeTruthy();
-	expect((ast.children[1] as TableNode).align).toBe('L|C|R');
-	expect((ast.children[2] as TableNode).filterable).toBeTruthy();
-	expect((ast.children[2] as TableNode).sortable).toBeTruthy();
-	expect((ast.children[3].children[0] as TableRowNode).children[1].align).toBe('right');
-	expect((ast.children[3].children[0] as TableRowNode).children[0].align).toBe('center');
-	expect((ast.children[3] as TableNode).align).toBe('C|R');
-	expect((ast.children[3] as TableNode).sortable).toBeUndefined();
-	expect((ast.children[4] as TableNode).children[0].header).toBeFalsy();
-	expect((ast.children[5] as TableNode).children.length).toBe(7);
+	debugAST('tables', ast);
 
-	// Check document
-	checkAstStructureForDefaultDocument(ast, 6);
+	// Validate AST
+	expect(JSON.stringify(ast)).toBe(JSON.stringify(TABLE_AST));
 });
 
 test('MarkdownParser using BlockquoteParserPlugin', () => {

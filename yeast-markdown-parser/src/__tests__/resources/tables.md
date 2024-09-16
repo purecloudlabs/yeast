@@ -31,3 +31,6 @@
 | Italic        | _Do you know who I am?_ or *DO YOU KNOW WHO I AM?* |
 | Bold          | **I AM THE JUGGERNAUT!**                           |
 | Image         | ![Cat pic](https://cats.com 'Cuteness overload')   |
+| Escaped Pipes | The pipe character: \| -- like a\|b\|c |
+| escaped other things | **some\_function\_name** |
+| failed attempt at table nesting injection | \| table? \| what \| |
