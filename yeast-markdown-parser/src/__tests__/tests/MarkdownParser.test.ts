@@ -156,7 +156,7 @@ test('MarkdownParser using TableParserPlugin', () => {
 	// Parse
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/tables.md'), 'utf8');
 	const ast = parser.parse(documentText);
-	debugAST('tables', ast);
+	// debugAST('tables', ast);
 
 	// Validate AST
 	expect(JSON.stringify(ast)).toBe(JSON.stringify(TABLE_AST));
@@ -383,9 +383,10 @@ test('MarkdownParser using all inline plugins', () => {
 	// Parse
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/everythinginline.md'), 'utf8');
 	const ast = parser.parse(documentText);
+	// debugAST('everythinginline', ast);
 
 	// Check document
-	checkAstStructureForDefaultDocument(ast, 3);
+	checkAstStructureForDefaultDocument(ast, 4);
 
 	// Paragraph 1
 	expect(ast.children[0].children.length).toBe(26);
@@ -426,6 +427,10 @@ test('MarkdownParser using all inline plugins', () => {
 	expect((ast.children[2].children[1] as BoldNode).children.length).toBe(1);
 	expect(((ast.children[2].children[1] as BoldNode).children[0] as YeastText).text).toBeTruthy();
 	expect((ast.children[2].children[2] as YeastText).text).toBeTruthy();
+
+	// Paragraph 4 - dangling unescapes
+	expect(ast.children[3].children.length).toBe(1);
+	expect((ast.children[3].children[0] as YeastText).text).toBe('Dangling escaped markers, like * or __ or |, should get unescaped.');
 });
 
 test('MarkdownParser using all defaults', () => {

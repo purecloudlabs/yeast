@@ -3,3 +3,5 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. ~Nulla viverra~ tortor 
 This paragraph tests _non_standard touching use cases. Sin_gle_ cha*racters* _i_n *wo*rds are f_o_r i*talic*s. Characters * surrounded * by _ whitespace _ are ignored. Es\_ca\_ped ch\*ar\*acters a\__re\__ n\**ot\** \**parsed out\** \_but\_ \*are\* \__rendered without\__ escape characters. Dou__ble__ cha**racters** __i__n **wo**rds are f__o__r b**ol**d.
 
 Check **that \_escaped text\_ inside bold text** is reassembed into one text node.
+
+Dangling escaped markers, like \* or \__ or \|, should get unescaped.

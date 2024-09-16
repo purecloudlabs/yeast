@@ -18,6 +18,7 @@ import { TableParserPlugin } from './plugins/block/TableParser';
 import { PsuedoParagraphScrubber } from './plugins/post/PsuedoParagraphScrubber';
 import { ParagraphDenester } from './plugins/post/ParagraphDenester';
 import { AdjacentTextCombiner } from './plugins/post/AdjacentTextCombiner';
+import { UnescapeDanglingEscapes } from './plugins/post/UnescapeDanglingEscapes';
 import { InlineTextLinkPlugin } from './plugins/inline/InlineTextLinkPlugin';
 import { InlineImagePlugin } from './plugins/inline/InlineImagePlugin';
 import { InlineImageLinkPlugin } from './plugins/inline/InlineImageLinkPlugin';
@@ -31,6 +32,7 @@ export class MarkdownParser extends YeastParser {
 		this.registerPostProcessorPlugin(new PsuedoParagraphScrubber());
 		this.registerPostProcessorPlugin(new ParagraphDenester());
 		this.registerPostProcessorPlugin(new AdjacentTextCombiner());
+		this.registerPostProcessorPlugin(new UnescapeDanglingEscapes());
 
 		this.registerBlockPlugin(new HeadingParserPlugin());
 		this.registerBlockPlugin(new HorizontalRuleParserPlugin());

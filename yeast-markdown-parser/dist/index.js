@@ -1000,6 +1000,27 @@ function combine(nodes) {
     return newNodes;
 }
 
+class UnescapeDanglingEscapes {
+    parse(document, parser) {
+        document.children = unescapeStuff(document.children);
+        return document;
+    }
+}
+const ESCAPED_STUFF_REGEX = /\\(__|\*\*|_|\*|\|)/g;
+function unescapeStuff(nodes) {
+    if (!nodes)
+        return undefined;
+    nodes.forEach((node) => {
+        if (isYeastTextNode(node)) {
+            node.text = node.text.replaceAll(ESCAPED_STUFF_REGEX, '$1');
+        }
+        if (isYeastNode(node)) {
+            node.children = unescapeStuff(node.children);
+        }
+    });
+    return nodes;
+}
+
 const TEXT_LINK_REGEX = /https:\/\/[^ )]+/gi;
 class InlineTextLinkPlugin {
     tokenize(text, parser) {
@@ -1071,6 +1092,7 @@ class MarkdownParser extends YeastParser {
         this.registerPostProcessorPlugin(new PsuedoParagraphScrubber());
         this.registerPostProcessorPlugin(new ParagraphDenester());
         this.registerPostProcessorPlugin(new AdjacentTextCombiner());
+        this.registerPostProcessorPlugin(new UnescapeDanglingEscapes());
         this.registerBlockPlugin(new HeadingParserPlugin());
         this.registerBlockPlugin(new HorizontalRuleParserPlugin());
         this.registerBlockPlugin(new CalloutParserPlugin());
