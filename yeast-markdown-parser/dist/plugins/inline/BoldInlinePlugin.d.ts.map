@@ -1,1 +1,0 @@
-{"version":3,"file":"BoldInlinePlugin.d.ts","sourceRoot":"","sources":["../../../src/plugins/inline/BoldInlinePlugin.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,qBAAqB,EAAE,KAAK,EAAE,WAAW,EAAoB,MAAM,YAAY,CAAC;AAOzF,qBAAa,gBAAiB,YAAW,qBAAqB;IAC7D,QAAQ,CAAC,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,WAAW,GAAG,IAAI,GAAG,KAAK,EAAE;CAe3D"}

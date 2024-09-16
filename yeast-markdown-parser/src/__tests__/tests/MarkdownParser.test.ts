@@ -19,6 +19,7 @@ import {
 	TableNode,
 	TableRowNode,
 	YeastInlineChild,
+	YeastInlineNodeTypes,
 	YeastNode,
 	YeastText,
 } from 'yeast-core';
@@ -34,13 +35,13 @@ import { HorizontalRuleParserPlugin } from '../../plugins/block/HorizontalRulePa
 import { ListParserPlugin } from '../../plugins/block/ListParserPlugin';
 import { ParagraphParserPlugin } from '../../plugins/block/ParagraphParserPlugin';
 import { TableParserPlugin } from '../../plugins/block/TableParser';
-import { BoldInlinePlugin } from '../../plugins/inline/BoldInlinePlugin';
+import { InlineEmphasisPlugin } from '../../plugins/inline/InlineEmphasisPlugin';
 
 import { IMAGE_AST, IMAGE_LINKS_AST, IMAGE_LINKS_MARKDOWN, IMAGE_MARKDOWN } from '../resources/images';
 import { LINK_AST, LINK_MARKDOWN } from '../resources/links';
 
 const standardBlockPluginCount = 10;
-const standardInlinePluginCount = 8;
+const standardInlinePluginCount = 7;
 
 test('MarkdownParser with no plugins should create root document with frontmatter', () => {
 	// Initialize parser
@@ -149,7 +150,7 @@ test('MarkdownParser using TableParserPlugin', () => {
 	parser.registerBlockPlugin(new ParagraphParserPlugin());
 
 	// Check plugins
-	checkParserPlugins(parser, 13, 8);
+	checkParserPlugins(parser, 13, standardInlinePluginCount);
 
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/tables.md'), 'utf8');
 	const ast = parser.parse(documentText);
@@ -247,7 +248,7 @@ test('MarkdownParser using ContentGroupParserPlugin', () => {
 	const parser = new MarkdownParser();
 	parser.clearBlockPlugins();
 	parser.clearInlinePlugins();
-	parser.registerInlinePlugin(new BoldInlinePlugin());
+	parser.registerInlinePlugin(new InlineEmphasisPlugin());
 	parser.registerBlockPlugin(new ContentGroupParserPlugin());
 	parser.registerBlockPlugin(new CodeParserPlugin());
 	parser.registerBlockPlugin(new ParagraphParserPlugin());
@@ -396,22 +397,39 @@ test('MarkdownParser using all inline plugins', () => {
 	const ast = parser.parse(documentText);
 
 	// Check document
-	checkAstStructureForDefaultDocument(ast, 1);
-	expect(ast.children.length).toBe(1);
+	checkAstStructureForDefaultDocument(ast, 2);
+
+	// Paragraph 1
 	expect(ast.children[0].children.length).toBe(26);
-	expect((ast.children[0].children[1] as StrikethroughNode).type).toBe('strikethrough');
-	expect((ast.children[0].children[3] as InlineCodeNode).type).toBe('inlinecode');
-	expect((ast.children[0].children[5] as ItalicNode).type).toBe('italic');
-	expect((ast.children[0].children[7] as ItalicNode).type).toBe('italic');
-	expect((ast.children[0].children[9] as BoldNode).type).toBe('bold');
-	expect((ast.children[0].children[11] as InlineCodeNode).type).toBe('inlinecode');
-	expect((ast.children[0].children[13] as ImageNode).type).toBe('image');
-	expect((ast.children[0].children[15] as ImageNode).type).toBe('image');
-	expect((ast.children[0].children[17] as ImageNode).type).toBe('image');
-	expect((ast.children[0].children[19] as LinkNode).type).toBe('link');
-	expect((ast.children[0].children[21] as LinkNode).type).toBe('link');
-	expect((ast.children[0].children[23] as LinkNode).type).toBe('link');
-	expect((ast.children[0].children[25] as LinkNode).type).toBe('link');
+	expect((ast.children[0].children[1] as StrikethroughNode).type).toBe(YeastInlineNodeTypes.Strikethrough);
+	expect((ast.children[0].children[3] as InlineCodeNode).type).toBe(YeastInlineNodeTypes.Code);
+	expect((ast.children[0].children[5] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
+	expect((ast.children[0].children[7] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
+	expect((ast.children[0].children[9] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
+	expect((ast.children[0].children[11] as InlineCodeNode).type).toBe(YeastInlineNodeTypes.Code);
+	expect((ast.children[0].children[13] as ImageNode).type).toBe(YeastInlineNodeTypes.Image);
+	expect((ast.children[0].children[15] as ImageNode).type).toBe(YeastInlineNodeTypes.Image);
+	expect((ast.children[0].children[17] as ImageNode).type).toBe(YeastInlineNodeTypes.Image);
+	expect((ast.children[0].children[19] as LinkNode).type).toBe(YeastInlineNodeTypes.Link);
+	expect((ast.children[0].children[21] as LinkNode).type).toBe(YeastInlineNodeTypes.Link);
+	expect((ast.children[0].children[23] as LinkNode).type).toBe(YeastInlineNodeTypes.Link);
+	expect((ast.children[0].children[25] as LinkNode).type).toBe(YeastInlineNodeTypes.Link);
+
+	// Paragraph 2
+	expect(ast.children[1].children.length).toBe(27);
+	expect((ast.children[1].children[1] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
+	expect((ast.children[1].children[3] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
+	expect((ast.children[1].children[5] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
+	expect((ast.children[1].children[7] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
+	expect((ast.children[1].children[9] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
+	expect((ast.children[1].children[11] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
+	expect((ast.children[1].children[13] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
+	expect((ast.children[1].children[15] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
+	expect((ast.children[1].children[17] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
+	expect((ast.children[1].children[19] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
+	expect((ast.children[1].children[21] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
+	expect((ast.children[1].children[23] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
+	expect((ast.children[1].children[25] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
 });
 
 test('MarkdownParser using all defaults', () => {
@@ -525,4 +543,13 @@ function checkAstStructureForDefaultDocument(ast: DocumentNode, childrenCount: n
 	expect(ast.children).not.toBeUndefined();
 	expect(ast.children.length).toBe(childrenCount);
 	expect(Object.keys(ast).length).toBe(3);
+}
+
+// debugAST prints the AST document to the console log and writes it to a local file in the debug directory
+function debugAST(testName: string, ast: DocumentNode) {
+	console.log(JSON.stringify(ast, null, 2));
+	if (!fs.existsSync('./debug/')) {
+		fs.mkdirSync('debug');
+	}
+	fs.writeFileSync(`./debug/${(testName || 'unnamed').replaceAll(/[^a-z0-9]/gi, '_')}.json`, JSON.stringify(ast, null, 2));
 }

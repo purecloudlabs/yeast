@@ -1,8 +1,7 @@
 import { MarkdownParser } from './MarkdownParser';
 import { FrontmatterParserPlugin } from './plugins/root/FrontmatterParserPlugin';
 import { ParagraphParserPlugin } from './plugins/block/ParagraphParserPlugin';
-import { ItalicsInlinePlugin } from './plugins/inline/ItalicsInlinePlugin';
-import { BoldInlinePlugin } from './plugins/inline/BoldInlinePlugin';
+import { InlineEmphasisPlugin } from './plugins/inline/InlineEmphasisPlugin';
 import { HeadingParserPlugin } from './plugins/block/HeadingParserPlugin';
 import { ListParserPlugin } from './plugins/block/ListParserPlugin';
 import { ImageParserPlugin } from 'plugins/block/ImageParserPlugin';
@@ -21,8 +20,7 @@ export {
 	MarkdownParser,
 	FrontmatterParserPlugin,
 	ParagraphParserPlugin,
-	ItalicsInlinePlugin,
-	BoldInlinePlugin,
+	InlineEmphasisPlugin,
 	HeadingParserPlugin,
 	ListParserPlugin,
 	ImageParserPlugin,

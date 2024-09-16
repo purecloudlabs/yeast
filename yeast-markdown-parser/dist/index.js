@@ -1,4 +1,4 @@
-import { YeastBlockNodeTypes, YeastNodeFactory, isYeastNodeType, YeastInlineNodeTypes, scrapeText, ContentGroupType, YeastParser } from 'yeast-core';
+import { YeastBlockNodeTypes, YeastNodeFactory, YeastInlineNodeTypes, isYeastNodeType, scrapeText, ContentGroupType, YeastParser } from 'yeast-core';
 import { parse } from 'yaml';
 import { XMLParser } from 'fast-xml-parser';
 
@@ -66,19 +66,34 @@ class ParagraphParserPlugin {
     }
 }
 
-const ITALICS_REGEX = /_(\S.+?)_/gi;
-class ItalicsInlinePlugin {
+const ITALICS_REGEX_UNDERSCORES = /_([^\s_]|\S.*?\S)_/gi;
+const ITALICS_REGEX_ASTERISKS = /\*([^\s_]|\S.*?\S)\*/gi;
+const BOLD_REGEX_UNDERSCORES = /__([^\s_]|\S.*?\S)__/gi;
+const BOLD_REGEX_ASTERISKS = /\*\*([^\s_]|\S.*?\S)\*\*/gi;
+class InlineEmphasisPlugin {
     tokenize(text, parser) {
         const tokens = [];
-        for (const match of text.matchAll(ITALICS_REGEX)) {
-            const node = YeastNodeFactory.CreateItalicNode();
+        const parseMatch = (match, nodeType) => {
+            const node = YeastNodeFactory.Create(nodeType);
             node.children = parser.parseInline(match[1]);
             tokens.push({
                 start: match.index,
                 end: match.index + match[0].length,
-                from: 'ItalicsInlinePlugin',
+                from: 'InlineEmphasisPlugin',
                 nodes: [node],
             });
+        };
+        for (const match of text.matchAll(BOLD_REGEX_UNDERSCORES)) {
+            parseMatch(match, YeastInlineNodeTypes.Bold);
+        }
+        for (const match of text.matchAll(BOLD_REGEX_ASTERISKS)) {
+            parseMatch(match, YeastInlineNodeTypes.Bold);
+        }
+        for (const match of text.matchAll(ITALICS_REGEX_UNDERSCORES)) {
+            parseMatch(match, YeastInlineNodeTypes.Italic);
+        }
+        for (const match of text.matchAll(ITALICS_REGEX_ASTERISKS)) {
+            parseMatch(match, YeastInlineNodeTypes.Italic);
         }
         const textArr = text.split('');
         let index = 0;
@@ -113,24 +128,6 @@ class ItalicsInlinePlugin {
                 }
             }
             index++;
-        }
-        return tokens;
-    }
-}
-
-const BOLD_REGEX = /\*\*(\S.+?)\*\*/gi;
-class BoldInlinePlugin {
-    tokenize(text, parser) {
-        const tokens = [];
-        for (const match of text.matchAll(BOLD_REGEX)) {
-            const node = YeastNodeFactory.CreateBoldNode();
-            node.children = parser.parseInline(match[1]);
-            tokens.push({
-                start: match.index,
-                end: match.index + match[0].length,
-                from: 'BoldInlinePlugin',
-                nodes: [node],
-            });
         }
         return tokens;
     }
@@ -1053,8 +1050,7 @@ class MarkdownParser extends YeastParser {
         this.registerBlockPlugin(new ParagraphParserPlugin());
         this.registerInlinePlugin(new InlineCodePlugin());
         this.registerInlinePlugin(new InlineStrikeThroughPlugin());
-        this.registerInlinePlugin(new ItalicsInlinePlugin());
-        this.registerInlinePlugin(new BoldInlinePlugin());
+        this.registerInlinePlugin(new InlineEmphasisPlugin());
         this.registerInlinePlugin(new InlineImageLinkPlugin());
         this.registerInlinePlugin(new InlineImagePlugin());
         this.registerInlinePlugin(new InlineLinkPlugin());
@@ -1081,5 +1077,5 @@ class ImageParserPlugin {
     }
 }
 
-export { BlockquoteParserPlugin, BoldInlinePlugin, CalloutParserPlugin, CodeParserPlugin, ContentGroupParserPlugin, CustomComponentParserPlugin, FrontmatterParserPlugin, HeadingParserPlugin, HorizontalRuleParserPlugin, ImageParserPlugin, InlineCodePlugin, InlineImageLinkPlugin, InlineLinkPlugin, InlineStrikeThroughPlugin, ItalicsInlinePlugin, ListParserPlugin, MarkdownParser, ParagraphParserPlugin, TableParserPlugin };
+export { BlockquoteParserPlugin, CalloutParserPlugin, CodeParserPlugin, ContentGroupParserPlugin, CustomComponentParserPlugin, FrontmatterParserPlugin, HeadingParserPlugin, HorizontalRuleParserPlugin, ImageParserPlugin, InlineCodePlugin, InlineEmphasisPlugin, InlineImageLinkPlugin, InlineLinkPlugin, InlineStrikeThroughPlugin, ListParserPlugin, MarkdownParser, ParagraphParserPlugin, TableParserPlugin };
 //# sourceMappingURL=index.js.map

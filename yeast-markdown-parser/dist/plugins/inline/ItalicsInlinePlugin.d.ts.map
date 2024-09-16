@@ -1,1 +1,0 @@
-{"version":3,"file":"ItalicsInlinePlugin.d.ts","sourceRoot":"","sources":["../../../src/plugins/inline/ItalicsInlinePlugin.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,qBAAqB,EAAE,KAAK,EAAE,WAAW,EAAoB,MAAM,YAAY,CAAC;AAOzF,qBAAa,mBAAoB,YAAW,qBAAqB;IAChE,QAAQ,CAAC,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,WAAW,GAAG,IAAI,GAAG,KAAK,EAAE;CAmD3D"}

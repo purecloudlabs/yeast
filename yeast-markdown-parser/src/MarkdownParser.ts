@@ -2,8 +2,7 @@ import { YeastParser } from 'yeast-core';
 
 import { FrontmatterParserPlugin } from './plugins/root/FrontmatterParserPlugin';
 import { ParagraphParserPlugin } from './plugins/block/ParagraphParserPlugin';
-import { ItalicsInlinePlugin } from './plugins/inline/ItalicsInlinePlugin';
-import { BoldInlinePlugin } from './plugins/inline/BoldInlinePlugin';
+import { InlineEmphasisPlugin } from './plugins/inline/InlineEmphasisPlugin';
 import { HeadingParserPlugin } from './plugins/block/HeadingParserPlugin';
 import { ListParserPlugin } from './plugins/block/ListParserPlugin';
 import { InlineStrikeThroughPlugin } from './plugins/inline/InlineStrikeThroughPlugin';
@@ -44,8 +43,7 @@ export class MarkdownParser extends YeastParser {
 
 		this.registerInlinePlugin(new InlineCodePlugin());
 		this.registerInlinePlugin(new InlineStrikeThroughPlugin());
-		this.registerInlinePlugin(new ItalicsInlinePlugin());
-		this.registerInlinePlugin(new BoldInlinePlugin());
+		this.registerInlinePlugin(new InlineEmphasisPlugin());
 		this.registerInlinePlugin(new InlineImageLinkPlugin());
 		this.registerInlinePlugin(new InlineImagePlugin());
 		this.registerInlinePlugin(new InlineLinkPlugin());

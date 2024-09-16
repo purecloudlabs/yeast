@@ -1,19 +1,20 @@
 {
-  "compilerOptions": {
-    "module": "esnext",
-    "target": "es6",
-    "outDir": "./dist",
-    "baseUrl": "./src",
-    "moduleResolution": "node",
-    "declaration": true,
-    "declarationDir": "dist",
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "declarationMap": true,
-    "inlineSourceMap": true
-  },
-  "include": ["./src/**/*"],
-  "exclude": ["./node_modules", "./dist/**/*"]
+	"compilerOptions": {
+		"module": "esnext",
+		"target": "es6",
+		"lib": ["ESNext"],
+		"outDir": "./dist",
+		"baseUrl": "./src",
+		"moduleResolution": "node",
+		"declaration": true,
+		"declarationDir": "dist",
+		"removeComments": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"allowSyntheticDefaultImports": true,
+		"declarationMap": true,
+		"inlineSourceMap": true
+	},
+	"include": ["./src/**/*"],
+	"exclude": ["./node_modules", "./dist/**/*"]
 }
