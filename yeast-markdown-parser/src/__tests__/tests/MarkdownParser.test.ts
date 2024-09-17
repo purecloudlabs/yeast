@@ -40,6 +40,7 @@ import { InlineEmphasisPlugin } from '../../plugins/inline/InlineEmphasisPlugin'
 import { IMAGE_AST, IMAGE_LINKS_AST, IMAGE_LINKS_MARKDOWN, IMAGE_MARKDOWN } from '../resources/images';
 import { LINK_AST, LINK_MARKDOWN } from '../resources/links';
 import { TABLE_AST } from '../resources/table-data';
+import { EVERYTHING_INLINE_AST } from '../resources/everythinginline';
 
 const standardBlockPluginCount = 10;
 const standardInlinePluginCount = 7;
@@ -386,51 +387,10 @@ test('MarkdownParser using all inline plugins', () => {
 	// debugAST('everythinginline', ast);
 
 	// Check document
-	checkAstStructureForDefaultDocument(ast, 4);
+	checkAstStructureForDefaultDocument(ast, 8);
 
-	// Paragraph 1
-	expect(ast.children[0].children.length).toBe(26);
-	expect((ast.children[0].children[1] as StrikethroughNode).type).toBe(YeastInlineNodeTypes.Strikethrough);
-	expect((ast.children[0].children[3] as InlineCodeNode).type).toBe(YeastInlineNodeTypes.Code);
-	expect((ast.children[0].children[5] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
-	expect((ast.children[0].children[7] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
-	expect((ast.children[0].children[9] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
-	expect((ast.children[0].children[11] as InlineCodeNode).type).toBe(YeastInlineNodeTypes.Code);
-	expect((ast.children[0].children[13] as ImageNode).type).toBe(YeastInlineNodeTypes.Image);
-	expect((ast.children[0].children[15] as ImageNode).type).toBe(YeastInlineNodeTypes.Image);
-	expect((ast.children[0].children[17] as ImageNode).type).toBe(YeastInlineNodeTypes.Image);
-	expect((ast.children[0].children[19] as LinkNode).type).toBe(YeastInlineNodeTypes.Link);
-	expect((ast.children[0].children[21] as LinkNode).type).toBe(YeastInlineNodeTypes.Link);
-	expect((ast.children[0].children[23] as LinkNode).type).toBe(YeastInlineNodeTypes.Link);
-	expect((ast.children[0].children[25] as LinkNode).type).toBe(YeastInlineNodeTypes.Link);
-
-	// Paragraph 2 - test bold and italic formats and escaping
-	expect(ast.children[1].children.length).toBe(27);
-	expect((ast.children[1].children[1] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
-	expect((ast.children[1].children[3] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
-	expect((ast.children[1].children[5] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
-	expect((ast.children[1].children[7] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
-	expect((ast.children[1].children[9] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
-	expect((ast.children[1].children[11] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
-	expect((ast.children[1].children[13] as ItalicNode).type).toBe(YeastInlineNodeTypes.Italic);
-	expect((ast.children[1].children[15] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
-	expect((ast.children[1].children[17] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
-	expect((ast.children[1].children[19] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
-	expect((ast.children[1].children[21] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
-	expect((ast.children[1].children[23] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
-	expect((ast.children[1].children[25] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
-
-	// Paragraph 3 -- make sure text reassembly works for inline elements (paragraph above tests for blocks)
-	expect(ast.children[2].children.length).toBe(3);
-	expect((ast.children[2].children[0] as YeastText).text).toBeTruthy();
-	expect((ast.children[2].children[1] as BoldNode).type).toBe(YeastInlineNodeTypes.Bold);
-	expect((ast.children[2].children[1] as BoldNode).children.length).toBe(1);
-	expect(((ast.children[2].children[1] as BoldNode).children[0] as YeastText).text).toBeTruthy();
-	expect((ast.children[2].children[2] as YeastText).text).toBeTruthy();
-
-	// Paragraph 4 - dangling unescapes
-	expect(ast.children[3].children.length).toBe(1);
-	expect((ast.children[3].children[0] as YeastText).text).toBe('Dangling escaped markers, like * or __ or |, should get unescaped.');
+	// Validate AST
+	expect(JSON.stringify(ast)).toBe(JSON.stringify(EVERYTHING_INLINE_AST));
 });
 
 test('MarkdownParser using all defaults', () => {

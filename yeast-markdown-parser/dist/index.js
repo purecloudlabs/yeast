@@ -66,25 +66,21 @@ class ParagraphParserPlugin {
     }
 }
 
-const ITALICS_REGEX_UNDERSCORES = /(\\?)(_)([^\s_]|\S.*?\S)(\\?)(_)/gi;
-const ITALICS_REGEX_ASTERISKS = /(\\?)(\*)([^\s_]|\S.*?\S)(\\?)(\*)/gi;
-const BOLD_REGEX_UNDERSCORES = /(\\?)(__)([^\s_]|\S.*?\S)(\\?)(__)/gi;
-const BOLD_REGEX_ASTERISKS = /(\\?)(\*\*)([^\s_]|\S.*?\S)(\\?)(\*\*)/gi;
+const ITALICS_REGEX_UNDERSCORES = /(?:^|([^\\]))_(?:(\\_|[^\\\s][^_\s]?)_|((?:\\_|\S)(?:\\_|[^_])*?[^\s\\])_)/gi;
+const ITALICS_REGEX_ASTERISKS = /(?:^|([^\\]))\*(?:(\\\*|[^\\\s][^\*\s]?)\*|((?:\\\*|\S)(?:\\\*|[^\*])*?[^\s\\])\*)/gi;
+const BOLD_REGEX_UNDERSCORES = /(?:^|([^\\]))__(?:(\\_|[^\\\s][^_\s]?)__|((?:\\_|\S)(?:\\_|[^_])*?[^\s\\])__)/gi;
+const BOLD_REGEX_ASTERISKS = /(?:^|([^\\]))\*\*(?:(\\\*|[^\\\s][^\*\s]?)\*\*|((?:\\\*|\S)(?:\\\*|[^\*])*?[^\s\\])\*\*)/gi;
 class InlineEmphasisPlugin {
     tokenize(text, parser) {
         const tokens = [];
         const parseMatch = (match, nodeType) => {
-            let node;
-            if (match.length == 6 && match[1] && match[4]) {
-                node = YeastNodeFactory.CreateText();
-                node.text = `${match[2]}${match[3]}${match[5]}`;
-            }
-            else {
-                node = YeastNodeFactory.Create(nodeType);
-                node.children = parser.parseInline(match[3]);
-            }
+            if (match.length < 4 || (!match[2] && !match[3]))
+                return;
+            const startOffset = (match[1] || '').length;
+            let node = YeastNodeFactory.Create(nodeType);
+            node.children = parser.parseInline(match[2] || match[3]);
             tokens.push({
-                start: match.index,
+                start: match.index + startOffset,
                 end: match.index + match[0].length,
                 from: 'InlineEmphasisPlugin',
                 nodes: [node],
@@ -101,40 +97,6 @@ class InlineEmphasisPlugin {
         }
         for (const match of text.matchAll(ITALICS_REGEX_ASTERISKS)) {
             parseMatch(match, YeastInlineNodeTypes.Italic);
-        }
-        const textArr = text.split('');
-        let index = 0;
-        while (index < textArr.length) {
-            if (textArr[index] === '*' && textArr[index + 1] !== '*' && textArr[index + 1] !== ' ') {
-                if (index >= 0 && textArr[index - 1] !== '*') {
-                    let italizedText = '';
-                    let startIndex = index;
-                    let isInvalidSyntax = false;
-                    do {
-                        if (textArr[index + 1]) {
-                            italizedText += textArr[++index];
-                        }
-                        else {
-                            isInvalidSyntax = true;
-                            break;
-                        }
-                    } while (textArr[index + 1] !== '*' && index < textArr.length);
-                    if (isInvalidSyntax) {
-                        index++;
-                        continue;
-                    }
-                    const node = YeastNodeFactory.CreateItalicNode();
-                    node.children = parser.parseInline(italizedText);
-                    tokens.push({
-                        start: startIndex,
-                        end: startIndex + italizedText.length + 2,
-                        from: 'ItalicsInlinePlugin',
-                        nodes: [node],
-                    });
-                    index++;
-                }
-            }
-            index++;
         }
         return tokens;
     }
