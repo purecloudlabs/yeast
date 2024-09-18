@@ -1,0 +1,1 @@
+{"version":3,"file":"AdjacentTextCombiner.d.ts","sourceRoot":"","sources":["../../../src/plugins/post/AdjacentTextCombiner.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,YAAY,EAAgC,mBAAmB,EAAyB,WAAW,EAAa,MAAM,YAAY,CAAC;AAE5I,qBAAa,oBAAqB,YAAW,mBAAmB;IAC/D,KAAK,CAAC,QAAQ,EAAE,YAAY,EAAE,MAAM,EAAE,WAAW,GAAG,YAAY;CAIhE"}

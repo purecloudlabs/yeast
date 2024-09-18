@@ -1,4 +1,4 @@
-import { YeastBlockNodeTypes, YeastNodeFactory, isYeastNodeType, YeastInlineNodeTypes, scrapeText, ContentGroupType, YeastParser } from 'yeast-core';
+import { YeastBlockNodeTypes, YeastNodeFactory, YeastInlineNodeTypes, isYeastNodeType, scrapeText, ContentGroupType, isYeastTextNode, isYeastNode, YeastParser } from 'yeast-core';
 import { parse } from 'yaml';
 import { XMLParser } from 'fast-xml-parser';
 
@@ -66,71 +66,37 @@ class ParagraphParserPlugin {
     }
 }
 
-const ITALICS_REGEX = /_(\S.+?)_/gi;
-class ItalicsInlinePlugin {
+const ITALICS_REGEX_UNDERSCORES = /(?:^|([^\\]))_(?:(\\_|[^\\\s][^_\s]?)_|((?:\\_|\S)(?:\\_|[^_])*?[^\s\\])_)/gi;
+const ITALICS_REGEX_ASTERISKS = /(?:^|([^\\]))\*(?:(\\\*|[^\\\s][^\*\s]?)\*|((?:\\\*|\S)(?:\\\*|[^\*])*?[^\s\\])\*)/gi;
+const BOLD_REGEX_UNDERSCORES = /(?:^|([^\\]))__(?:(\\_|[^\\\s][^_\s]?)__|((?:\\_|\S)(?:\\_|[^_])*?[^\s\\])__)/gi;
+const BOLD_REGEX_ASTERISKS = /(?:^|([^\\]))\*\*(?:(\\\*|[^\\\s][^\*\s]?)\*\*|((?:\\\*|\S)(?:\\\*|[^\*])*?[^\s\\])\*\*)/gi;
+class InlineEmphasisPlugin {
     tokenize(text, parser) {
         const tokens = [];
-        for (const match of text.matchAll(ITALICS_REGEX)) {
-            const node = YeastNodeFactory.CreateItalicNode();
-            node.children = parser.parseInline(match[1]);
+        const parseMatch = (match, nodeType) => {
+            if (match.length < 4 || (!match[2] && !match[3]))
+                return;
+            const startOffset = (match[1] || '').length;
+            let node = YeastNodeFactory.Create(nodeType);
+            node.children = parser.parseInline(match[2] || match[3]);
             tokens.push({
-                start: match.index,
+                start: match.index + startOffset,
                 end: match.index + match[0].length,
-                from: 'ItalicsInlinePlugin',
+                from: 'InlineEmphasisPlugin',
                 nodes: [node],
             });
+        };
+        for (const match of text.matchAll(BOLD_REGEX_UNDERSCORES)) {
+            parseMatch(match, YeastInlineNodeTypes.Bold);
         }
-        const textArr = text.split('');
-        let index = 0;
-        while (index < textArr.length) {
-            if (textArr[index] === '*' && textArr[index + 1] !== '*' && textArr[index + 1] !== ' ') {
-                if (index >= 0 && textArr[index - 1] !== '*') {
-                    let italizedText = '';
-                    let startIndex = index;
-                    let isInvalidSyntax = false;
-                    do {
-                        if (textArr[index + 1]) {
-                            italizedText += textArr[++index];
-                        }
-                        else {
-                            isInvalidSyntax = true;
-                            break;
-                        }
-                    } while (textArr[index + 1] !== '*' && index < textArr.length);
-                    if (isInvalidSyntax) {
-                        index++;
-                        continue;
-                    }
-                    const node = YeastNodeFactory.CreateItalicNode();
-                    node.children = parser.parseInline(italizedText);
-                    tokens.push({
-                        start: startIndex,
-                        end: startIndex + italizedText.length + 2,
-                        from: 'ItalicsInlinePlugin',
-                        nodes: [node],
-                    });
-                    index++;
-                }
-            }
-            index++;
+        for (const match of text.matchAll(BOLD_REGEX_ASTERISKS)) {
+            parseMatch(match, YeastInlineNodeTypes.Bold);
         }
-        return tokens;
-    }
-}
-
-const BOLD_REGEX = /\*\*(\S.+?)\*\*/gi;
-class BoldInlinePlugin {
-    tokenize(text, parser) {
-        const tokens = [];
-        for (const match of text.matchAll(BOLD_REGEX)) {
-            const node = YeastNodeFactory.CreateBoldNode();
-            node.children = parser.parseInline(match[1]);
-            tokens.push({
-                start: match.index,
-                end: match.index + match[0].length,
-                from: 'BoldInlinePlugin',
-                nodes: [node],
-            });
+        for (const match of text.matchAll(ITALICS_REGEX_UNDERSCORES)) {
+            parseMatch(match, YeastInlineNodeTypes.Italic);
+        }
+        for (const match of text.matchAll(ITALICS_REGEX_ASTERISKS)) {
+            parseMatch(match, YeastInlineNodeTypes.Italic);
         }
         return tokens;
     }
@@ -340,12 +306,13 @@ class InlineCodePlugin {
     }
 }
 
-const LINK_REGEX = /\[([^\[\]]*)\]\((.+?)(?:\s["'](.*?)["'])?\)/gi;
+const LINK_REGEX = /\[\s*([^\[\]]*?(?:\\.[^\[\]]*?)*?)\s*\]\(\s*(\S+)(?:\s+["']\s*(.*?)\s*["'])?\s*\)/gi;
 class InlineLinkPlugin {
     tokenize(text, parser) {
         const tokens = [];
         for (const match of text.matchAll(LINK_REGEX)) {
-            if (text.charAt(match.index - 1) === '!') {
+            const charBefore = text.charAt(match.index - 1);
+            if (charBefore === '!' || charBefore === '\\') {
                 continue;
             }
             const node = YeastNodeFactory.CreateLinkNode();
@@ -736,7 +703,8 @@ const keyExists = (arr, key) => {
 const IS_TABLE = /^\s*(.+?)\s*\|\s*(.+)(?:\||$)/;
 const IS_ALIGNMENT_ROW = /^.*\s*:*-+:*\s*\|\s*:*-+:*\s*\|{0,1}$/;
 const ALIGNMENT_CELL = /^\s*\|{0,1}\s*(:*)-+(:*)\s*(?:\||$)/;
-const CELL_CONTENT = /^\s*([^|\\]+?)\s*(\||\\\s*$|$)/;
+const CELL_CONTENT = /^\s*((?:\\\||[^|])+?)\s*(\||\\\s*$|$)/;
+const CELL_PIPE_FINDER = /\\\|/g;
 const CELL_NORMALIZER = /^\s*\|{0,1}/;
 const TABLE_CLASS = /^\s*\{:\s*class\s*=\s*["'](.+?)["']\s*\}/i;
 class TableParserPlugin {
@@ -824,7 +792,7 @@ const parseLine = (line, alignment, parser) => {
         if (!isCell)
             continue;
         const cell = YeastNodeFactory.CreateTableCellNode();
-        cell.children = parser.parseBlock(cellContentMatch[1]);
+        cell.children = parser.parseBlock(cellContentMatch[1].replaceAll(CELL_PIPE_FINDER, '|'));
         if (cell.children.length === 0)
             cell.children.push(YeastNodeFactory.CreateParagraphNode());
         cell.align = alignment ? alignment[columnNumber] : 'left';
@@ -971,18 +939,70 @@ function denest(nodes) {
     return nodes;
 }
 
-const TEXT_LINK_REGEX = /https:\/\/[^ )]+/gi;
+class AdjacentTextCombiner {
+    parse(document, parser) {
+        document.children = combine(document.children);
+        return document;
+    }
+}
+function combine(nodes) {
+    if (!nodes)
+        return undefined;
+    let newNodes = [];
+    nodes.forEach((node) => {
+        if (newNodes.length > 0 && isYeastTextNode(node) && isYeastTextNode(newNodes[newNodes.length - 1])) {
+            newNodes[newNodes.length - 1].text += node.text;
+        }
+        else {
+            if (isYeastNode(node)) {
+                node.children = combine(node.children);
+            }
+            newNodes.push(node);
+        }
+    });
+    return newNodes;
+}
+
+class UnescapeDanglingEscapes {
+    parse(document, parser) {
+        document.children = unescapeStuff(document.children);
+        return document;
+    }
+}
+const ESCAPED_STUFF_REGEX = /\\(__|\*\*|_|\*|\||\[|\])/g;
+function unescapeStuff(nodes) {
+    if (!nodes)
+        return undefined;
+    nodes.forEach((node) => {
+        if (isYeastTextNode(node)) {
+            node.text = node.text.replaceAll(ESCAPED_STUFF_REGEX, '$1');
+        }
+        if (isYeastNode(node)) {
+            node.children = unescapeStuff(node.children);
+        }
+    });
+    return nodes;
+}
+
+const TEXT_LINK_REGEX = /https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
 class InlineTextLinkPlugin {
     tokenize(text, parser) {
         const tokens = [];
         for (const match of text.matchAll(TEXT_LINK_REGEX)) {
+            let linkText = match[0];
+            let offset = 0;
+            let lastChar = linkText.substring(linkText.length - 1);
+            while (['.', ',', '!', '?', ';'].includes(lastChar)) {
+                linkText = linkText.substring(0, linkText.length - 1);
+                lastChar = linkText.substring(linkText.length - 1);
+                offset++;
+            }
             const node = YeastNodeFactory.CreateLinkNode();
-            const linkText = { text: match[0] };
-            node.children = [linkText];
-            node.href = match[0];
+            node.children = [{ text: linkText }];
+            node.href = linkText;
             tokens.push({
                 start: match.index,
-                end: match.index + match[0].length,
+                end: match.index + match[0].length - offset,
                 from: 'InlineLinkPlugin',
                 nodes: [node],
             });
@@ -1041,6 +1061,8 @@ class MarkdownParser extends YeastParser {
         this.registerRootPlugin(new FrontmatterParserPlugin());
         this.registerPostProcessorPlugin(new PsuedoParagraphScrubber());
         this.registerPostProcessorPlugin(new ParagraphDenester());
+        this.registerPostProcessorPlugin(new AdjacentTextCombiner());
+        this.registerPostProcessorPlugin(new UnescapeDanglingEscapes());
         this.registerBlockPlugin(new HeadingParserPlugin());
         this.registerBlockPlugin(new HorizontalRuleParserPlugin());
         this.registerBlockPlugin(new CalloutParserPlugin());
@@ -1053,8 +1075,7 @@ class MarkdownParser extends YeastParser {
         this.registerBlockPlugin(new ParagraphParserPlugin());
         this.registerInlinePlugin(new InlineCodePlugin());
         this.registerInlinePlugin(new InlineStrikeThroughPlugin());
-        this.registerInlinePlugin(new ItalicsInlinePlugin());
-        this.registerInlinePlugin(new BoldInlinePlugin());
+        this.registerInlinePlugin(new InlineEmphasisPlugin());
         this.registerInlinePlugin(new InlineImageLinkPlugin());
         this.registerInlinePlugin(new InlineImagePlugin());
         this.registerInlinePlugin(new InlineLinkPlugin());
@@ -1081,5 +1102,5 @@ class ImageParserPlugin {
     }
 }
 
-export { BlockquoteParserPlugin, BoldInlinePlugin, CalloutParserPlugin, CodeParserPlugin, ContentGroupParserPlugin, CustomComponentParserPlugin, FrontmatterParserPlugin, HeadingParserPlugin, HorizontalRuleParserPlugin, ImageParserPlugin, InlineCodePlugin, InlineImageLinkPlugin, InlineLinkPlugin, InlineStrikeThroughPlugin, ItalicsInlinePlugin, ListParserPlugin, MarkdownParser, ParagraphParserPlugin, TableParserPlugin };
+export { BlockquoteParserPlugin, CalloutParserPlugin, CodeParserPlugin, ContentGroupParserPlugin, CustomComponentParserPlugin, FrontmatterParserPlugin, HeadingParserPlugin, HorizontalRuleParserPlugin, ImageParserPlugin, InlineCodePlugin, InlineEmphasisPlugin, InlineImageLinkPlugin, InlineLinkPlugin, InlineStrikeThroughPlugin, ListParserPlugin, MarkdownParser, ParagraphParserPlugin, TableParserPlugin };
 //# sourceMappingURL=index.js.map

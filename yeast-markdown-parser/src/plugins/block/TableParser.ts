@@ -8,7 +8,9 @@ const IS_ALIGNMENT_ROW = /^.*\s*:*-+:*\s*\|\s*:*-+:*\s*\|{0,1}$/;
 // Capture the left/right markers up to the next (pipe) or (EOL)
 const ALIGNMENT_CELL = /^\s*\|{0,1}\s*(:*)-+(:*)\s*(?:\||$)/;
 // Capture everything up to the next (pipe) or (row wrap and EOL) or (EOL)
-const CELL_CONTENT = /^\s*([^|\\]+?)\s*(\||\\\s*$|$)/;
+const CELL_CONTENT = /^\s*((?:\\\||[^|])+?)\s*(\||\\\s*$|$)/;
+// Used for replacing escaped pipes
+const CELL_PIPE_FINDER = /\\\|/g;
 // Expression to identify leading pipe for removal
 const CELL_NORMALIZER = /^\s*\|{0,1}/;
 // Capture table class spec
@@ -123,7 +125,7 @@ const parseLine = (line: string, alignment: string[], parser: YeastParser) => {
 		const cell = YeastNodeFactory.CreateTableCellNode();
 
 		// Parse contents into cell
-		cell.children = parser.parseBlock(cellContentMatch[1]);
+		cell.children = parser.parseBlock(cellContentMatch[1].replaceAll(CELL_PIPE_FINDER, '|'));
 		// Lazy-init if cell was empty
 		if (cell.children.length === 0) cell.children.push(YeastNodeFactory.CreateParagraphNode());
 

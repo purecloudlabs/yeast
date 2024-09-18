@@ -1,8 +1,7 @@
 import { MarkdownParser } from './MarkdownParser';
 import { FrontmatterParserPlugin } from './plugins/root/FrontmatterParserPlugin';
 import { ParagraphParserPlugin } from './plugins/block/ParagraphParserPlugin';
-import { ItalicsInlinePlugin } from './plugins/inline/ItalicsInlinePlugin';
-import { BoldInlinePlugin } from './plugins/inline/BoldInlinePlugin';
+import { InlineEmphasisPlugin } from './plugins/inline/InlineEmphasisPlugin';
 import { HeadingParserPlugin } from './plugins/block/HeadingParserPlugin';
 import { ListParserPlugin } from './plugins/block/ListParserPlugin';
 import { ImageParserPlugin } from 'plugins/block/ImageParserPlugin';
@@ -17,5 +16,5 @@ import { ContentGroupParserPlugin } from 'plugins/block/ContentGroupParserPlugin
 import { CustomComponentParserPlugin } from 'plugins/block/CustomComponentParser';
 import { TableParserPlugin } from 'plugins/block/TableParser';
 import { InlineImageLinkPlugin } from 'plugins/inline/InlineImageLinkPlugin';
-export { MarkdownParser, FrontmatterParserPlugin, ParagraphParserPlugin, ItalicsInlinePlugin, BoldInlinePlugin, HeadingParserPlugin, ListParserPlugin, ImageParserPlugin, InlineStrikeThroughPlugin, InlineCodePlugin, InlineImageLinkPlugin, InlineLinkPlugin, HorizontalRuleParserPlugin, CalloutParserPlugin, BlockquoteParserPlugin, CodeParserPlugin, ContentGroupParserPlugin, CustomComponentParserPlugin, TableParserPlugin, };
+export { MarkdownParser, FrontmatterParserPlugin, ParagraphParserPlugin, InlineEmphasisPlugin, HeadingParserPlugin, ListParserPlugin, ImageParserPlugin, InlineStrikeThroughPlugin, InlineCodePlugin, InlineImageLinkPlugin, InlineLinkPlugin, HorizontalRuleParserPlugin, CalloutParserPlugin, BlockquoteParserPlugin, CodeParserPlugin, ContentGroupParserPlugin, CustomComponentParserPlugin, TableParserPlugin, };
 //# sourceMappingURL=index.d.ts.map

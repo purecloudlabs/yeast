@@ -19,6 +19,7 @@ import {
 	TableNode,
 	TableRowNode,
 	YeastInlineChild,
+	YeastInlineNodeTypes,
 	YeastNode,
 	YeastText,
 } from 'yeast-core';
@@ -34,13 +35,15 @@ import { HorizontalRuleParserPlugin } from '../../plugins/block/HorizontalRulePa
 import { ListParserPlugin } from '../../plugins/block/ListParserPlugin';
 import { ParagraphParserPlugin } from '../../plugins/block/ParagraphParserPlugin';
 import { TableParserPlugin } from '../../plugins/block/TableParser';
-import { BoldInlinePlugin } from '../../plugins/inline/BoldInlinePlugin';
+import { InlineEmphasisPlugin } from '../../plugins/inline/InlineEmphasisPlugin';
 
 import { IMAGE_AST, IMAGE_LINKS_AST, IMAGE_LINKS_MARKDOWN, IMAGE_MARKDOWN } from '../resources/images';
 import { LINK_AST, LINK_MARKDOWN } from '../resources/links';
+import { TABLE_AST } from '../resources/table-data';
+import { EVERYTHING_INLINE_AST } from '../resources/everythinginline';
 
 const standardBlockPluginCount = 10;
-const standardInlinePluginCount = 8;
+const standardInlinePluginCount = 7;
 
 test('MarkdownParser with no plugins should create root document with frontmatter', () => {
 	// Initialize parser
@@ -149,28 +152,15 @@ test('MarkdownParser using TableParserPlugin', () => {
 	parser.registerBlockPlugin(new ParagraphParserPlugin());
 
 	// Check plugins
-	checkParserPlugins(parser, 13, 8);
+	checkParserPlugins(parser, 13, standardInlinePluginCount);
 
+	// Parse
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/tables.md'), 'utf8');
 	const ast = parser.parse(documentText);
-	expect(ast.children[0].children.length).toBe(3);
-	expect((ast.children[0] as TableNode).children[0].header).toBeTruthy();
-	// table > tablerow > tablecell > paragraph > text
-	expect((((ast.children[0] as TableNode).children[1].children[0].children[0] as YeastNode).children[0] as YeastText).text).toBe('Header');
-	expect(((ast.children[0] as TableNode).children[2].children[1].children[0] as BoldNode).type).toBe('bold');
-	expect((ast.children[1] as TableNode).children[0].header).toBeTruthy();
-	expect((ast.children[1] as TableNode).align).toBe('L|C|R');
-	expect((ast.children[2] as TableNode).filterable).toBeTruthy();
-	expect((ast.children[2] as TableNode).sortable).toBeTruthy();
-	expect((ast.children[3].children[0] as TableRowNode).children[1].align).toBe('right');
-	expect((ast.children[3].children[0] as TableRowNode).children[0].align).toBe('center');
-	expect((ast.children[3] as TableNode).align).toBe('C|R');
-	expect((ast.children[3] as TableNode).sortable).toBeUndefined();
-	expect((ast.children[4] as TableNode).children[0].header).toBeFalsy();
-	expect((ast.children[5] as TableNode).children.length).toBe(7);
+	// debugAST('tables', ast);
 
-	// Check document
-	checkAstStructureForDefaultDocument(ast, 6);
+	// Validate AST
+	expect(JSON.stringify(ast)).toBe(JSON.stringify(TABLE_AST));
 });
 
 test('MarkdownParser using BlockquoteParserPlugin', () => {
@@ -247,7 +237,7 @@ test('MarkdownParser using ContentGroupParserPlugin', () => {
 	const parser = new MarkdownParser();
 	parser.clearBlockPlugins();
 	parser.clearInlinePlugins();
-	parser.registerInlinePlugin(new BoldInlinePlugin());
+	parser.registerInlinePlugin(new InlineEmphasisPlugin());
 	parser.registerBlockPlugin(new ContentGroupParserPlugin());
 	parser.registerBlockPlugin(new CodeParserPlugin());
 	parser.registerBlockPlugin(new ParagraphParserPlugin());
@@ -394,24 +384,13 @@ test('MarkdownParser using all inline plugins', () => {
 	// Parse
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/everythinginline.md'), 'utf8');
 	const ast = parser.parse(documentText);
+	// debugAST('everythinginline', ast);
 
 	// Check document
-	checkAstStructureForDefaultDocument(ast, 1);
-	expect(ast.children.length).toBe(1);
-	expect(ast.children[0].children.length).toBe(26);
-	expect((ast.children[0].children[1] as StrikethroughNode).type).toBe('strikethrough');
-	expect((ast.children[0].children[3] as InlineCodeNode).type).toBe('inlinecode');
-	expect((ast.children[0].children[5] as ItalicNode).type).toBe('italic');
-	expect((ast.children[0].children[7] as ItalicNode).type).toBe('italic');
-	expect((ast.children[0].children[9] as BoldNode).type).toBe('bold');
-	expect((ast.children[0].children[11] as InlineCodeNode).type).toBe('inlinecode');
-	expect((ast.children[0].children[13] as ImageNode).type).toBe('image');
-	expect((ast.children[0].children[15] as ImageNode).type).toBe('image');
-	expect((ast.children[0].children[17] as ImageNode).type).toBe('image');
-	expect((ast.children[0].children[19] as LinkNode).type).toBe('link');
-	expect((ast.children[0].children[21] as LinkNode).type).toBe('link');
-	expect((ast.children[0].children[23] as LinkNode).type).toBe('link');
-	expect((ast.children[0].children[25] as LinkNode).type).toBe('link');
+	checkAstStructureForDefaultDocument(ast, 8);
+
+	// Validate AST
+	expect(JSON.stringify(ast)).toBe(JSON.stringify(EVERYTHING_INLINE_AST));
 });
 
 test('MarkdownParser using all defaults', () => {
@@ -491,6 +470,7 @@ test('MarkdownParser parses hyperlink in text', () => {
 
 	// Parse
 	const ast = parser.parse(LINK_MARKDOWN);
+	// debugAST('links', ast);
 
 	expect(JSON.stringify(ast)).toBe(JSON.stringify(LINK_AST));
 });
@@ -525,4 +505,13 @@ function checkAstStructureForDefaultDocument(ast: DocumentNode, childrenCount: n
 	expect(ast.children).not.toBeUndefined();
 	expect(ast.children.length).toBe(childrenCount);
 	expect(Object.keys(ast).length).toBe(3);
+}
+
+// debugAST prints the AST document to the console log and writes it to a local file in the debug directory
+function debugAST(testName: string, ast: DocumentNode) {
+	console.log(JSON.stringify(ast, null, 2));
+	if (!fs.existsSync('./debug/')) {
+		fs.mkdirSync('debug');
+	}
+	fs.writeFileSync(`./debug/${(testName || 'unnamed').replaceAll(/[^a-z0-9]/gi, '_')}.json`, JSON.stringify(ast, null, 2));
 }

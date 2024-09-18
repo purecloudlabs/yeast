@@ -1,0 +1,1 @@
+{"version":3,"file":"InlineEmphasisPlugin.d.ts","sourceRoot":"","sources":["../../../src/plugins/inline/InlineEmphasisPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,EACN,qBAAqB,EACrB,KAAK,EACL,WAAW,EAKX,MAAM,YAAY,CAAC;AAiBpB,qBAAa,oBAAqB,YAAW,qBAAqB;IACjE,QAAQ,CAAC,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,WAAW,GAAG,IAAI,GAAG,KAAK,EAAE;CAuC3D"}

@@ -1,26 +1,18 @@
-import {
-	InlineTokenizerPlugin,
-	Token,
-	YeastParser,
-	YeastNodeFactory,
-	YeastInlineNode,
-	isYeastNodeType,
-	YeastInlineNodeTypes,
-	scrapeText,
-} from 'yeast-core';
+import { InlineTokenizerPlugin, Token, YeastParser, YeastNodeFactory, isYeastNodeType, YeastInlineNodeTypes, scrapeText } from 'yeast-core';
 
-const LINK_REGEX = /\[([^\[\]]*)\]\((.+?)(?:\s["'](.*?)["'])?\)/gi;
+const LINK_REGEX = /\[\s*([^\[\]]*?(?:\\.[^\[\]]*?)*?)\s*\]\(\s*(\S+)(?:\s+["']\s*(.*?)\s*["'])?\s*\)/gi;
 
 export class InlineLinkPlugin implements InlineTokenizerPlugin {
 	tokenize(text: string, parser: YeastParser): void | Token[] {
 		const tokens: Token[] = [];
 		for (const match of text.matchAll(LINK_REGEX)) {
-			//Don't process if it's an image
-			if (text.charAt(match.index - 1) === '!') {
+			// Don't process if it's an image or escaped
+			const charBefore = text.charAt(match.index - 1);
+			if (charBefore === '!' || charBefore === '\\') {
 				continue;
 			}
 			const node = YeastNodeFactory.CreateLinkNode();
-			//if alt text is empty use target as alt text
+			// If alt text is empty use target as alt text
 			if (match[1].length > 0) {
 				node.children = parser.parseInline(match[1]);
 			} else {
