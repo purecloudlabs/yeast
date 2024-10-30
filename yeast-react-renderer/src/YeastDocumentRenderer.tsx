@@ -4,11 +4,13 @@ import { DocumentNode } from 'yeast-core';
 import { NodeRendererMap } from './ReactRenderer';
 import YeastNodeRenderer from './YeastNodeRenderer';
 import { getDiffRenderData, DiffRenderData } from './helpers/diff';
+import CmsApi from './helpers/types';
 
 interface IProps {
 	ast: DocumentNode;
 	className?: string;
 	customRenderers?: NodeRendererMap;
+	api: CmsApi;
 }
 
 export default function YeastDocumentRenderer(props: IProps) {
@@ -35,7 +37,7 @@ export default function YeastDocumentRenderer(props: IProps) {
 		<div className={className}>
 			<h1>{title}</h1>
 			{author && <h2>{author}</h2>}
-			<YeastNodeRenderer nodes={props.ast?.children} customRenderers={props.customRenderers} />
+			<YeastNodeRenderer nodes={props.ast?.children} customRenderers={props.customRenderers} api={props.api}/>
 		</div>
 	);
 }

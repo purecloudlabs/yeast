@@ -30,6 +30,7 @@
 		"@testing-library/user-event": "^14.4.3",
 		"@types/jest": "^29.0.1",
 		"@types/react": "^16",
+		"axios": "^1.7.7",
 		"cross-env": "^7.0.3",
 		"genesys-dev-icons": "^0.3.0",
 		"genesys-react-components": "^0.5.0",

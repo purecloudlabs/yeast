@@ -1,19 +1,64 @@
-import React from 'react';
+import React, { useEffect, useRef, useState }  from 'react';
 import { ImageNode } from 'yeast-core';
-import { v4 as uuidv4} from 'uuid';
 
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
+import CmsApi from '../helpers/types'
 
 interface IProps {
 	node: ImageNode;
 	renderer: ReactRenderer;
+	api: CmsApi;
 }
 
+const hostnameRegex = /^https?:\/\//i;
+
 export default function ImageNodeRenderer(props: IProps) {
+	const [imgSrc, setImgSrc] = useState<string>();
+	const [loadingError, setLoadingError] = useState<string>();
+
 	const key1 = useKey();
 	const key2 = useKey();
+	const currentSrc = useRef<string>();
+
+	useEffect(() => {
+		if (currentSrc.current === props.node.src) return;
+		currentSrc.current = props.node.src;
+		(async () => {
+			try {
+				setLoadingError(undefined);
+				setImgSrc(undefined);
+				const match = hostnameRegex.exec(props.node.src);
+				let src = new URL(props.node.src, window.location.href);
+				const isSameHost = window.location.hostname.toLowerCase() === src.hostname.toLowerCase();
+				if (match && !isSameHost) {
+					// Set src to URL to let the browser load the image normally
+					setImgSrc(props.node.src);
+				} else {
+					// Load image from API and set src as encoded image data
+					const content = await props.api.getAssetContent(src.pathname, true);
+					if (!content) {
+						setLoadingError('Failed to load image');
+					}
+					let str = await readBlob(content?.content);
+					setImgSrc(str);
+				}
+			} catch (err) {
+				console.error(err);
+				setLoadingError('Failed to load image');
+			}
+		})();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [props.node.src]);
+
+	const readBlob = async(imageBlob: Blob) => {
+		const reader = new FileReader();
+		return new Promise<string>((resolve) => {
+			reader.onloadend = () => resolve(reader.result as string);
+			reader.readAsDataURL(imageBlob);
+		});
+	}
 
 	const diffRenderData: DiffRenderData = getDiffRenderData(props.node);
 	const className: string = diffRenderData ? diffRenderData.diffClass : '';

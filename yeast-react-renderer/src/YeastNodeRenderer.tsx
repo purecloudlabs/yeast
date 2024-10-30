@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { YeastChild } from 'yeast-core';
-import { getDiffRenderData, DiffRenderData } from './helpers/diff';
 
 import { useKey } from './helpers/useKey';
 import { ReactRenderer, NodeRendererMap } from './ReactRenderer';
+import CmsApi from './helpers/types';
 
 export interface YeastNodeRendererProps {
 	nodes: YeastChild[];
 	customRenderers?: NodeRendererMap;
+	api: CmsApi;
 }
 
 export default function YeastNodeRenderer(props: YeastNodeRendererProps) {
@@ -19,5 +20,5 @@ export default function YeastNodeRenderer(props: YeastNodeRendererProps) {
 		setRenderer(new ReactRenderer(props.customRenderers));
 	}, [props.customRenderers]);
 
-	return <React.Fragment key={key.current}>{renderer.renderComponents(props.nodes)}</React.Fragment>;
+	return <React.Fragment key={key.current}>{renderer.renderComponents(props.nodes, props.api)}</React.Fragment>;
 }
