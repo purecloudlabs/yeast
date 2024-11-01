@@ -2,6 +2,7 @@ import { DocumentNode } from 'yeast-core';
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import CmsApi from '../../helpers/types';
 
 import YeastDocumentRenderer from '../../YeastDocumentRenderer';
 
@@ -16,6 +17,8 @@ import { default as ParagraphData } from '../resources/ParagraphData';
 test('testing paragraph node', async () => {
 	const IProp = {
 		ast: MixedData as DocumentNode,
+		api: {} as CmsApi
+
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -28,6 +31,7 @@ test('testing paragraph node', async () => {
 test('testing heading node', async () => {
 	const IProp = {
 		ast: MixedData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -46,6 +50,7 @@ test('testing heading node', async () => {
 test('testing list node', async () => {
 	const IProp = {
 		ast: MixedData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -59,6 +64,7 @@ test('testing list node', async () => {
 test('testing listitem node', async () => {
 	const IProp = {
 		ast: MixedData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -72,6 +78,7 @@ test('testing listitem node', async () => {
 test('testing BlockType and Inline code node', async () => {
 	const IProp = {
 		ast: CodeData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -99,6 +106,7 @@ test('testing BlockType and Inline code node', async () => {
 test('testing link node', async () => {
 	const IProp = {
 		ast: MixedData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -111,6 +119,7 @@ test('testing link node', async () => {
 test('testing callout node', async () => {
 	const IProp = {
 		ast: MixedData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -121,6 +130,7 @@ test('testing callout node', async () => {
 test('testing bold and italic node', async () => {
 	const IProp = {
 		ast: MixedData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -135,6 +145,7 @@ test('testing bold and italic node', async () => {
 test('testing tableCellHeader and tablecell node', async () => {
 	const IProp = {
 		ast: TableData as DocumentNode,
+		api: {} as CmsApi
 	};
 	render(<YeastDocumentRenderer {...IProp} />);
 
@@ -145,6 +156,7 @@ test('testing tableCellHeader and tablecell node', async () => {
 test('testing blockquote node', async () => {
 	const IProp = {
 		ast: MixedData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -156,6 +168,7 @@ test('testing blockquote node', async () => {
 test('testing strikethrough node', async () => {
 	const IProp = {
 		ast: MixedData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -167,6 +180,7 @@ test('testing strikethrough node', async () => {
 test('testing nested Paragraph/Bold/Italic/Strikethrough Node', async () => {
 	const IProp = {
 		ast: NestedData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -179,6 +193,7 @@ test('testing nested Paragraph/Bold/Italic/Strikethrough Node', async () => {
 test('testing contentgroup & conntentgroupitem node', async () => {
 	const IProp = {
 		ast: MixedData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -190,6 +205,7 @@ test('testing contentgroup & conntentgroupitem node', async () => {
 test('inlinecode as a table child', async () => {
 	const IProp = {
 		ast: NestedData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -200,6 +216,7 @@ test('inlinecode as a table child', async () => {
 test('testing for unexpected html elements', async () => {
 	const IProp = {
 		ast: MixedData as DocumentNode,
+		api: {} as CmsApi
 	};
 
 	await act(() => {
@@ -246,6 +263,7 @@ test('testing for unexpected html elements', async () => {
 test('blockcode as a table child', async () => {
 	const IProp = {
 		ast: TableData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -256,6 +274,7 @@ test('blockcode as a table child', async () => {
 test('contengroupitem title', async () => {
 	const IProp = {
 		ast: ContentGroupData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -267,6 +286,7 @@ test('contengroupitem title', async () => {
 test('testing case insensitive nodes', async () => {
 	const IProp = {
 		ast: ParagraphData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
@@ -278,6 +298,7 @@ test('testing case insensitive nodes', async () => {
 test('indent implemented in paragraph', async () => {
 	const IProp = {
 		ast: ParagraphData as DocumentNode,
+		api: {} as CmsApi
 	};
 	await act(() => {
 		render(<YeastDocumentRenderer {...IProp} />);
