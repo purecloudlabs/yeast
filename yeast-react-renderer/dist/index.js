@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
-import { CodeFence, AlertBlock, DxAccordionGroup, DxTabbedContent, DataTable, DxAccordion, DxTabPanel } from 'genesys-react-components';
-import React, { useState, useEffect } from 'react';
+import { CodeFence, AlertBlock, DxAccordionGroup, DxTabbedContent, LoadingPlaceholder, DataTable, DxAccordion, DxTabPanel } from 'genesys-react-components';
+import React, { useState, useRef, useEffect } from 'react';
 import { DiffType, DiffSource, isYeastNode, YeastBlockNodeTypes, YeastInlineNodeTypes } from 'yeast-core';
 
 // import { useRef } from 'react';
@@ -389,36 +389,127 @@ function HeadingNodeRenderer(props) {
     }
 }
 
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+function __awaiter(thisArg, _arguments, P, generator) {
+  function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+  return new (P || (P = Promise))(function (resolve, reject) {
+      function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+      function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+      function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+      step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+}
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+  var e = new Error(message);
+  return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
+const hostnameRegex = /^https?:\/\//i;
 function ImageNodeRenderer(props) {
+    const [imgSrc, setImgSrc] = useState();
+    const [loadingError, setLoadingError] = useState();
+    const [oldSrc, setOldSrc] = useState();
+    const [newSrc, setNewSrc] = useState();
+    const [oldAlt, setOldAlt] = useState();
+    const [newAlt, setNewAlt] = useState();
+    const [oldTitle, setOldTitle] = useState();
+    const [newTitle, setNewTitle] = useState();
+    const [diffRenderData, setDiffRenderData] = useState();
     const key1 = useKey();
     const key2 = useKey();
-    const diffRenderData = getDiffRenderData(props.node);
+    const currentSrc = useRef();
+    const currentNode = useRef();
+    useEffect(() => {
+        if (JSON.stringify(props.node) === JSON.stringify(currentNode))
+            return;
+        const newDiffRenderData = getDiffRenderData(props.node);
+        if (newDiffRenderData && newDiffRenderData.renderedStrings) {
+            if (newDiffRenderData.renderedStrings['title']) {
+                setOldTitle(newDiffRenderData.renderedStrings['title'].oldString);
+                setNewTitle(newDiffRenderData.renderedStrings['title'].newString);
+            }
+            if (newDiffRenderData.renderedStrings['alt']) {
+                setOldAlt(newDiffRenderData.renderedStrings['alt'].oldString);
+                setNewAlt(newDiffRenderData.renderedStrings['alt'].newString);
+            }
+            if (newDiffRenderData.renderedStrings['src']) {
+                (() => __awaiter(this, void 0, void 0, function* () {
+                    const oldImgSrc = yield getImgSrc(newDiffRenderData.renderedStrings['src'].oldString);
+                    if (oldImgSrc)
+                        setOldSrc(oldImgSrc);
+                    const newImgSrc = yield getImgSrc(newDiffRenderData.renderedStrings['src'].newString);
+                    if (newImgSrc)
+                        setNewSrc(newImgSrc);
+                }))();
+            }
+            setDiffRenderData(newDiffRenderData);
+        }
+        else if (currentSrc.current !== props.node.src) {
+            currentSrc.current = props.node.src;
+            (() => __awaiter(this, void 0, void 0, function* () {
+                const newSrc = yield getImgSrc(props.node.src);
+                if (newSrc)
+                    setImgSrc(newSrc);
+            }))();
+        }
+    }, [props.node]);
+    const getImgSrc = (src) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            setLoadingError(undefined);
+            setImgSrc(undefined);
+            const match = hostnameRegex.exec(src);
+            let newSrc = new URL(src, window.location.href);
+            const isSameHost = window.location.hostname.toLowerCase() === newSrc.hostname.toLowerCase();
+            if (match && !isSameHost) {
+                // Set src to URL to let the browser load the image normally
+                return src;
+            }
+            else {
+                // Load image from API and set src as encoded image data
+                const content = yield props.api.getAssetContent(newSrc.pathname, true);
+                if (!content) {
+                    setLoadingError('Failed to load image');
+                }
+                let str = yield readBlob(content === null || content === void 0 ? void 0 : content.content);
+                return str;
+            }
+        }
+        catch (err) {
+            console.error(err);
+            setLoadingError('Failed to load image');
+        }
+    });
+    const readBlob = (imageBlob) => __awaiter(this, void 0, void 0, function* () {
+        const reader = new FileReader();
+        return new Promise((resolve) => {
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(imageBlob);
+        });
+    });
     const className = diffRenderData ? diffRenderData.diffClass : '';
-    let oldSrc = '';
-    let newSrc = '';
-    let oldAlt = '';
-    let newAlt = '';
-    let oldTitle = '';
-    let newTitle = '';
-    if (diffRenderData && diffRenderData.renderedStrings) {
-        if (diffRenderData.renderedStrings['title']) {
-            oldTitle = diffRenderData.renderedStrings['title'].oldString;
-            newTitle = diffRenderData.renderedStrings['title'].newString;
-        }
-        if (diffRenderData.renderedStrings['alt']) {
-            oldAlt = diffRenderData.renderedStrings['alt'].oldString;
-            newAlt = diffRenderData.renderedStrings['alt'].newString;
-        }
-        if (diffRenderData.renderedStrings['src']) {
-            oldSrc = diffRenderData.renderedStrings['src'].oldString;
-            newSrc = diffRenderData.renderedStrings['src'].newString;
-        }
-    }
     return diffRenderData && diffRenderData.renderedStrings
-        ? (React.createElement(React.Fragment, null,
-            React.createElement("img", { key: key1.current, alt: oldAlt, src: oldSrc, title: oldTitle, className: className }),
-            React.createElement("img", { key: key2.current, alt: newAlt, src: newSrc, title: newTitle, className: className })))
-        : React.createElement("img", { key: key1.current, alt: props.node.alt, src: props.node.src, title: props.node.title, className: className });
+        ?
+            React.createElement(React.Fragment, null,
+                React.createElement("img", { key: key1.current, alt: oldAlt, src: oldSrc, title: oldTitle, className: className }),
+                React.createElement("img", { key: key2.current, alt: newAlt, src: newSrc, title: newTitle, className: className }))
+        : imgSrc
+            ? React.createElement("img", { key: key1.current, alt: props.node.alt, src: imgSrc, title: props.node.title, className: className })
+            : React.createElement(LoadingPlaceholder, null);
 }
 
 function InlineCodeNodeRenderer(props) {
@@ -612,8 +703,8 @@ class ReactRenderer {
             [YeastBlockNodeTypes.Table]: (node, renderer) => {
                 return React.createElement(TableNodeRenderer, { key: v4(), node: node, renderer: renderer });
             },
-            [YeastInlineNodeTypes.Image]: (node, renderer) => {
-                return React.createElement(ImageNodeRenderer, { key: v4(), node: node, renderer: renderer });
+            [YeastInlineNodeTypes.Image]: (node, renderer, api) => {
+                return React.createElement(ImageNodeRenderer, { key: v4(), node: node, renderer: renderer, api: api });
             },
             [YeastBlockNodeTypes.HorizontalRule]: (node, renderer) => {
                 return React.createElement(HorizontalRuleNodeRenderer, { key: v4(), node: node, renderer: renderer });
@@ -638,16 +729,16 @@ class ReactRenderer {
         };
         this.customRenderers = customRenderers;
     }
-    renderComponents(nodes) {
+    renderComponents(nodes, api) {
         if (!nodes)
             return;
         return nodes.map((node, i) => {
             // Render the node using custom renderers
-            let rendered = this.renderComponent(node, this.customRenderers);
+            let rendered = this.renderComponent(node, this.customRenderers, api);
             if (!!rendered)
                 return rendered;
             // Render the node using defaults
-            rendered = this.renderComponent(node, this.defaultRenderers);
+            rendered = this.renderComponent(node, this.defaultRenderers, api);
             if (!!rendered)
                 return rendered;
             // Fallback to custom unhandled renderer
@@ -670,7 +761,7 @@ class ReactRenderer {
             }
         });
     }
-    renderComponent(node, renderers) {
+    renderComponent(node, renderers, api) {
         if (!node || !renderers)
             return;
         // Untyped nodes aren't handled here
@@ -683,6 +774,12 @@ class ReactRenderer {
         Object.entries(renderers).some(([nodeType, plugin]) => {
             if (typedNode.type.toLowerCase() === nodeType.toLowerCase()) {
                 component = plugin(node, this);
+                if (component === renderers[YeastInlineNodeTypes.Image]) {
+                    component = plugin(node, this, api);
+                }
+                else {
+                    component = plugin(node, this);
+                }
             }
             return !!component;
         });
@@ -699,7 +796,7 @@ function YeastNodeRenderer(props) {
             return;
         setRenderer(new ReactRenderer(props.customRenderers));
     }, [props.customRenderers]);
-    return React.createElement(React.Fragment, { key: key.current }, renderer.renderComponents(props.nodes));
+    return React.createElement(React.Fragment, { key: key.current }, renderer.renderComponents(props.nodes, props.api));
 }
 
 function YeastDocumentRenderer(props) {
@@ -726,7 +823,7 @@ function YeastDocumentRenderer(props) {
     return (React.createElement("div", { className: className },
         React.createElement("h1", null, title),
         author && React.createElement("h2", null, author),
-        React.createElement(YeastNodeRenderer, { nodes: (_c = props.ast) === null || _c === void 0 ? void 0 : _c.children, customRenderers: props.customRenderers })));
+        React.createElement(YeastNodeRenderer, { nodes: (_c = props.ast) === null || _c === void 0 ? void 0 : _c.children, customRenderers: props.customRenderers, api: props.api })));
 }
 
 export { ReactRenderer, YeastDocumentRenderer, YeastNodeRenderer, useKey };

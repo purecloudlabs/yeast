@@ -171,7 +171,7 @@ export class ReactRenderer {
 		Object.entries(renderers).some(([nodeType, plugin]) => {
 			if (typedNode.type.toLowerCase() === nodeType.toLowerCase()) {
 				component = plugin(node, this);
-				if (component === renderers[YeastBlockNodeTypes.Image]) {
+				if (component === renderers[YeastInlineNodeTypes.Image]) {
 					component = plugin(node, this, api);
 				} else {
 					component = plugin(node, this);

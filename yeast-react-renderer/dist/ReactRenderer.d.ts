@@ -1,8 +1,9 @@
 import './styles/ReactRenderer.scss';
 import { ReactNode } from 'react';
 import { YeastBlockNodeTypes, YeastInlineNodeTypes, YeastChild } from 'yeast-core';
+import CmsApi from './helpers/types';
 export interface NodeRendererPlugin {
-    (node: YeastChild, renderer: ReactRenderer): ReactNode | undefined;
+    (node: YeastChild, renderer: ReactRenderer, api?: CmsApi): ReactNode | undefined;
 }
 export type NodeRendererMapKeys = YeastBlockNodeTypes | YeastInlineNodeTypes | string;
 export type NodeRendererMap = {
@@ -16,6 +17,6 @@ export declare class ReactRenderer {
     customRenderers?: NodeRendererMap;
     unhandledNodeRenderer?: NodeRendererPlugin;
     constructor(customRenderers?: NodeRendererMap);
-    renderComponents(nodes: YeastChild[] | undefined): ReactNode;
-    renderComponent(node: YeastChild, renderers: NodeRendererMap): ReactNode;
+    renderComponents(nodes: YeastChild[] | undefined, api?: CmsApi): ReactNode;
+    renderComponent(node: YeastChild, renderers: NodeRendererMap, api: CmsApi): ReactNode;
 }
