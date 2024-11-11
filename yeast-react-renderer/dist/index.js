@@ -773,8 +773,7 @@ class ReactRenderer {
         let component;
         Object.entries(renderers).some(([nodeType, plugin]) => {
             if (typedNode.type.toLowerCase() === nodeType.toLowerCase()) {
-                component = plugin(node, this);
-                if (component === renderers[YeastInlineNodeTypes.Image]) {
+                if (nodeType === YeastInlineNodeTypes.Image) {
                     component = plugin(node, this, api, property);
                 }
                 else {
