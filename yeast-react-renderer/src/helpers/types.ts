@@ -1,7 +1,12 @@
 export default interface AssetContent {
-	content: any;
-	contentType: string;
+    content: any;
+    contentType: string;
 }
+
 export default interface CmsApi {
-	getAssetContent: (draftId: string, asBlob?: boolean) => Promise<AssetContent | undefined>
+    AssetsApi: AssetsApi;
+}
+
+interface AssetsApi {
+    getAssetContent: (draftId: string, asBlob?: boolean) => Promise<AssetContent | undefined>;
 }

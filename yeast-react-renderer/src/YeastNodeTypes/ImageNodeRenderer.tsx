@@ -76,7 +76,7 @@ export default function ImageNodeRenderer(props: IProps) {
 				return src;
 			} else {
 				// Load image from API and set src as encoded image data
-				const content = await props.api.getAssetContent(newSrc.pathname, true);
+				const content = await props.api.AssetsApi.getAssetContent(newSrc.pathname, true);
 				if (!content) {
 					setLoadingError('Failed to load image');
 				}

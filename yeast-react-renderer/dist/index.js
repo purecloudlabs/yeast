@@ -481,7 +481,7 @@ function ImageNodeRenderer(props) {
             }
             else {
                 // Load image from API and set src as encoded image data
-                const content = yield props.api.getAssetContent(newSrc.pathname, true);
+                const content = yield props.api.AssetsApi.getAssetContent(newSrc.pathname, true);
                 if (!content) {
                     setLoadingError('Failed to load image');
                 }
