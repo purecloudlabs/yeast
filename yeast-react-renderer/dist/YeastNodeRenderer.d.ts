@@ -5,6 +5,6 @@ import CmsApi from './helpers/types';
 export interface YeastNodeRendererProps {
     nodes: YeastChild[];
     customRenderers?: NodeRendererMap;
-    api: CmsApi;
+    api?: CmsApi;
 }
 export default function YeastNodeRenderer(props: YeastNodeRendererProps): React.JSX.Element;
