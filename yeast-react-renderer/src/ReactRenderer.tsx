@@ -46,10 +46,10 @@ import TableNodeRenderer from './YeastNodeTypes/TableNodeRenderer';
 import HorizontalRuleNodeRenderer from './YeastNodeTypes/HorizontalRuleNodeRenderer';
 
 import { DiffRenderData, getDiffRenderData } from './helpers/diff';
-import CmsApi from './helpers/types';
+import CmsApi, { CMSProperties } from './helpers/types';
 
 export interface NodeRendererPlugin {
-	(node: YeastChild, renderer: ReactRenderer, api?: CmsApi): ReactNode | undefined;
+	(node: YeastChild, renderer: ReactRenderer, api?: CmsApi, property?: CMSProperties): ReactNode | undefined;
 }
 
 export type NodeRendererMapKeys = YeastBlockNodeTypes | YeastInlineNodeTypes | string;
@@ -96,8 +96,8 @@ export class ReactRenderer {
 		[YeastBlockNodeTypes.Table]: (node: TableNode, renderer: ReactRenderer) => {
 			return <TableNodeRenderer key={uuidv4()} node={node} renderer={renderer} />;
 		},
-		[YeastInlineNodeTypes.Image]: (node: ImageNode, renderer: ReactRenderer, api: CmsApi) => {
-			return <ImageNodeRenderer key={uuidv4()} node={node} renderer={renderer} api={api}/>;
+		[YeastInlineNodeTypes.Image]: (node: ImageNode, renderer: ReactRenderer, api: CmsApi, property: CMSProperties) => {
+			return <ImageNodeRenderer key={uuidv4()} node={node} renderer={renderer} api={api} property={property}/>;
 		},
 		[YeastBlockNodeTypes.HorizontalRule]: (node: HorizontalRuleNode, renderer: ReactRenderer) => {
 			return <HorizontalRuleNodeRenderer key={uuidv4()} node={node} renderer={renderer} />;
@@ -126,15 +126,15 @@ export class ReactRenderer {
 		this.customRenderers = customRenderers;
 	}
 
-	renderComponents(nodes: YeastChild[] | undefined, api?: CmsApi): ReactNode {
+	renderComponents(nodes: YeastChild[] | undefined, api?: CmsApi, property?: CMSProperties): ReactNode {
 		if (!nodes) return;
 		return nodes.map((node, i) => {
 			// Render the node using custom renderers
-			let rendered = this.renderComponent(node, this.customRenderers, api);
+			let rendered = this.renderComponent(node, this.customRenderers, api, property);
 			if (!!rendered) return rendered;
 
 			// Render the node using defaults
-			rendered = this.renderComponent(node, this.defaultRenderers, api);
+			rendered = this.renderComponent(node, this.defaultRenderers, api, property);
 			if (!!rendered) return rendered;
 
 			// Fallback to custom unhandled renderer
@@ -157,7 +157,7 @@ export class ReactRenderer {
 		});
 	}
 
-	renderComponent(node: YeastChild, renderers: NodeRendererMap, api: CmsApi): ReactNode {
+	renderComponent(node: YeastChild, renderers: NodeRendererMap, api: CmsApi, property: CMSProperties): ReactNode {
 		if (!node || !renderers) return;
 
 		// Untyped nodes aren't handled here
@@ -172,7 +172,7 @@ export class ReactRenderer {
 			if (typedNode.type.toLowerCase() === nodeType.toLowerCase()) {
 				component = plugin(node, this);
 				if (component === renderers[YeastInlineNodeTypes.Image]) {
-					component = plugin(node, this, api);
+					component = plugin(node, this, api, property);
 				} else {
 					component = plugin(node, this);
 				}

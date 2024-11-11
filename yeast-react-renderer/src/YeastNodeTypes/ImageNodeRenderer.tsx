@@ -4,13 +4,14 @@ import { ImageNode } from 'yeast-core';
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import CmsApi from '../helpers/types'
+import CmsApi, { CMSProperties } from '../helpers/types'
 import { LoadingPlaceholder } from 'genesys-react-components';
 
 interface IProps {
 	node: ImageNode;
 	renderer: ReactRenderer;
 	api: CmsApi;
+	property: CMSProperties;
 }
 
 const hostnameRegex = /^https?:\/\//i;
@@ -76,8 +77,7 @@ export default function ImageNodeRenderer(props: IProps) {
 				return src;
 			} else {
 				// Load image from API and set src as encoded image data
-				const property = "api-central";
-				const content = await props.api.AssetsApi.getAssetContent(property, newSrc.pathname);
+				const content = await props.api.AssetsApi.getAssetContent(props.property, newSrc.pathname);
 				if (!content) {
 					setLoadingError('Failed to load image');
 				}

@@ -3,12 +3,13 @@ import { YeastChild } from 'yeast-core';
 
 import { useKey } from './helpers/useKey';
 import { ReactRenderer, NodeRendererMap } from './ReactRenderer';
-import CmsApi from './helpers/types';
+import CmsApi, { CMSProperties } from './helpers/types';
 
 export interface YeastNodeRendererProps {
 	nodes: YeastChild[];
 	customRenderers?: NodeRendererMap;
 	api?: CmsApi;
+	property?: CMSProperties;
 }
 
 export default function YeastNodeRenderer(props: YeastNodeRendererProps) {
@@ -20,5 +21,5 @@ export default function YeastNodeRenderer(props: YeastNodeRendererProps) {
 		setRenderer(new ReactRenderer(props.customRenderers));
 	}, [props.customRenderers]);
 
-	return <React.Fragment key={key.current}>{renderer.renderComponents(props.nodes, props.api)}</React.Fragment>;
+	return <React.Fragment key={key.current}>{renderer.renderComponents(props.nodes, props.api, props.property)}</React.Fragment>;
 }

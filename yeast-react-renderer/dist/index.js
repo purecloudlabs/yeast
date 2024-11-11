@@ -481,8 +481,7 @@ function ImageNodeRenderer(props) {
             }
             else {
                 // Load image from API and set src as encoded image data
-                const property = "api-central";
-                const content = yield props.api.AssetsApi.getAssetContent(property, newSrc.pathname);
+                const content = yield props.api.AssetsApi.getAssetContent(props.property, newSrc.pathname);
                 if (!content) {
                     setLoadingError('Failed to load image');
                 }
@@ -704,8 +703,8 @@ class ReactRenderer {
             [YeastBlockNodeTypes.Table]: (node, renderer) => {
                 return React.createElement(TableNodeRenderer, { key: v4(), node: node, renderer: renderer });
             },
-            [YeastInlineNodeTypes.Image]: (node, renderer, api) => {
-                return React.createElement(ImageNodeRenderer, { key: v4(), node: node, renderer: renderer, api: api });
+            [YeastInlineNodeTypes.Image]: (node, renderer, api, property) => {
+                return React.createElement(ImageNodeRenderer, { key: v4(), node: node, renderer: renderer, api: api, property: property });
             },
             [YeastBlockNodeTypes.HorizontalRule]: (node, renderer) => {
                 return React.createElement(HorizontalRuleNodeRenderer, { key: v4(), node: node, renderer: renderer });
@@ -730,16 +729,16 @@ class ReactRenderer {
         };
         this.customRenderers = customRenderers;
     }
-    renderComponents(nodes, api) {
+    renderComponents(nodes, api, property) {
         if (!nodes)
             return;
         return nodes.map((node, i) => {
             // Render the node using custom renderers
-            let rendered = this.renderComponent(node, this.customRenderers, api);
+            let rendered = this.renderComponent(node, this.customRenderers, api, property);
             if (!!rendered)
                 return rendered;
             // Render the node using defaults
-            rendered = this.renderComponent(node, this.defaultRenderers, api);
+            rendered = this.renderComponent(node, this.defaultRenderers, api, property);
             if (!!rendered)
                 return rendered;
             // Fallback to custom unhandled renderer
@@ -762,7 +761,7 @@ class ReactRenderer {
             }
         });
     }
-    renderComponent(node, renderers, api) {
+    renderComponent(node, renderers, api, property) {
         if (!node || !renderers)
             return;
         // Untyped nodes aren't handled here
@@ -776,7 +775,7 @@ class ReactRenderer {
             if (typedNode.type.toLowerCase() === nodeType.toLowerCase()) {
                 component = plugin(node, this);
                 if (component === renderers[YeastInlineNodeTypes.Image]) {
-                    component = plugin(node, this, api);
+                    component = plugin(node, this, api, property);
                 }
                 else {
                     component = plugin(node, this);
@@ -797,7 +796,7 @@ function YeastNodeRenderer(props) {
             return;
         setRenderer(new ReactRenderer(props.customRenderers));
     }, [props.customRenderers]);
-    return React.createElement(React.Fragment, { key: key.current }, renderer.renderComponents(props.nodes, props.api));
+    return React.createElement(React.Fragment, { key: key.current }, renderer.renderComponents(props.nodes, props.api, props.property));
 }
 
 function YeastDocumentRenderer(props) {
@@ -824,7 +823,7 @@ function YeastDocumentRenderer(props) {
     return (React.createElement("div", { className: className },
         React.createElement("h1", null, title),
         author && React.createElement("h2", null, author),
-        React.createElement(YeastNodeRenderer, { nodes: (_c = props.ast) === null || _c === void 0 ? void 0 : _c.children, customRenderers: props.customRenderers, api: props.api })));
+        React.createElement(YeastNodeRenderer, { nodes: (_c = props.ast) === null || _c === void 0 ? void 0 : _c.children, customRenderers: props.customRenderers, api: props.api, property: props.property })));
 }
 
 export { ReactRenderer, YeastDocumentRenderer, YeastNodeRenderer, useKey };
