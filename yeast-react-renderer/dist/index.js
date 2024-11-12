@@ -9838,14 +9838,14 @@ function ImageNodeRenderer(props) {
             const content = yield cmsApi.AssetsApi.getAssetContent(property, keyPath, true);
             if (!content) {
                 setLoadingError('Failed to load image');
-                return;
+                throw new Error('Failed to load image');
             }
             let str = yield readBlob(content === null || content === void 0 ? void 0 : content.content);
             return str;
         }
         else {
             setLoadingError('Failed to load image');
-            return;
+            throw new Error('Failed to load image');
         }
     });
     const readBlob = (imageBlob) => __awaiter(this, void 0, void 0, function* () {
