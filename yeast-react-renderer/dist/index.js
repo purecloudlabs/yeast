@@ -10116,24 +10116,30 @@ class ReactRenderer {
     }
 }
 
-function YeastNodeRenderer(props) {
-    const key = useKey();
-    const [renderer, setRenderer] = useState$3(new ReactRenderer(props.customRenderers));
+function YeastNodeState(props) {
     const property = useProperty();
     const cmsApi = useCmsApi();
-    useEffect$5(() => {
-        if (props.customRenderers === renderer.customRenderers)
-            return;
-        setRenderer(new ReactRenderer(props.customRenderers));
-    }, [props.customRenderers]);
     useEffect$5(() => {
         if (props.property !== property)
             setProperty(props.property);
         if (props.api !== cmsApi)
             setCmsApi(props.api);
     }, [props.api, props.property]);
+    return React.createElement(React.Fragment, null);
+}
+
+function YeastNodeRenderer(props) {
+    const key = useKey();
+    const [renderer, setRenderer] = useState$3(new ReactRenderer(props.customRenderers));
+    useEffect$5(() => {
+        if (props.customRenderers === renderer.customRenderers)
+            return;
+        setRenderer(new ReactRenderer(props.customRenderers));
+    }, [props.customRenderers]);
     return (React.createElement(Recoil_index_5, null,
         React.createElement(_default, null),
+        "props.property && props.api && ",
+        React.createElement(YeastNodeState, { api: props.api, property: props.property }),
         React.createElement(React.Fragment, { key: key.current }, renderer.renderComponents(props.nodes))));
 }
 
@@ -10158,12 +10164,10 @@ function YeastDocumentRenderer(props) {
             author = diffRenderData.renderedNodes['author'];
         }
     }
-    return (React.createElement(Recoil_index_5, null,
-        React.createElement(_default, null),
-        React.createElement("div", { className: className },
-            React.createElement("h1", null, title),
-            author && React.createElement("h2", null, author),
-            React.createElement(YeastNodeRenderer, { nodes: (_c = props.ast) === null || _c === void 0 ? void 0 : _c.children, customRenderers: props.customRenderers, api: props.api, property: props.property }))));
+    return (React.createElement("div", { className: className },
+        React.createElement("h1", null, title),
+        author && React.createElement("h2", null, author),
+        React.createElement(YeastNodeRenderer, { nodes: (_c = props.ast) === null || _c === void 0 ? void 0 : _c.children, customRenderers: props.customRenderers, api: props.api, property: props.property })));
 }
 
 export { ReactRenderer, YeastDocumentRenderer, YeastNodeRenderer, useKey };
