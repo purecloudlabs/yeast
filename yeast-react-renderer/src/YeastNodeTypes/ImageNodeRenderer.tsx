@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState }  from 'react';
 import { ImageNode } from 'yeast-core';
+import { useRecoilState } from 'recoil';
 
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import CmsApi, { CMSProperties } from '../helpers/types'
-import { useProperty } from '../atoms/PropertyAtom';
-import { useCmsApi } from '../atoms/CmsApiAtom';
+import { propertyAtom } from '../atoms/PropertyAtom';
+import { cmsApiAtom, useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 
 interface IProps {
@@ -17,6 +17,8 @@ interface IProps {
 const hostnameRegex = /^https?:\/\//i;
 
 export default function ImageNodeRenderer(props: IProps) {
+	const [property, setProperty] = useRecoilState(propertyAtom)
+	const [cmsApi, setCmsApi] = useRecoilState(cmsApiAtom);
 	const [imgSrc, setImgSrc] = useState<string>();
 	const [loadingError, setLoadingError] = useState<string>();
 	const [oldSrc, setOldSrc] = useState<string>();
@@ -26,8 +28,6 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [oldTitle, setOldTitle] = useState<string>();
 	const [newTitle, setNewTitle] = useState<string>();
 	const [diffRenderData, setDiffRenderData] = useState<DiffRenderData>();
-	const property = useProperty();
-	const cmsApi = useCmsApi();
 
 	const key1 = useKey();
 	const key2 = useKey();
