@@ -9767,6 +9767,8 @@ function ImageNodeRenderer(props) {
     const key1 = useKey();
     const key2 = useKey();
     const currentSrc = useRef$6();
+    const currentProperty = useRef$6();
+    const currentCmsApi = useRef$6();
     const currentNode = useRef$6();
     useEffect$5(() => {
         if (JSON.stringify(props.node) === JSON.stringify(currentNode))
@@ -9793,8 +9795,10 @@ function ImageNodeRenderer(props) {
             }
             setDiffRenderData(newDiffRenderData);
         }
-        else if (currentSrc.current !== props.node.src) {
+        else if (currentSrc.current !== props.node.src || currentProperty.current !== property || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
             currentSrc.current = props.node.src;
+            currentProperty.current = property;
+            currentCmsApi.current = cmsApi;
             (() => __awaiter(this, void 0, void 0, function* () {
                 const newSrc = yield getImgSrc(props.node.src);
                 if (newSrc)
@@ -9815,12 +9819,18 @@ function ImageNodeRenderer(props) {
             }
             else {
                 // Load image from API and set src as encoded image data
-                const content = yield cmsApi.AssetsApi.getAssetContent(property, newSrc.pathname);
-                if (!content) {
-                    setLoadingError('Failed to load image');
+                if (property && cmsApi) {
+                    const content = yield cmsApi.AssetsApi.getAssetContent(property, newSrc.pathname);
+                    if (!content) {
+                        setLoadingError('Failed to load image');
+                    }
+                    let str = yield readBlob(content === null || content === void 0 ? void 0 : content.content);
+                    return str;
                 }
-                let str = yield readBlob(content === null || content === void 0 ? void 0 : content.content);
-                return str;
+                else {
+                    setLoadingError('Failed to load image');
+                    return;
+                }
             }
         }
         catch (err) {

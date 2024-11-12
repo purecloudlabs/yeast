@@ -7,6 +7,7 @@ import { ReactRenderer } from '../ReactRenderer';
 import { useProperty } from '../atoms/PropertyAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
+import CmsApi, { CMSProperties } from '../helpers/types';
 
 interface IProps {
 	node: ImageNode;
@@ -31,6 +32,8 @@ export default function ImageNodeRenderer(props: IProps) {
 	const key1 = useKey();
 	const key2 = useKey();
 	const currentSrc = useRef<string>();
+	const currentProperty = useRef<CMSProperties>();
+	const currentCmsApi = useRef<CmsApi>();
 	const currentNode = useRef<ImageNode>();
 
 
@@ -57,8 +60,11 @@ export default function ImageNodeRenderer(props: IProps) {
 			}
 
 			setDiffRenderData(newDiffRenderData);
-		} else if (currentSrc.current !== props.node.src) {
+		} else if (currentSrc.current !== props.node.src || currentProperty.current !== property || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
 			currentSrc.current = props.node.src;
+			currentProperty.current = property;
+			currentCmsApi.current = cmsApi;
+
 			(async () => {
 				const newSrc = await getImgSrc(props.node.src);
 				if (newSrc) setImgSrc(newSrc)
@@ -78,12 +84,17 @@ export default function ImageNodeRenderer(props: IProps) {
 				return src;
 			} else {
 				// Load image from API and set src as encoded image data
-				const content = await cmsApi.AssetsApi.getAssetContent(property, newSrc.pathname);
-				if (!content) {
+				if (property && cmsApi) {
+					const content = await cmsApi.AssetsApi.getAssetContent(property, newSrc.pathname);
+					if (!content) {
+						setLoadingError('Failed to load image');
+					}
+					let str = await readBlob(content?.content);
+					return str;
+				} else {
 					setLoadingError('Failed to load image');
+					return;
 				}
-				let str = await readBlob(content?.content);
-				return str;
 			}
 		} catch (err) {
 			console.error(err);
