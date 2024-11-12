@@ -9700,7 +9700,7 @@ function RecoilNexus() {
     }, []);
     return null;
 }
-RecoilNexus$1.default = RecoilNexus;
+var _default = RecoilNexus$1.default = RecoilNexus;
 function getRecoil(atom) {
     return nexus.get(atom);
 }
@@ -10132,7 +10132,9 @@ function YeastNodeRenderer(props) {
         if (props.api !== cmsApi)
             setCmsApi(props.api);
     }, [props.api, props.property]);
-    return React.createElement(React.Fragment, { key: key.current }, renderer.renderComponents(props.nodes));
+    return (React.createElement(Recoil_index_5, null,
+        React.createElement(_default, null),
+        React.createElement(React.Fragment, { key: key.current }, renderer.renderComponents(props.nodes))));
 }
 
 function YeastDocumentRenderer(props) {
@@ -10156,10 +10158,12 @@ function YeastDocumentRenderer(props) {
             author = diffRenderData.renderedNodes['author'];
         }
     }
-    return (React.createElement("div", { className: className },
-        React.createElement("h1", null, title),
-        author && React.createElement("h2", null, author),
-        React.createElement(YeastNodeRenderer, { nodes: (_c = props.ast) === null || _c === void 0 ? void 0 : _c.children, customRenderers: props.customRenderers, api: props.api, property: props.property })));
+    return (React.createElement(Recoil_index_5, null,
+        React.createElement(_default, null),
+        React.createElement("div", { className: className },
+            React.createElement("h1", null, title),
+            author && React.createElement("h2", null, author),
+            React.createElement(YeastNodeRenderer, { nodes: (_c = props.ast) === null || _c === void 0 ? void 0 : _c.children, customRenderers: props.customRenderers, api: props.api, property: props.property }))));
 }
 
 export { ReactRenderer, YeastDocumentRenderer, YeastNodeRenderer, useKey };
