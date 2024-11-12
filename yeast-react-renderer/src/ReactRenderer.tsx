@@ -49,7 +49,7 @@ import { DiffRenderData, getDiffRenderData } from './helpers/diff';
 import CmsApi, { CMSProperties } from './helpers/types';
 
 export interface NodeRendererPlugin {
-	(node: YeastChild, renderer: ReactRenderer, api?: CmsApi, property?: CMSProperties): ReactNode | undefined;
+	(node: YeastChild, renderer: ReactRenderer): ReactNode | undefined;
 }
 
 export type NodeRendererMapKeys = YeastBlockNodeTypes | YeastInlineNodeTypes | string;
