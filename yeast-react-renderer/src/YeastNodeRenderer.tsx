@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { YeastChild } from 'yeast-core';
+import { RecoilRoot } from 'recoil';
+import RecoilNexus from 'recoil-nexus';
 
 import { useKey } from './helpers/useKey';
 import { ReactRenderer, NodeRendererMap } from './ReactRenderer';
@@ -30,5 +32,10 @@ export default function YeastNodeRenderer(props: YeastNodeRendererProps) {
 		if (props.api !== cmsApi) setCmsApi(props.api);
 	}, [props.api, props.property]);
 
-	return <React.Fragment key={key.current}>{renderer.renderComponents(props.nodes)}</React.Fragment>;
+	return (
+		<RecoilRoot>
+			<RecoilNexus />
+			<React.Fragment key={key.current}>{renderer.renderComponents(props.nodes)}</React.Fragment>
+		</RecoilRoot>
+	);
 }

@@ -1,5 +1,7 @@
 import React, { ReactNode } from 'react';
 import { DocumentNode } from 'yeast-core';
+import { RecoilRoot } from 'recoil';
+import RecoilNexus from 'recoil-nexus';
 
 import { NodeRendererMap } from './ReactRenderer';
 import YeastNodeRenderer from './YeastNodeRenderer';
@@ -35,10 +37,13 @@ export default function YeastDocumentRenderer(props: IProps) {
 	}
 
 	return (
-		<div className={className}>
-			<h1>{title}</h1>
-			{author && <h2>{author}</h2>}
-			<YeastNodeRenderer nodes={props.ast?.children} customRenderers={props.customRenderers} api={props.api} property={props.property}/>
-		</div>
+		<RecoilRoot>
+			<RecoilNexus />
+			<div className={className}>
+				<h1>{title}</h1>
+				{author && <h2>{author}</h2>}
+				<YeastNodeRenderer nodes={props.ast?.children} customRenderers={props.customRenderers} api={props.api} property={props.property}/>
+			</div>
+		</RecoilRoot>
 	);
 }
