@@ -9753,6 +9753,8 @@ function setCmsApi(cmsApi) {
 
 const hostnameRegex = /^https?:\/\//i;
 function ImageNodeRenderer(props) {
+    const [property, setProperty] = Recoil_index_22(propertyAtom);
+    const [cmsApi, setCmsApi] = Recoil_index_22(cmsApiAtom);
     const [imgSrc, setImgSrc] = useState$3();
     const [loadingError, setLoadingError] = useState$3();
     const [oldSrc, setOldSrc] = useState$3();
@@ -9762,8 +9764,6 @@ function ImageNodeRenderer(props) {
     const [oldTitle, setOldTitle] = useState$3();
     const [newTitle, setNewTitle] = useState$3();
     const [diffRenderData, setDiffRenderData] = useState$3();
-    const property = useProperty();
-    const cmsApi = useCmsApi();
     const key1 = useKey();
     const key2 = useKey();
     const currentSrc = useRef$6();
