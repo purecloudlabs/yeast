@@ -17,6 +17,6 @@ export declare class ReactRenderer {
     customRenderers?: NodeRendererMap;
     unhandledNodeRenderer?: NodeRendererPlugin;
     constructor(customRenderers?: NodeRendererMap);
-    renderComponents(nodes: YeastChild[] | undefined, api?: CmsApi, property?: CMSProperties): ReactNode;
-    renderComponent(node: YeastChild, renderers: NodeRendererMap, api: CmsApi, property: CMSProperties): ReactNode;
+    renderComponents(nodes: YeastChild[] | undefined): ReactNode;
+    renderComponent(node: YeastChild, renderers: NodeRendererMap): ReactNode;
 }

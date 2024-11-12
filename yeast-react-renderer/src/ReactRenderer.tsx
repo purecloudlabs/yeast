@@ -96,8 +96,8 @@ export class ReactRenderer {
 		[YeastBlockNodeTypes.Table]: (node: TableNode, renderer: ReactRenderer) => {
 			return <TableNodeRenderer key={uuidv4()} node={node} renderer={renderer} />;
 		},
-		[YeastInlineNodeTypes.Image]: (node: ImageNode, renderer: ReactRenderer, api: CmsApi, property: CMSProperties) => {
-			return <ImageNodeRenderer key={uuidv4()} node={node} renderer={renderer} api={api} property={property}/>;
+		[YeastInlineNodeTypes.Image]: (node: ImageNode, renderer: ReactRenderer) => {
+			return <ImageNodeRenderer key={uuidv4()} node={node} renderer={renderer} />;
 		},
 		[YeastBlockNodeTypes.HorizontalRule]: (node: HorizontalRuleNode, renderer: ReactRenderer) => {
 			return <HorizontalRuleNodeRenderer key={uuidv4()} node={node} renderer={renderer} />;
@@ -126,15 +126,15 @@ export class ReactRenderer {
 		this.customRenderers = customRenderers;
 	}
 
-	renderComponents(nodes: YeastChild[] | undefined, api?: CmsApi, property?: CMSProperties): ReactNode {
+	renderComponents(nodes: YeastChild[] | undefined): ReactNode {
 		if (!nodes) return;
 		return nodes.map((node, i) => {
 			// Render the node using custom renderers
-			let rendered = this.renderComponent(node, this.customRenderers, api, property);
+			let rendered = this.renderComponent(node, this.customRenderers);
 			if (!!rendered) return rendered;
 
 			// Render the node using defaults
-			rendered = this.renderComponent(node, this.defaultRenderers, api, property);
+			rendered = this.renderComponent(node, this.defaultRenderers);
 			if (!!rendered) return rendered;
 
 			// Fallback to custom unhandled renderer
@@ -157,7 +157,7 @@ export class ReactRenderer {
 		});
 	}
 
-	renderComponent(node: YeastChild, renderers: NodeRendererMap, api: CmsApi, property: CMSProperties): ReactNode {
+	renderComponent(node: YeastChild, renderers: NodeRendererMap): ReactNode {
 		if (!node || !renderers) return;
 
 		// Untyped nodes aren't handled here
@@ -170,11 +170,7 @@ export class ReactRenderer {
 		let component: ReactNode;
 		Object.entries(renderers).some(([nodeType, plugin]) => {
 			if (typedNode.type.toLowerCase() === nodeType.toLowerCase()) {
-				if (nodeType === YeastInlineNodeTypes.Image) {
-					component = plugin(node, this, api, property);
-				} else {
-					component = plugin(node, this);
-				}
+				component = plugin(node, this);
 			}
 			return !!component;
 		});

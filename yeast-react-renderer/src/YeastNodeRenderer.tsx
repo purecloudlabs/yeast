@@ -21,5 +21,5 @@ export default function YeastNodeRenderer(props: YeastNodeRendererProps) {
 		setRenderer(new ReactRenderer(props.customRenderers));
 	}, [props.customRenderers]);
 
-	return <React.Fragment key={key.current}>{renderer.renderComponents(props.nodes, props.api, props.property)}</React.Fragment>;
+	return <React.Fragment key={key.current}>{renderer.renderComponents(props.nodes)}</React.Fragment>;
 }
