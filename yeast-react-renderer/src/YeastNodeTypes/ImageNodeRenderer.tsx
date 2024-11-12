@@ -111,6 +111,7 @@ export default function ImageNodeRenderer(props: IProps) {
 			const content = await cmsApi.AssetsApi.getAssetContent(property, keyPath, true);
 			if (!content) {
 				setLoadingError('Failed to load image');
+				return;
 			}
 			let str = await readBlob(content?.content);
 			return str;

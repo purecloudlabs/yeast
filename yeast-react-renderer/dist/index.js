@@ -9838,6 +9838,7 @@ function ImageNodeRenderer(props) {
             const content = yield cmsApi.AssetsApi.getAssetContent(property, keyPath, true);
             if (!content) {
                 setLoadingError('Failed to load image');
+                return;
             }
             let str = yield readBlob(content === null || content === void 0 ? void 0 : content.content);
             return str;
