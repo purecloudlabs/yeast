@@ -9669,7 +9669,7 @@ var RecoilNexus$1 = {};
 var require$$0 = /*@__PURE__*/getAugmentedNamespace(es);
 
 Object.defineProperty(RecoilNexus$1, "__esModule", { value: true });
-RecoilNexus$1.resetRecoil = RecoilNexus$1.setRecoil = RecoilNexus$1.getRecoilPromise = RecoilNexus$1.getRecoil = void 0;
+RecoilNexus$1.resetRecoil = setRecoil_1 = RecoilNexus$1.setRecoil = RecoilNexus$1.getRecoilPromise = RecoilNexus$1.getRecoil = void 0;
 var recoil_1 = require$$0;
 var nexus = {};
 function RecoilNexus() {
@@ -9712,7 +9712,7 @@ RecoilNexus$1.getRecoilPromise = getRecoilPromise;
 function setRecoil(atom, valOrUpdater) {
     nexus.set(atom, valOrUpdater);
 }
-RecoilNexus$1.setRecoil = setRecoil;
+var setRecoil_1 = RecoilNexus$1.setRecoil = setRecoil;
 function resetRecoil(atom) {
     nexus.reset(atom);
 }
@@ -9733,6 +9733,12 @@ const propertyAtom = Recoil_index_8({
 function useProperty() {
     return Recoil_index_20(propertyAtom);
 }
+function setProperty(property) {
+    if (Object.values(CMSProperties).includes(property))
+        setRecoil_1(propertyAtom, property);
+    else
+        setRecoil_1(propertyAtom, CMSProperties.None);
+}
 
 const cmsApiAtom = Recoil_index_8({
     key: 'CmsApi',
@@ -9740,6 +9746,9 @@ const cmsApiAtom = Recoil_index_8({
 });
 function useCmsApi() {
     return Recoil_index_20(cmsApiAtom);
+}
+function setCmsApi(cmsApi) {
+    setRecoil_1(cmsApiAtom, cmsApi);
 }
 
 const hostnameRegex = /^https?:\/\//i;
@@ -10110,11 +10119,19 @@ class ReactRenderer {
 function YeastNodeRenderer(props) {
     const key = useKey();
     const [renderer, setRenderer] = useState$3(new ReactRenderer(props.customRenderers));
+    const property = useProperty();
+    const cmsApi = useCmsApi();
     useEffect$5(() => {
         if (props.customRenderers === renderer.customRenderers)
             return;
         setRenderer(new ReactRenderer(props.customRenderers));
     }, [props.customRenderers]);
+    useEffect$5(() => {
+        if (props.property !== property)
+            setProperty(props.property);
+        if (props.api !== cmsApi)
+            setCmsApi(props.api);
+    }, [props.api, props.property]);
     return React.createElement(React.Fragment, { key: key.current }, renderer.renderComponents(props.nodes));
 }
 

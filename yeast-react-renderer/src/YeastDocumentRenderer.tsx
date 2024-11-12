@@ -11,7 +11,7 @@ interface IProps {
 	className?: string;
 	customRenderers?: NodeRendererMap;
 	api?: CmsApi;
-	property?: CMSProperties
+	property?: CMSProperties;
 }
 
 export default function YeastDocumentRenderer(props: IProps) {
