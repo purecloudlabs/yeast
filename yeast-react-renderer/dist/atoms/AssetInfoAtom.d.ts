@@ -1,6 +1,6 @@
 import { CMSProperties } from '../helpers/types';
 export interface AssetInfo {
-    property: CMSProperties;
+    property: CMSProperties | undefined;
     keyPath: string;
 }
 export declare const assetInfoAtom: import("recoil").RecoilState<AssetInfo>;

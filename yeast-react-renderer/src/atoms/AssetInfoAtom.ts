@@ -3,7 +3,7 @@ import { setRecoil } from 'recoil-nexus';
 import CmsApi, { CMSProperties } from '../helpers/types';
 
 export interface AssetInfo {
-    property: CMSProperties;
+    property: CMSProperties | undefined;
     keyPath: string;
 }
 
