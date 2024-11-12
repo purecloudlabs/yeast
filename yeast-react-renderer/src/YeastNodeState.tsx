@@ -1,22 +1,22 @@
 import React, { useEffect } from 'react';
 
 import CmsApi, { CMSProperties } from './helpers/types';
-import { setProperty, useProperty } from './atoms/PropertyAtom';
+import { AssetInfo, setAssetInfo, useAssetInfo } from './atoms/AssetInfoAtom';
 import { setCmsApi, useCmsApi } from './atoms/CmsApiAtom';
 
 export interface YeastNodeStateProps {
 	api: CmsApi;
-	property: CMSProperties;
+	assetInfo: AssetInfo;
 }
 
 export default function YeastNodeState(props: YeastNodeStateProps) {
-    const property = useProperty();
+    const assetInfo: AssetInfo = useAssetInfo();
     const cmsApi = useCmsApi();
 
     useEffect(() => {
-		if (props.property !== property) setProperty(props.property);
+		if (props.assetInfo !== assetInfo) setAssetInfo(props.assetInfo);
 		if (props.api !== cmsApi) setCmsApi(props.api);
-	}, [props.api, props.property]);
+	}, [props.api, props.assetInfo]);
 
     return <></>;
 }

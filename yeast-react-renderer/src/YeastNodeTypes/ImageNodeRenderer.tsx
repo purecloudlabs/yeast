@@ -4,7 +4,7 @@ import { ImageNode } from 'yeast-core';
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import { useProperty } from '../atoms/PropertyAtom';
+import { useAssetInfo } from '../atoms/AssetInfoAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 import CmsApi, { CMSProperties } from '../helpers/types';
@@ -15,6 +15,7 @@ interface IProps {
 }
 
 const hostnameRegex = /^https?:\/\//i;
+const filepathRegex = /^(\/)?(.+\.(jpg|jpeg|png|svg))$/i;
 
 export default function ImageNodeRenderer(props: IProps) {
 	const [imgSrc, setImgSrc] = useState<string>();
@@ -26,7 +27,7 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [oldTitle, setOldTitle] = useState<string>();
 	const [newTitle, setNewTitle] = useState<string>();
 	const [diffRenderData, setDiffRenderData] = useState<DiffRenderData>();
-	const property = useProperty();
+	const assetInfo = useAssetInfo();
 	const cmsApi = useCmsApi();
 
 	const key1 = useKey();
@@ -60,9 +61,9 @@ export default function ImageNodeRenderer(props: IProps) {
 			}
 
 			setDiffRenderData(newDiffRenderData);
-		} else if (currentSrc.current !== props.node.src || currentProperty.current !== property || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
+		} else if (currentSrc.current !== props.node.src || currentProperty.current !== assetInfo.property || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
 			currentSrc.current = props.node.src;
-			currentProperty.current = property;
+			currentProperty.current = assetInfo.property;
 			currentCmsApi.current = cmsApi;
 
 			(async () => {
@@ -70,35 +71,52 @@ export default function ImageNodeRenderer(props: IProps) {
 				if (newSrc) setImgSrc(newSrc)
 			})();
 		}
-	}, [props.node, property, cmsApi]);
+	}, [props.node, assetInfo, cmsApi]);
 
 	const getImgSrc = async (src: string): Promise<string | undefined> => {
+		setLoadingError(undefined);
+		setImgSrc(undefined);
+		const match = hostnameRegex.exec(src);
+		let newSrc = new URL(src, window.location.href);
+		const isSameHost = window.location.hostname.toLowerCase() === newSrc.hostname.toLowerCase();
 		try {
-			setLoadingError(undefined);
-			setImgSrc(undefined);
-			const match = hostnameRegex.exec(src);
-			let newSrc = new URL(src, window.location.href);
-			const isSameHost = window.location.hostname.toLowerCase() === newSrc.hostname.toLowerCase();
 			if (match && !isSameHost) {
 				// Set src to URL to let the browser load the image normally
 				return src;
 			} else {
 				// Load image from API and set src as encoded image data
-				if (property && cmsApi) {
-					const content = await cmsApi.AssetsApi.getAssetContent(property, newSrc.pathname, true);
-					if (!content) {
-						setLoadingError('Failed to load image');
-					}
-					let str = await readBlob(content?.content);
-					return str;
-				} else {
-					setLoadingError('Failed to load image');
-					return;
-				}
+				return getImg(assetInfo.property, newSrc.pathname);
 			}
 		} catch (err) {
-			console.error(err);
+			const filepathMatch = filepathRegex.exec(newSrc.pathname);
+			if (filepathMatch) {
+				let normalizedPath: string = filepathMatch[0];
+				if (filepathMatch[1] === '/') normalizedPath = filepathMatch[2];
+				try {
+					const resolvedSrc = assetInfo.keyPath + '/' + normalizedPath;
+					return getImg(assetInfo.property, resolvedSrc);
+				} catch (err) {
+					console.error(err);
+					setLoadingError('Failed to load image');
+				}
+			} else {
+				console.error(err);
+				setLoadingError('Failed to load image');
+			}
+		}
+	};
+
+	const getImg = async(property: string, keyPath: string): Promise<string | undefined> => {
+		if (property && cmsApi) {
+			const content = await cmsApi.AssetsApi.getAssetContent(property, keyPath, true);
+			if (!content) {
+				setLoadingError('Failed to load image');
+			}
+			let str = await readBlob(content?.content);
+			return str;
+		} else {
 			setLoadingError('Failed to load image');
+			return;
 		}
 	};
 

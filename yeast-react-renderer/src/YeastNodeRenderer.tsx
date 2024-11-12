@@ -7,12 +7,13 @@ import { useKey } from './helpers/useKey';
 import { ReactRenderer, NodeRendererMap } from './ReactRenderer';
 import CmsApi, { CMSProperties } from './helpers/types';
 import YeastNodeState from './YeastNodeState';
+import { AssetInfo } from './atoms/AssetInfoAtom';
 
 export interface YeastNodeRendererProps {
 	nodes: YeastChild[];
 	customRenderers?: NodeRendererMap;
 	api?: CmsApi;
-	property?: CMSProperties;
+	assetInfo?: AssetInfo;
 }
 
 export default function YeastNodeRenderer(props: YeastNodeRendererProps) {
@@ -27,7 +28,7 @@ export default function YeastNodeRenderer(props: YeastNodeRendererProps) {
 	return (
 		<RecoilRoot>
 			<RecoilNexus />
-			props.property && props.api && <YeastNodeState api={props.api} property={props.property}></YeastNodeState>
+			<YeastNodeState api={props.api} assetInfo={props.assetInfo}></YeastNodeState>
 			<React.Fragment key={key.current}>{renderer.renderComponents(props.nodes)}</React.Fragment>
 		</RecoilRoot>
 	);

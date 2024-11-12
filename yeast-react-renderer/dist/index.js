@@ -9718,26 +9718,15 @@ function resetRecoil(atom) {
 }
 RecoilNexus$1.resetRecoil = resetRecoil;
 
-var CMSProperties;
-(function (CMSProperties) {
-    CMSProperties["None"] = "";
-    CMSProperties["APICentral"] = "api-central";
-    CMSProperties["GCDevCenter"] = "gc-dev-center";
-    CMSProperties["YetiCMSDocs"] = "yeti-cms-docs";
-})(CMSProperties || (CMSProperties = {}));
-
-const propertyAtom = Recoil_index_8({
-    key: 'property',
-    default: CMSProperties.None,
+const assetInfoAtom = Recoil_index_8({
+    key: 'AssetInfo',
+    default: {}
 });
-function useProperty() {
-    return Recoil_index_20(propertyAtom);
+function useAssetInfo() {
+    return Recoil_index_20(assetInfoAtom);
 }
-function setProperty(property) {
-    if (Object.values(CMSProperties).includes(property))
-        setRecoil_1(propertyAtom, property);
-    else
-        setRecoil_1(propertyAtom, CMSProperties.None);
+function setAssetInfo(assetInfo) {
+    setRecoil_1(assetInfoAtom, assetInfo);
 }
 
 const cmsApiAtom = Recoil_index_8({
@@ -9752,6 +9741,7 @@ function setCmsApi(cmsApi) {
 }
 
 const hostnameRegex = /^https?:\/\//i;
+const filepathRegex = /^(\/)?(.+\.(jpg|jpeg|png|svg))$/i;
 function ImageNodeRenderer(props) {
     const [imgSrc, setImgSrc] = useState$3();
     const [loadingError, setLoadingError] = useState$3();
@@ -9762,7 +9752,7 @@ function ImageNodeRenderer(props) {
     const [oldTitle, setOldTitle] = useState$3();
     const [newTitle, setNewTitle] = useState$3();
     const [diffRenderData, setDiffRenderData] = useState$3();
-    const property = useProperty();
+    const assetInfo = useAssetInfo();
     const cmsApi = useCmsApi();
     const key1 = useKey();
     const key2 = useKey();
@@ -9795,9 +9785,9 @@ function ImageNodeRenderer(props) {
             }
             setDiffRenderData(newDiffRenderData);
         }
-        else if (currentSrc.current !== props.node.src || currentProperty.current !== property || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
+        else if (currentSrc.current !== props.node.src || currentProperty.current !== assetInfo.property || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
             currentSrc.current = props.node.src;
-            currentProperty.current = property;
+            currentProperty.current = assetInfo.property;
             currentCmsApi.current = cmsApi;
             (() => __awaiter(this, void 0, void 0, function* () {
                 const newSrc = yield getImgSrc(props.node.src);
@@ -9805,37 +9795,56 @@ function ImageNodeRenderer(props) {
                     setImgSrc(newSrc);
             }))();
         }
-    }, [props.node, property, cmsApi]);
+    }, [props.node, assetInfo, cmsApi]);
     const getImgSrc = (src) => __awaiter(this, void 0, void 0, function* () {
+        setLoadingError(undefined);
+        setImgSrc(undefined);
+        const match = hostnameRegex.exec(src);
+        let newSrc = new URL(src, window.location.href);
+        const isSameHost = window.location.hostname.toLowerCase() === newSrc.hostname.toLowerCase();
         try {
-            setLoadingError(undefined);
-            setImgSrc(undefined);
-            const match = hostnameRegex.exec(src);
-            let newSrc = new URL(src, window.location.href);
-            const isSameHost = window.location.hostname.toLowerCase() === newSrc.hostname.toLowerCase();
             if (match && !isSameHost) {
                 // Set src to URL to let the browser load the image normally
                 return src;
             }
             else {
                 // Load image from API and set src as encoded image data
-                if (property && cmsApi) {
-                    const content = yield cmsApi.AssetsApi.getAssetContent(property, newSrc.pathname, true);
-                    if (!content) {
-                        setLoadingError('Failed to load image');
-                    }
-                    let str = yield readBlob(content === null || content === void 0 ? void 0 : content.content);
-                    return str;
-                }
-                else {
-                    setLoadingError('Failed to load image');
-                    return;
-                }
+                return getImg(assetInfo.property, newSrc.pathname);
             }
         }
         catch (err) {
-            console.error(err);
+            const filepathMatch = filepathRegex.exec(newSrc.pathname);
+            if (filepathMatch) {
+                let normalizedPath = filepathMatch[0];
+                if (filepathMatch[1] === '/')
+                    normalizedPath = filepathMatch[2];
+                try {
+                    const resolvedSrc = assetInfo.keyPath + '/' + normalizedPath;
+                    return getImg(assetInfo.property, resolvedSrc);
+                }
+                catch (err) {
+                    console.error(err);
+                    setLoadingError('Failed to load image');
+                }
+            }
+            else {
+                console.error(err);
+                setLoadingError('Failed to load image');
+            }
+        }
+    });
+    const getImg = (property, keyPath) => __awaiter(this, void 0, void 0, function* () {
+        if (property && cmsApi) {
+            const content = yield cmsApi.AssetsApi.getAssetContent(property, keyPath, true);
+            if (!content) {
+                setLoadingError('Failed to load image');
+            }
+            let str = yield readBlob(content === null || content === void 0 ? void 0 : content.content);
+            return str;
+        }
+        else {
             setLoadingError('Failed to load image');
+            return;
         }
     });
     const readBlob = (imageBlob) => __awaiter(this, void 0, void 0, function* () {
@@ -10127,14 +10136,14 @@ class ReactRenderer {
 }
 
 function YeastNodeState(props) {
-    const property = useProperty();
+    const assetInfo = useAssetInfo();
     const cmsApi = useCmsApi();
     useEffect$5(() => {
-        if (props.property !== property)
-            setProperty(props.property);
+        if (props.assetInfo !== assetInfo)
+            setAssetInfo(props.assetInfo);
         if (props.api !== cmsApi)
             setCmsApi(props.api);
-    }, [props.api, props.property]);
+    }, [props.api, props.assetInfo]);
     return React.createElement(React.Fragment, null);
 }
 
@@ -10148,8 +10157,7 @@ function YeastNodeRenderer(props) {
     }, [props.customRenderers]);
     return (React.createElement(Recoil_index_5, null,
         React.createElement(_default, null),
-        "props.property && props.api && ",
-        React.createElement(YeastNodeState, { api: props.api, property: props.property }),
+        React.createElement(YeastNodeState, { api: props.api, assetInfo: props.assetInfo }),
         React.createElement(React.Fragment, { key: key.current }, renderer.renderComponents(props.nodes))));
 }
 
@@ -10177,7 +10185,7 @@ function YeastDocumentRenderer(props) {
     return (React.createElement("div", { className: className },
         React.createElement("h1", null, title),
         author && React.createElement("h2", null, author),
-        React.createElement(YeastNodeRenderer, { nodes: (_c = props.ast) === null || _c === void 0 ? void 0 : _c.children, customRenderers: props.customRenderers, api: props.api, property: props.property })));
+        React.createElement(YeastNodeRenderer, { nodes: (_c = props.ast) === null || _c === void 0 ? void 0 : _c.children, customRenderers: props.customRenderers, api: props.api, assetInfo: props.assetInfo })));
 }
 
 export { ReactRenderer, YeastDocumentRenderer, YeastNodeRenderer, useKey };

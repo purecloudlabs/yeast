@@ -1,7 +1,8 @@
 import React from 'react';
-import CmsApi, { CMSProperties } from './helpers/types';
+import CmsApi from './helpers/types';
+import { AssetInfo } from './atoms/AssetInfoAtom';
 export interface YeastNodeStateProps {
     api: CmsApi;
-    property: CMSProperties;
+    assetInfo: AssetInfo;
 }
 export default function YeastNodeState(props: YeastNodeStateProps): React.JSX.Element;
