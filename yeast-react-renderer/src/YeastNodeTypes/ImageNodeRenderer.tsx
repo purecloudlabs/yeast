@@ -85,7 +85,7 @@ export default function ImageNodeRenderer(props: IProps) {
 			} else {
 				// Load image from API and set src as encoded image data
 				if (property && cmsApi) {
-					const content = await cmsApi.AssetsApi.getAssetContent(property, newSrc.pathname);
+					const content = await cmsApi.AssetsApi.getAssetContent(property, newSrc.pathname, true);
 					if (!content) {
 						setLoadingError('Failed to load image');
 					}

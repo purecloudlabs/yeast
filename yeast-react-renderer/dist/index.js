@@ -9820,7 +9820,7 @@ function ImageNodeRenderer(props) {
             else {
                 // Load image from API and set src as encoded image data
                 if (property && cmsApi) {
-                    const content = yield cmsApi.AssetsApi.getAssetContent(property, newSrc.pathname);
+                    const content = yield cmsApi.AssetsApi.getAssetContent(property, newSrc.pathname, true);
                     if (!content) {
                         setLoadingError('Failed to load image');
                     }
