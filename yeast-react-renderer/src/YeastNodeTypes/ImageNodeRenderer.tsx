@@ -16,6 +16,7 @@ interface IProps {
 
 const hostnameRegex = /^https?:\/\//i;
 const changesetFilepathRegex = /^\/changesets\/(.+\.(jpg|jpeg|png|svg))$/i;
+const keyPathRegex = /^(.+)\/[^\/]+$/i;
 
 export default function ImageNodeRenderer(props: IProps) {
 	const [imgSrc, setImgSrc] = useState<string>();
@@ -34,6 +35,7 @@ export default function ImageNodeRenderer(props: IProps) {
 	const key2 = useKey();
 	const currentSrc = useRef<string>();
 	const currentProperty = useRef<CMSProperties>();
+	const currentKeyPath = useRef<string>();
 	const currentCmsApi = useRef<CmsApi>();
 	const currentNode = useRef<ImageNode>();
 
@@ -61,9 +63,13 @@ export default function ImageNodeRenderer(props: IProps) {
 			}
 
 			setDiffRenderData(newDiffRenderData);
-		} else if (currentSrc.current !== props.node.src || currentProperty.current !== assetInfo.property || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
+		} else if (
+			currentSrc.current !== props.node.src || currentProperty.current !== assetInfo.property || currentKeyPath.current !== assetInfo.keyPath
+				|| JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)
+		) {
 			currentSrc.current = props.node.src;
 			currentProperty.current = assetInfo.property;
+			currentKeyPath.current = assetInfo.keyPath;
 			currentCmsApi.current = cmsApi;
 
 			(async () => {
@@ -89,10 +95,16 @@ export default function ImageNodeRenderer(props: IProps) {
 			}
 		} catch (err) {
 			const filepathMatch = changesetFilepathRegex.exec(newSrc.pathname);
-			if (filepathMatch) {
-				let filename: string = filepathMatch[1];
+			if (filepathMatch && assetInfo.keyPath) {
+				const keyPathMatch = keyPathRegex.exec(assetInfo.keyPath);
+				if (!keyPathMatch || !keyPathMatch[1]) {
+					setLoadingError('Failed to load image');
+					return;
+				}
+				const prefix: string = keyPathMatch[1];
+				const filename: string = filepathMatch[1];
 				try {
-					const resolvedSrc = assetInfo.keyPath + '/' + filename;
+					const resolvedSrc = prefix + '/' + filename;
 					return await getImg(assetInfo.property, resolvedSrc);
 				} catch (err) {
 					console.error(err);

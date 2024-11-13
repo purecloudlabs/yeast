@@ -9742,6 +9742,7 @@ function setCmsApi(cmsApi) {
 
 const hostnameRegex = /^https?:\/\//i;
 const changesetFilepathRegex = /^\/changesets\/(.+\.(jpg|jpeg|png|svg))$/i;
+const keyPathRegex = /^(.+)\/[^\/]+$/i;
 function ImageNodeRenderer(props) {
     const [imgSrc, setImgSrc] = useState$3();
     const [loadingError, setLoadingError] = useState$3();
@@ -9758,6 +9759,7 @@ function ImageNodeRenderer(props) {
     const key2 = useKey();
     const currentSrc = useRef$6();
     const currentProperty = useRef$6();
+    const currentKeyPath = useRef$6();
     const currentCmsApi = useRef$6();
     const currentNode = useRef$6();
     useEffect$5(() => {
@@ -9785,9 +9787,11 @@ function ImageNodeRenderer(props) {
             }
             setDiffRenderData(newDiffRenderData);
         }
-        else if (currentSrc.current !== props.node.src || currentProperty.current !== assetInfo.property || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
+        else if (currentSrc.current !== props.node.src || currentProperty.current !== assetInfo.property || currentKeyPath.current !== assetInfo.keyPath
+            || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
             currentSrc.current = props.node.src;
             currentProperty.current = assetInfo.property;
+            currentKeyPath.current = assetInfo.keyPath;
             currentCmsApi.current = cmsApi;
             (() => __awaiter(this, void 0, void 0, function* () {
                 const newSrc = yield getImgSrc(props.node.src);
@@ -9814,10 +9818,16 @@ function ImageNodeRenderer(props) {
         }
         catch (err) {
             const filepathMatch = changesetFilepathRegex.exec(newSrc.pathname);
-            if (filepathMatch) {
-                let filename = filepathMatch[1];
+            if (filepathMatch && assetInfo.keyPath) {
+                const keyPathMatch = keyPathRegex.exec(assetInfo.keyPath);
+                if (!keyPathMatch || !keyPathMatch[1]) {
+                    setLoadingError('Failed to load image');
+                    return;
+                }
+                const prefix = keyPathMatch[1];
+                const filename = filepathMatch[1];
                 try {
-                    const resolvedSrc = assetInfo.keyPath + '/' + filename;
+                    const resolvedSrc = prefix + '/' + filename;
                     return yield getImg(assetInfo.property, resolvedSrc);
                 }
                 catch (err) {
