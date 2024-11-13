@@ -85,7 +85,7 @@ export default function ImageNodeRenderer(props: IProps) {
 				return src;
 			} else {
 				// Load image from API and set src as encoded image data
-				return getImg(assetInfo.property, newSrc.pathname);
+				return await getImg(assetInfo.property, newSrc.pathname);
 			}
 		} catch (err) {
 			const filepathMatch = filepathRegex.exec(newSrc.pathname);
@@ -94,7 +94,7 @@ export default function ImageNodeRenderer(props: IProps) {
 				if (filepathMatch[1] === '/') normalizedPath = filepathMatch[2];
 				try {
 					const resolvedSrc = assetInfo.keyPath + '/' + normalizedPath;
-					return getImg(assetInfo.property, resolvedSrc);
+					return await getImg(assetInfo.property, resolvedSrc);
 				} catch (err) {
 					console.error(err);
 					setLoadingError('Failed to load image');

@@ -9809,7 +9809,7 @@ function ImageNodeRenderer(props) {
             }
             else {
                 // Load image from API and set src as encoded image data
-                return getImg(assetInfo.property, newSrc.pathname);
+                return yield getImg(assetInfo.property, newSrc.pathname);
             }
         }
         catch (err) {
@@ -9820,7 +9820,7 @@ function ImageNodeRenderer(props) {
                     normalizedPath = filepathMatch[2];
                 try {
                     const resolvedSrc = assetInfo.keyPath + '/' + normalizedPath;
-                    return getImg(assetInfo.property, resolvedSrc);
+                    return yield getImg(assetInfo.property, resolvedSrc);
                 }
                 catch (err) {
                     console.error(err);
