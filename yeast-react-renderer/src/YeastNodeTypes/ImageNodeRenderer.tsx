@@ -72,10 +72,12 @@ export default function ImageNodeRenderer(props: IProps) {
 			currentKeyPath.current = assetInfo.keyPath;
 			currentCmsApi.current = cmsApi;
 
-			(async () => {
-				const newSrc = await getImgSrc(props.node.src);
-				if (newSrc) setImgSrc(newSrc)
-			})();
+			if (assetInfo.property && assetInfo.keyPath && cmsApi) {
+				(async () => {
+					const newSrc = await getImgSrc(props.node.src);
+					if (newSrc) setImgSrc(newSrc)
+				})();
+			}
 		}
 	}, [props.node, assetInfo, cmsApi]);
 

@@ -9793,11 +9793,13 @@ function ImageNodeRenderer(props) {
             currentProperty.current = assetInfo.property;
             currentKeyPath.current = assetInfo.keyPath;
             currentCmsApi.current = cmsApi;
-            (() => __awaiter(this, void 0, void 0, function* () {
-                const newSrc = yield getImgSrc(props.node.src);
-                if (newSrc)
-                    setImgSrc(newSrc);
-            }))();
+            if (assetInfo.property && assetInfo.keyPath && cmsApi) {
+                (() => __awaiter(this, void 0, void 0, function* () {
+                    const newSrc = yield getImgSrc(props.node.src);
+                    if (newSrc)
+                        setImgSrc(newSrc);
+                }))();
+            }
         }
     }, [props.node, assetInfo, cmsApi]);
     const getImgSrc = (src) => __awaiter(this, void 0, void 0, function* () {
