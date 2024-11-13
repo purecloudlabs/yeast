@@ -9814,8 +9814,9 @@ function ImageNodeRenderer(props) {
             setIsDebouncing(false);
             doItAll();
         }
-        else if ((currentAssetInfo.current.property && assetInfo.property && currentAssetInfo.current.property !== assetInfo.property)
-            || (currentAssetInfo.current.keyPath && assetInfo.keyPath && currentAssetInfo.current.keyPath !== assetInfo.keyPath)) {
+        else if (currentAssetInfo.current &&
+            ((currentAssetInfo.current.property && assetInfo.property && currentAssetInfo.current.property !== assetInfo.property)
+                || (currentAssetInfo.current.keyPath && assetInfo.keyPath && currentAssetInfo.current.keyPath !== assetInfo.keyPath))) {
             setIsDebouncing(true);
             timer.current = setTimeout(() => {
                 setIsDebouncing(false);
