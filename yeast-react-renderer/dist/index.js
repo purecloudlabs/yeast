@@ -9741,7 +9741,7 @@ function setCmsApi(cmsApi) {
 }
 
 const hostnameRegex = /^https?:\/\//i;
-const filepathRegex = /^(\/)?(.+\.(jpg|jpeg|png|svg))$/i;
+const changesetFilepathRegex = /^\/changeset\/(.+\.(jpg|jpeg|png|svg))$/i;
 function ImageNodeRenderer(props) {
     const [imgSrc, setImgSrc] = useState$3();
     const [loadingError, setLoadingError] = useState$3();
@@ -9813,13 +9813,11 @@ function ImageNodeRenderer(props) {
             }
         }
         catch (err) {
-            const filepathMatch = filepathRegex.exec(newSrc.pathname);
+            const filepathMatch = changesetFilepathRegex.exec(newSrc.pathname);
             if (filepathMatch) {
-                let normalizedPath = filepathMatch[0];
-                if (filepathMatch[1] === '/')
-                    normalizedPath = filepathMatch[2];
+                let filename = filepathMatch[2];
                 try {
-                    const resolvedSrc = assetInfo.keyPath + '/' + normalizedPath;
+                    const resolvedSrc = assetInfo.keyPath + '/' + filename;
                     return yield getImg(assetInfo.property, resolvedSrc);
                 }
                 catch (err) {

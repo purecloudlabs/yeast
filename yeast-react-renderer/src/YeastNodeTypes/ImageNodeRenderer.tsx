@@ -15,7 +15,7 @@ interface IProps {
 }
 
 const hostnameRegex = /^https?:\/\//i;
-const filepathRegex = /^(\/)?(.+\.(jpg|jpeg|png|svg))$/i;
+const changesetFilepathRegex = /^\/changeset\/(.+\.(jpg|jpeg|png|svg))$/i;
 
 export default function ImageNodeRenderer(props: IProps) {
 	const [imgSrc, setImgSrc] = useState<string>();
@@ -88,12 +88,11 @@ export default function ImageNodeRenderer(props: IProps) {
 				return await getImg(assetInfo.property, newSrc.pathname);
 			}
 		} catch (err) {
-			const filepathMatch = filepathRegex.exec(newSrc.pathname);
+			const filepathMatch = changesetFilepathRegex.exec(newSrc.pathname);
 			if (filepathMatch) {
-				let normalizedPath: string = filepathMatch[0];
-				if (filepathMatch[1] === '/') normalizedPath = filepathMatch[2];
+				let filename: string = filepathMatch[2];
 				try {
-					const resolvedSrc = assetInfo.keyPath + '/' + normalizedPath;
+					const resolvedSrc = assetInfo.keyPath + '/' + filename;
 					return await getImg(assetInfo.property, resolvedSrc);
 				} catch (err) {
 					console.error(err);
