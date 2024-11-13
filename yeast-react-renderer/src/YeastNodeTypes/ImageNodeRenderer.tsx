@@ -15,7 +15,7 @@ interface IProps {
 }
 
 const hostnameRegex = /^https?:\/\//i;
-const changesetFilepathRegex = /^\/changeset\/(.+\.(jpg|jpeg|png|svg))$/i;
+const changesetFilepathRegex = /^\/changesets\/(.+\.(jpg|jpeg|png|svg))$/i;
 
 export default function ImageNodeRenderer(props: IProps) {
 	const [imgSrc, setImgSrc] = useState<string>();

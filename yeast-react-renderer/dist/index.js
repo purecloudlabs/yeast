@@ -9741,7 +9741,7 @@ function setCmsApi(cmsApi) {
 }
 
 const hostnameRegex = /^https?:\/\//i;
-const changesetFilepathRegex = /^\/changeset\/(.+\.(jpg|jpeg|png|svg))$/i;
+const changesetFilepathRegex = /^\/changesets\/(.+\.(jpg|jpeg|png|svg))$/i;
 function ImageNodeRenderer(props) {
     const [imgSrc, setImgSrc] = useState$3();
     const [loadingError, setLoadingError] = useState$3();
