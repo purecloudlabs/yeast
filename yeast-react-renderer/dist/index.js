@@ -9815,7 +9815,7 @@ function ImageNodeRenderer(props) {
         catch (err) {
             const filepathMatch = changesetFilepathRegex.exec(newSrc.pathname);
             if (filepathMatch) {
-                let filename = filepathMatch[2];
+                let filename = filepathMatch[1];
                 try {
                     const resolvedSrc = assetInfo.keyPath + '/' + filename;
                     return yield getImg(assetInfo.property, resolvedSrc);

@@ -90,7 +90,7 @@ export default function ImageNodeRenderer(props: IProps) {
 		} catch (err) {
 			const filepathMatch = changesetFilepathRegex.exec(newSrc.pathname);
 			if (filepathMatch) {
-				let filename: string = filepathMatch[2];
+				let filename: string = filepathMatch[1];
 				try {
 					const resolvedSrc = assetInfo.keyPath + '/' + filename;
 					return await getImg(assetInfo.property, resolvedSrc);
