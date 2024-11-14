@@ -163,7 +163,7 @@ export class ReactRenderer {
 		// Untyped nodes aren't handled here
 		if (!(node as any).type) return;
 
-		const typedNode = node as YeastBlockNode | YeastInlineNode;
+		const typedNode = Object.assign({}, node as YeastBlockNode | YeastInlineNode);
 		typedNode.children = typedNode.children || [];
 
 		// Process renderers

@@ -10172,7 +10172,7 @@ class ReactRenderer {
         // Untyped nodes aren't handled here
         if (!node.type)
             return;
-        const typedNode = node;
+        const typedNode = Object.assign({}, node);
         typedNode.children = typedNode.children || [];
         // Process renderers
         let component;
