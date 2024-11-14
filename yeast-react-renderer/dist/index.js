@@ -9746,6 +9746,14 @@ const imageDataAtom = Recoil_index_8({
     key: 'image-data',
     default: {}
 });
+const timerAtom = Recoil_index_8({
+    key: 'image-timer',
+    default: {}
+});
+const debounceAtom = Recoil_index_8({
+    key: 'image-debounce',
+    default: false
+});
 
 const hostnameRegex = /^https?:\/\//i;
 const changesetFilepathRegex = /^\/changesets\/(.+\.(jpg|jpeg|png|svg))$/i;
@@ -9763,6 +9771,8 @@ function ImageNodeRenderer(props) {
     const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
     const [prevAssetInfo, setPrevAssetInfo] = Recoil_index_22(prevAssetInfoAtom);
     const [imageData, setImageData] = Recoil_index_22(imageDataAtom);
+    const [timer, setTimer] = Recoil_index_22(timerAtom);
+    const [isDebouncing, setIsDebouncing] = Recoil_index_22(debounceAtom);
     const cmsApi = useCmsApi();
     const key1 = useKey();
     const key2 = useKey();
@@ -9772,19 +9782,21 @@ function ImageNodeRenderer(props) {
             && JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)
             && JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current))
             return;
-        if (imageData.isDebouncing) {
-            imageData && clearTimeout(imageData.timer);
-            setImageData(Object.assign(Object.assign({}, imageData), { isDebouncing: false }));
+        if (isDebouncing) {
+            clearTimeout(timer);
+            setTimer(undefined);
+            setIsDebouncing(false);
             doItAll();
         }
         // When asset property or key path changes, debounce to ensure all data is up to date before executing api calls
         else if (prevAssetInfo &&
             ((prevAssetInfo.property && assetInfo.property && prevAssetInfo.property !== assetInfo.property)
                 || (prevAssetInfo.keyPath && assetInfo.keyPath && prevAssetInfo.keyPath !== assetInfo.keyPath))) {
-            setImageData(Object.assign(Object.assign({}, imageData), { isDebouncing: true, timer: setTimeout(() => {
-                    setImageData(Object.assign(Object.assign({}, imageData), { isDebouncing: false }));
-                    doItAll();
-                }, 300) }));
+            setIsDebouncing(true);
+            setTimer(setTimeout(() => {
+                setIsDebouncing(false);
+                doItAll();
+            }, 300));
         }
         else {
             doItAll();
