@@ -17,6 +17,7 @@ export function addImageDataAtom(key: string, data?: ImageData): string {
 }
 
 export function useImageDataAtom(key: string) {
+    if (!imageDataAtoms[key]) return;
     return useRecoilValue(imageDataAtoms[key]);
 }
 

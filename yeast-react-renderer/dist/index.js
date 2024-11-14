@@ -9757,6 +9757,8 @@ function addImageDataAtom(key, data) {
     return key;
 }
 function useImageDataAtom(key) {
+    if (!imageDataAtoms[key])
+        return;
     return Recoil_index_20(imageDataAtoms[key]);
 }
 function setImageDataAtom(key, data) {
