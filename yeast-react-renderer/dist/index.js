@@ -9719,7 +9719,7 @@ function resetRecoil(atom) {
 RecoilNexus$1.resetRecoil = resetRecoil;
 
 const assetInfoAtom = Recoil_index_8({
-    key: 'AssetInfo',
+    key: 'asset-info',
     default: {}
 });
 function useAssetInfo() {
@@ -9733,7 +9733,7 @@ function setAssetInfo(assetInfo) {
  * which causes refs that would normally be used for this purpose to be reinitialized on those renders, making them useless.
  */
 Recoil_index_8({
-    key: 'AssetInfo',
+    key: 'prev-asset-info',
     default: {}
 });
 function usePrevAssetInfo() {

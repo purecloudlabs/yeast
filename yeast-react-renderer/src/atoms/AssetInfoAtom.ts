@@ -8,7 +8,7 @@ export interface AssetInfo {
 }
 
 export const assetInfoAtom = atom<AssetInfo>({
-    key: 'AssetInfo',
+    key: 'asset-info',
     default: {} as AssetInfo
 });
 
@@ -26,7 +26,7 @@ export function setAssetInfo(assetInfo: AssetInfo) {
  */
 
 export const prevAssetInfoAtom = atom<AssetInfo>({
-    key: 'AssetInfo',
+    key: 'prev-asset-info',
     default: {} as AssetInfo
 });
 
