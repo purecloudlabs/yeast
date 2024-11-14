@@ -9,7 +9,7 @@ interface ImageData {
 export declare const imageDataAtoms: {
     [key: string]: RecoilState<ImageData | undefined>;
 };
-export declare function addImageDataAtom(data?: ImageData): string;
-export declare function useImageDataAtom(key: string): ImageData;
-export declare function setImageDataAtom(key: string, data: ImageData): void;
+export declare const imageDataAtom: RecoilState<ImageData>;
+export declare function useImageDataAtom(): ImageData;
+export declare function setImageDataAtom(data: ImageData): void;
 export {};

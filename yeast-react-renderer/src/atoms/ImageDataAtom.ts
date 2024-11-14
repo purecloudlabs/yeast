@@ -1,7 +1,6 @@
 import { setRecoil } from "recoil-nexus";
 import { useRecoilValue, atom, RecoilState } from "recoil";
 import { ImageNode } from "yeast-core";
-import { v4 as uuidv4 } from 'uuid';
 
 interface ImageData {
     currentSrc: string;
@@ -11,17 +10,15 @@ interface ImageData {
 
 export const imageDataAtoms: { [key: string]: RecoilState<ImageData | undefined>} = {};
 
-export function addImageDataAtom(data?: ImageData): string {
-    const key = uuidv4();
-    imageDataAtoms[key] = atom({ key, default: data });
-    return key;
+export const imageDataAtom = atom({
+    key: 'image-data',
+    default: {} as ImageData
+});
+
+export function useImageDataAtom() {
+    return useRecoilValue(imageDataAtom);
 }
 
-export function useImageDataAtom(key: string) {
-    if (!imageDataAtoms[key]) return;
-    return useRecoilValue(imageDataAtoms[key]);
-}
-
-export function setImageDataAtom(key: string, data: ImageData) {
-    setRecoil(imageDataAtoms[key], data)
+export function setImageDataAtom(data: ImageData) {
+    setRecoil(imageDataAtom, data)
 }

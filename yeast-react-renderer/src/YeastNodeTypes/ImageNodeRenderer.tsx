@@ -4,11 +4,11 @@ import { ImageNode } from 'yeast-core';
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import { AssetInfo, setAssetInfo, useAssetInfo, usePrevAssetInfo } from '../atoms/AssetInfoAtom';
+import { setAssetInfo, useAssetInfo, usePrevAssetInfo } from '../atoms/AssetInfoAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
-import CmsApi, { CMSProperties } from '../helpers/types';
-import { addImageDataAtom, useImageDataAtom, setImageDataAtom } from '../atoms/ImageDataAtom';
+import CmsApi from '../helpers/types';
+import { useImageDataAtom, setImageDataAtom } from '../atoms/ImageDataAtom';
 
 interface IProps {
 	node: ImageNode;
@@ -28,7 +28,6 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [newAlt, setNewAlt] = useState<string>();
 	const [oldTitle, setOldTitle] = useState<string>();
 	const [newTitle, setNewTitle] = useState<string>();
-	const [dataKey, setDataKey] = useState<string>();
 	const [isDebouncing, setIsDebouncing] = useState<boolean>();
 	const [diffRenderData, setDiffRenderData] = useState<DiffRenderData>();
 	const assetInfo = useAssetInfo();
@@ -37,19 +36,11 @@ export default function ImageNodeRenderer(props: IProps) {
 	const key1 = useKey();
 	const key2 = useKey();
 	const currentAssetInfo = usePrevAssetInfo();
-	const imageData = useImageDataAtom(dataKey);
+	const imageData = useImageDataAtom();
 	const currentCmsApi = useRef<CmsApi>(cmsApi);
 	// const currentSrc = useRef<string>();
 	// const currentNode = useRef<ImageNode>();
 	// const timer = useRef<NodeJS.Timeout>();
-
-	useEffect(() => {
-		setDataKey(addImageDataAtom({
-			currentSrc: '',
-			currentNode: undefined,
-			timer: undefined
-		}));
-	}, []);
 
 	useEffect(() => {
 		if (
@@ -70,7 +61,7 @@ export default function ImageNodeRenderer(props: IProps) {
 				|| (currentAssetInfo.keyPath && assetInfo.keyPath && currentAssetInfo.keyPath !== assetInfo.keyPath))
 		) {
 			setIsDebouncing(true);
-			setImageDataAtom(dataKey, {
+			setImageDataAtom({
 				...imageData,
 				timer: setTimeout(() => {
 					setIsDebouncing(false);
@@ -107,7 +98,7 @@ export default function ImageNodeRenderer(props: IProps) {
 			(imageData && imageData.currentSrc !== props.node.src) || currentAssetInfo.property !== assetInfo.property || currentAssetInfo.keyPath !== assetInfo.keyPath
 				|| JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)
 		) {
-			setImageDataAtom(dataKey, {
+			setImageDataAtom({
 				...imageData,
 				currentSrc: props.node.src,
 				currentNode: props.node
