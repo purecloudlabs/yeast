@@ -13,19 +13,19 @@ export interface YeastNodeStateProps {
 export default function YeastNodeState(props: YeastNodeStateProps) {
     const cmsApi = useCmsApi();
     const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
-    const prevAssetInfo = useRecoilValue(prevAssetInfoAtom);
+    // const prevAssetInfo = useRecoilValue(prevAssetInfoAtom);
     const [isDebouncing, setIsDebouncing] = useRecoilState(debounceAtom);
 
     useEffect(() => {
-		if (props.assetInfo !== assetInfo) setAssetInfo(props.assetInfo);
-		if (props.api !== cmsApi) setCmsApi(props.api);
+		if (JSON.stringify(props.assetInfo) !== JSON.stringify(assetInfo)) setAssetInfo(props.assetInfo);
+		if (JSON.stringify(props.api) !== JSON.stringify(cmsApi)) setCmsApi(props.api);
 
         if (isDebouncing) {
             setIsDebouncing(false);
         } else if (
-			prevAssetInfo &&
-				((prevAssetInfo.property && assetInfo.property && prevAssetInfo.property !== assetInfo.property) 
-				|| (prevAssetInfo.keyPath && assetInfo.keyPath && prevAssetInfo.keyPath !== assetInfo.keyPath))
+			assetInfo &&
+				((assetInfo.property && assetInfo.property && props.assetInfo.property !== assetInfo.property) 
+				|| (assetInfo.keyPath && props.assetInfo.keyPath && assetInfo.keyPath !== props.assetInfo.keyPath))
 		) {
 			setIsDebouncing(true);
         }

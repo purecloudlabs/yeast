@@ -10185,19 +10185,19 @@ class ReactRenderer {
 function YeastNodeState(props) {
     const cmsApi = useCmsApi();
     const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
-    const prevAssetInfo = Recoil_index_20(prevAssetInfoAtom);
+    // const prevAssetInfo = useRecoilValue(prevAssetInfoAtom);
     const [isDebouncing, setIsDebouncing] = Recoil_index_22(debounceAtom);
     useEffect$5(() => {
-        if (props.assetInfo !== assetInfo)
+        if (JSON.stringify(props.assetInfo) !== JSON.stringify(assetInfo))
             setAssetInfo(props.assetInfo);
-        if (props.api !== cmsApi)
+        if (JSON.stringify(props.api) !== JSON.stringify(cmsApi))
             setCmsApi(props.api);
         if (isDebouncing) {
             setIsDebouncing(false);
         }
-        else if (prevAssetInfo &&
-            ((prevAssetInfo.property && assetInfo.property && prevAssetInfo.property !== assetInfo.property)
-                || (prevAssetInfo.keyPath && assetInfo.keyPath && prevAssetInfo.keyPath !== assetInfo.keyPath))) {
+        else if (assetInfo &&
+            ((assetInfo.property && assetInfo.property && props.assetInfo.property !== assetInfo.property)
+                || (assetInfo.keyPath && props.assetInfo.keyPath && assetInfo.keyPath !== props.assetInfo.keyPath))) {
             setIsDebouncing(true);
         }
     }, [props.api, props.assetInfo]);
