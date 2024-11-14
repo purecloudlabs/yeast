@@ -28,6 +28,7 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [newAlt, setNewAlt] = useState<string>();
 	const [oldTitle, setOldTitle] = useState<string>();
 	const [newTitle, setNewTitle] = useState<string>();
+	const [dataKey, setDataKey] = useState<string>();
 	const [isDebouncing, setIsDebouncing] = useState<boolean>();
 	const [diffRenderData, setDiffRenderData] = useState<DiffRenderData>();
 	const assetInfo = useAssetInfo();
@@ -35,20 +36,19 @@ export default function ImageNodeRenderer(props: IProps) {
 
 	const key1 = useKey();
 	const key2 = useKey();
-	const dataKey = useKey();
 	const currentAssetInfo = usePrevAssetInfo();
-	const imageData = useImageDataAtom(dataKey.current);
+	const imageData = useImageDataAtom(dataKey);
 	const currentCmsApi = useRef<CmsApi>(cmsApi);
 	// const currentSrc = useRef<string>();
 	// const currentNode = useRef<ImageNode>();
 	// const timer = useRef<NodeJS.Timeout>();
 
 	useEffect(() => {
-		addImageDataAtom(dataKey.current, {
+		setDataKey(addImageDataAtom({
 			currentSrc: '',
 			currentNode: undefined,
 			timer: undefined
-		});
+		}));
 	}, []);
 
 	useEffect(() => {
@@ -70,7 +70,7 @@ export default function ImageNodeRenderer(props: IProps) {
 				|| (currentAssetInfo.keyPath && assetInfo.keyPath && currentAssetInfo.keyPath !== assetInfo.keyPath))
 		) {
 			setIsDebouncing(true);
-			setImageDataAtom(dataKey.current, {
+			setImageDataAtom(dataKey, {
 				...imageData,
 				timer: setTimeout(() => {
 					setIsDebouncing(false);
@@ -107,7 +107,7 @@ export default function ImageNodeRenderer(props: IProps) {
 			(imageData && imageData.currentSrc !== props.node.src) || currentAssetInfo.property !== assetInfo.property || currentAssetInfo.keyPath !== assetInfo.keyPath
 				|| JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)
 		) {
-			setImageDataAtom(dataKey.current, {
+			setImageDataAtom(dataKey, {
 				...imageData,
 				currentSrc: props.node.src,
 				currentNode: props.node

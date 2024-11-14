@@ -9752,7 +9752,8 @@ function setCmsApi(cmsApi) {
 }
 
 const imageDataAtoms = {};
-function addImageDataAtom(key, data) {
+function addImageDataAtom(data) {
+    const key = v4();
     imageDataAtoms[key] = Recoil_index_8({ key, default: data });
     return key;
 }
@@ -9777,25 +9778,25 @@ function ImageNodeRenderer(props) {
     const [newAlt, setNewAlt] = useState$3();
     const [oldTitle, setOldTitle] = useState$3();
     const [newTitle, setNewTitle] = useState$3();
+    const [dataKey, setDataKey] = useState$3();
     const [isDebouncing, setIsDebouncing] = useState$3();
     const [diffRenderData, setDiffRenderData] = useState$3();
     const assetInfo = useAssetInfo();
     const cmsApi = useCmsApi();
     const key1 = useKey();
     const key2 = useKey();
-    const dataKey = useKey();
     const currentAssetInfo = usePrevAssetInfo();
-    const imageData = useImageDataAtom(dataKey.current);
+    const imageData = useImageDataAtom(dataKey);
     const currentCmsApi = useRef$6(cmsApi);
     // const currentSrc = useRef<string>();
     // const currentNode = useRef<ImageNode>();
     // const timer = useRef<NodeJS.Timeout>();
     useEffect$5(() => {
-        addImageDataAtom(dataKey.current, {
+        setDataKey(addImageDataAtom({
             currentSrc: '',
             currentNode: undefined,
             timer: undefined
-        });
+        }));
     }, []);
     useEffect$5(() => {
         if (JSON.stringify(props.node) === JSON.stringify(imageData === null || imageData === void 0 ? void 0 : imageData.currentNode)
@@ -9812,7 +9813,7 @@ function ImageNodeRenderer(props) {
             ((currentAssetInfo.property && assetInfo.property && currentAssetInfo.property !== assetInfo.property)
                 || (currentAssetInfo.keyPath && assetInfo.keyPath && currentAssetInfo.keyPath !== assetInfo.keyPath))) {
             setIsDebouncing(true);
-            setImageDataAtom(dataKey.current, Object.assign(Object.assign({}, imageData), { timer: setTimeout(() => {
+            setImageDataAtom(dataKey, Object.assign(Object.assign({}, imageData), { timer: setTimeout(() => {
                     setIsDebouncing(false);
                     doItAll();
                 }, 300) }));
@@ -9846,7 +9847,7 @@ function ImageNodeRenderer(props) {
         }
         else if ((imageData && imageData.currentSrc !== props.node.src) || currentAssetInfo.property !== assetInfo.property || currentAssetInfo.keyPath !== assetInfo.keyPath
             || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
-            setImageDataAtom(dataKey.current, Object.assign(Object.assign({}, imageData), { currentSrc: props.node.src, currentNode: props.node }));
+            setImageDataAtom(dataKey, Object.assign(Object.assign({}, imageData), { currentSrc: props.node.src, currentNode: props.node }));
             setAssetInfo({
                 property: assetInfo.property,
                 keyPath: assetInfo.keyPath

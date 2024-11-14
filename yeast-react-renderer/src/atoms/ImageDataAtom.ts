@@ -11,7 +11,8 @@ interface ImageData {
 
 export const imageDataAtoms: { [key: string]: RecoilState<ImageData | undefined>} = {};
 
-export function addImageDataAtom(key: string, data?: ImageData): string {
+export function addImageDataAtom(data?: ImageData): string {
+    const key = uuidv4();
     imageDataAtoms[key] = atom({ key, default: data });
     return key;
 }
