@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState }  from 'react';
+import { useRecoilState } from 'recoil';
 import { ImageNode } from 'yeast-core';
 
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import { setAssetInfo, setPrevAssetInfo, useAssetInfo, usePrevAssetInfo } from '../atoms/AssetInfoAtom';
+import { assetInfoAtom, prevAssetInfoAtom, setPrevAssetInfo, usePrevAssetInfo } from '../atoms/AssetInfoAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 import CmsApi from '../helpers/types';
@@ -30,12 +31,12 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [newTitle, setNewTitle] = useState<string>();
 	const [isDebouncing, setIsDebouncing] = useState<boolean>();
 	const [diffRenderData, setDiffRenderData] = useState<DiffRenderData>();
-	const assetInfo = useAssetInfo();
+	const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
+	const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
 	const cmsApi = useCmsApi();
 
 	const key1 = useKey();
 	const key2 = useKey();
-	const currentAssetInfo = usePrevAssetInfo();
 	const imageData = useImageDataAtom();
 	const currentCmsApi = useRef<CmsApi>(cmsApi);
 	// const currentSrc = useRef<string>();
@@ -45,7 +46,7 @@ export default function ImageNodeRenderer(props: IProps) {
 	useEffect(() => {
 		if (
 			JSON.stringify(props.node) === JSON.stringify(imageData?.currentNode)
-				&& JSON.stringify(assetInfo) === JSON.stringify(currentAssetInfo)
+				&& JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)
 				&& JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current)
 		) return;
 
@@ -56,9 +57,9 @@ export default function ImageNodeRenderer(props: IProps) {
 		}
 		// When asset property or key path changes, debounce to ensure all data is up to date before executing api calls
 		else if (
-			currentAssetInfo &&
-				((currentAssetInfo.property && assetInfo.property && currentAssetInfo.property !== assetInfo.property) 
-				|| (currentAssetInfo.keyPath && assetInfo.keyPath && currentAssetInfo.keyPath !== assetInfo.keyPath))
+			prevAssetInfo &&
+				((prevAssetInfo.property && assetInfo.property && prevAssetInfo.property !== assetInfo.property) 
+				|| (prevAssetInfo.keyPath && assetInfo.keyPath && prevAssetInfo.keyPath !== assetInfo.keyPath))
 		) {
 			setIsDebouncing(true);
 			setImageDataAtom({
@@ -95,7 +96,7 @@ export default function ImageNodeRenderer(props: IProps) {
 
 			setDiffRenderData(newDiffRenderData);
 		} else if (
-			(imageData && imageData.currentSrc !== props.node.src) || currentAssetInfo.property !== assetInfo.property || currentAssetInfo.keyPath !== assetInfo.keyPath
+			(imageData && imageData.currentSrc !== props.node.src) || prevAssetInfo.property !== assetInfo.property || prevAssetInfo.keyPath !== assetInfo.keyPath
 				|| JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)
 		) {
 			setImageDataAtom({

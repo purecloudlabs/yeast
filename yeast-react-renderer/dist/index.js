@@ -9732,16 +9732,10 @@ function setAssetInfo(assetInfo) {
  * The "previous" atom is needed because ImageNodeRenderer.tsx is unmounting and remounting between renders,
  * which causes refs that would normally be used for this purpose to be reinitialized on those renders, making them useless.
  */
-Recoil_index_8({
+const prevAssetInfoAtom = Recoil_index_8({
     key: 'prev-asset-info',
     default: {}
 });
-function usePrevAssetInfo() {
-    return Recoil_index_20(assetInfoAtom);
-}
-function setPrevAssetInfo(assetInfo) {
-    setRecoil_1(assetInfoAtom, assetInfo);
-}
 
 const cmsApiAtom = Recoil_index_8({
     key: 'CmsApi',
@@ -9779,11 +9773,11 @@ function ImageNodeRenderer(props) {
     const [newTitle, setNewTitle] = useState$3();
     const [isDebouncing, setIsDebouncing] = useState$3();
     const [diffRenderData, setDiffRenderData] = useState$3();
-    const assetInfo = useAssetInfo();
+    const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
+    const [prevAssetInfo, setPrevAssetInfo] = Recoil_index_22(prevAssetInfoAtom);
     const cmsApi = useCmsApi();
     const key1 = useKey();
     const key2 = useKey();
-    const currentAssetInfo = usePrevAssetInfo();
     const imageData = useImageDataAtom();
     const currentCmsApi = useRef$6(cmsApi);
     // const currentSrc = useRef<string>();
@@ -9791,7 +9785,7 @@ function ImageNodeRenderer(props) {
     // const timer = useRef<NodeJS.Timeout>();
     useEffect$5(() => {
         if (JSON.stringify(props.node) === JSON.stringify(imageData === null || imageData === void 0 ? void 0 : imageData.currentNode)
-            && JSON.stringify(assetInfo) === JSON.stringify(currentAssetInfo)
+            && JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)
             && JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current))
             return;
         if (isDebouncing) {
@@ -9800,9 +9794,9 @@ function ImageNodeRenderer(props) {
             doItAll();
         }
         // When asset property or key path changes, debounce to ensure all data is up to date before executing api calls
-        else if (currentAssetInfo &&
-            ((currentAssetInfo.property && assetInfo.property && currentAssetInfo.property !== assetInfo.property)
-                || (currentAssetInfo.keyPath && assetInfo.keyPath && currentAssetInfo.keyPath !== assetInfo.keyPath))) {
+        else if (prevAssetInfo &&
+            ((prevAssetInfo.property && assetInfo.property && prevAssetInfo.property !== assetInfo.property)
+                || (prevAssetInfo.keyPath && assetInfo.keyPath && prevAssetInfo.keyPath !== assetInfo.keyPath))) {
             setIsDebouncing(true);
             setImageDataAtom(Object.assign(Object.assign({}, imageData), { timer: setTimeout(() => {
                     setIsDebouncing(false);
@@ -9836,7 +9830,7 @@ function ImageNodeRenderer(props) {
             }
             setDiffRenderData(newDiffRenderData);
         }
-        else if ((imageData && imageData.currentSrc !== props.node.src) || currentAssetInfo.property !== assetInfo.property || currentAssetInfo.keyPath !== assetInfo.keyPath
+        else if ((imageData && imageData.currentSrc !== props.node.src) || prevAssetInfo.property !== assetInfo.property || prevAssetInfo.keyPath !== assetInfo.keyPath
             || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
             setImageDataAtom(Object.assign(Object.assign({}, imageData), { currentSrc: props.node.src, currentNode: props.node }));
             setPrevAssetInfo({
