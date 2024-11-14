@@ -9762,7 +9762,7 @@ function ImageNodeRenderer(props) {
     const [diffRenderData, setDiffRenderData] = useState$3();
     const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
     const [prevAssetInfo, setPrevAssetInfo] = Recoil_index_22(prevAssetInfoAtom);
-    const [imageData, setImageDataAtom] = Recoil_index_22(imageDataAtom);
+    const [imageData, setImageData] = Recoil_index_22(imageDataAtom);
     const cmsApi = useCmsApi();
     const key1 = useKey();
     const key2 = useKey();
@@ -9774,16 +9774,15 @@ function ImageNodeRenderer(props) {
             return;
         if (imageData.isDebouncing) {
             imageData && clearTimeout(imageData.timer);
-            setImageDataAtom(Object.assign(Object.assign({}, imageData), { isDebouncing: false }));
+            setImageData(Object.assign(Object.assign({}, imageData), { isDebouncing: false }));
             doItAll();
         }
         // When asset property or key path changes, debounce to ensure all data is up to date before executing api calls
         else if (prevAssetInfo &&
             ((prevAssetInfo.property && assetInfo.property && prevAssetInfo.property !== assetInfo.property)
                 || (prevAssetInfo.keyPath && assetInfo.keyPath && prevAssetInfo.keyPath !== assetInfo.keyPath))) {
-            setImageDataAtom(Object.assign(Object.assign({}, imageData), { isDebouncing: true }));
-            setImageDataAtom(Object.assign(Object.assign({}, imageData), { timer: setTimeout(() => {
-                    setImageDataAtom(Object.assign(Object.assign({}, imageData), { isDebouncing: false }));
+            setImageData(Object.assign(Object.assign({}, imageData), { isDebouncing: true, timer: setTimeout(() => {
+                    setImageData(Object.assign(Object.assign({}, imageData), { isDebouncing: false }));
                     doItAll();
                 }, 300) }));
         }
@@ -9816,7 +9815,7 @@ function ImageNodeRenderer(props) {
         }
         else if ((imageData && imageData.currentSrc !== props.node.src) || prevAssetInfo.property !== assetInfo.property || prevAssetInfo.keyPath !== assetInfo.keyPath
             || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
-            setImageDataAtom(Object.assign(Object.assign({}, imageData), { currentSrc: props.node.src, currentNode: props.node }));
+            setImageData(Object.assign(Object.assign({}, imageData), { currentSrc: props.node.src, currentNode: props.node }));
             setPrevAssetInfo({
                 property: assetInfo.property,
                 keyPath: assetInfo.keyPath

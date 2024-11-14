@@ -32,7 +32,7 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [diffRenderData, setDiffRenderData] = useState<DiffRenderData>();
 	const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
 	const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
-	const [imageData, setImageDataAtom] = useRecoilState(imageDataAtom)
+	const [imageData, setImageData] = useRecoilState(imageDataAtom)
 	const cmsApi = useCmsApi();
 
 	const key1 = useKey();
@@ -48,7 +48,7 @@ export default function ImageNodeRenderer(props: IProps) {
 
 		if (imageData.isDebouncing) {
 			imageData && clearTimeout(imageData.timer);
-			setImageDataAtom({
+			setImageData({
 				...imageData,
 				isDebouncing: false
 			});
@@ -60,14 +60,11 @@ export default function ImageNodeRenderer(props: IProps) {
 				((prevAssetInfo.property && assetInfo.property && prevAssetInfo.property !== assetInfo.property) 
 				|| (prevAssetInfo.keyPath && assetInfo.keyPath && prevAssetInfo.keyPath !== assetInfo.keyPath))
 		) {
-			setImageDataAtom({
+			setImageData({
 				...imageData,
-				isDebouncing: true
-			});
-			setImageDataAtom({
-				...imageData,
+				isDebouncing: true,
 				timer: setTimeout(() => {
-					setImageDataAtom({
+					setImageData({
 						...imageData,
 						isDebouncing: false
 					});
@@ -104,7 +101,7 @@ export default function ImageNodeRenderer(props: IProps) {
 			(imageData && imageData.currentSrc !== props.node.src) || prevAssetInfo.property !== assetInfo.property || prevAssetInfo.keyPath !== assetInfo.keyPath
 				|| JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)
 		) {
-			setImageDataAtom({
+			setImageData({
 				...imageData,
 				currentSrc: props.node.src,
 				currentNode: props.node

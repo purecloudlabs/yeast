@@ -1,5 +1,4 @@
 /// <reference types="node" />
-import { RecoilState } from "recoil";
 import { ImageNode } from "yeast-core";
 interface ImageData {
     currentSrc: string;
@@ -7,5 +6,5 @@ interface ImageData {
     timer: NodeJS.Timeout;
     isDebouncing: boolean;
 }
-export declare const imageDataAtom: RecoilState<ImageData>;
+export declare const imageDataAtom: import("recoil").RecoilState<ImageData>;
 export {};
