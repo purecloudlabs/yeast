@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import CmsApi, { CMSProperties } from './helpers/types';
+import CmsApi from './helpers/types';
 import { AssetInfo, setAssetInfo, useAssetInfo } from './atoms/AssetInfoAtom';
 import { setCmsApi, useCmsApi } from './atoms/CmsApiAtom';
 

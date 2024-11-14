@@ -4,7 +4,7 @@ import { ImageNode } from 'yeast-core';
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import { setAssetInfo, useAssetInfo, usePrevAssetInfo } from '../atoms/AssetInfoAtom';
+import { setAssetInfo, setPrevAssetInfo, useAssetInfo, usePrevAssetInfo } from '../atoms/AssetInfoAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 import CmsApi from '../helpers/types';
@@ -103,7 +103,7 @@ export default function ImageNodeRenderer(props: IProps) {
 				currentSrc: props.node.src,
 				currentNode: props.node
 			});
-			setAssetInfo({
+			setPrevAssetInfo({
 				property: assetInfo.property,
 				keyPath: assetInfo.keyPath
 			});

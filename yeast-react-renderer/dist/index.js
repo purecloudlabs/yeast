@@ -9739,6 +9739,9 @@ Recoil_index_8({
 function usePrevAssetInfo() {
     return Recoil_index_20(assetInfoAtom);
 }
+function setPrevAssetInfo(assetInfo) {
+    setRecoil_1(assetInfoAtom, assetInfo);
+}
 
 const cmsApiAtom = Recoil_index_8({
     key: 'CmsApi',
@@ -9836,7 +9839,7 @@ function ImageNodeRenderer(props) {
         else if ((imageData && imageData.currentSrc !== props.node.src) || currentAssetInfo.property !== assetInfo.property || currentAssetInfo.keyPath !== assetInfo.keyPath
             || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
             setImageDataAtom(Object.assign(Object.assign({}, imageData), { currentSrc: props.node.src, currentNode: props.node }));
-            setAssetInfo({
+            setPrevAssetInfo({
                 property: assetInfo.property,
                 keyPath: assetInfo.keyPath
             });
