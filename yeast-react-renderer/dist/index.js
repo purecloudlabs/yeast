@@ -9728,6 +9728,17 @@ function useAssetInfo() {
 function setAssetInfo(assetInfo) {
     setRecoil_1(assetInfoAtom, assetInfo);
 }
+/*
+ * The "previous" atom is needed because ImageNodeRenderer.tsx is unmounting and remounting between renders,
+ * which causes refs that would normally be used for this purpose to be reinitialized on those renders, making them useless.
+ */
+Recoil_index_8({
+    key: 'AssetInfo',
+    default: {}
+});
+function usePrevAssetInfo() {
+    return Recoil_index_20(assetInfoAtom);
+}
 
 const cmsApiAtom = Recoil_index_8({
     key: 'CmsApi',
@@ -9738,6 +9749,18 @@ function useCmsApi() {
 }
 function setCmsApi(cmsApi) {
     setRecoil_1(cmsApiAtom, cmsApi);
+}
+
+const imageDataAtoms = {};
+function addImageDataAtom(key, data) {
+    imageDataAtoms[key] = Recoil_index_8({ key, default: data });
+    return key;
+}
+function useImageDataAtom(key) {
+    return Recoil_index_20(imageDataAtoms[key]);
+}
+function setImageDataAtom(key, data) {
+    setRecoil_1(imageDataAtoms[key], data);
 }
 
 const hostnameRegex = /^https?:\/\//i;
@@ -9758,11 +9781,44 @@ function ImageNodeRenderer(props) {
     const cmsApi = useCmsApi();
     const key1 = useKey();
     const key2 = useKey();
-    const currentSrc = useRef$6();
-    const currentAssetInfo = useRef$6();
-    const currentCmsApi = useRef$6();
-    const currentNode = useRef$6();
-    const timer = useRef$6();
+    const dataKey = useKey();
+    const currentAssetInfo = usePrevAssetInfo();
+    const imageData = useImageDataAtom(dataKey.current);
+    const currentCmsApi = useRef$6(cmsApi);
+    // const currentSrc = useRef<string>();
+    // const currentNode = useRef<ImageNode>();
+    // const timer = useRef<NodeJS.Timeout>();
+    useEffect$5(() => {
+        addImageDataAtom(dataKey.current, {
+            currentSrc: '',
+            currentNode: undefined,
+            timer: undefined
+        });
+    }, []);
+    useEffect$5(() => {
+        if (JSON.stringify(props.node) === JSON.stringify(imageData.currentNode)
+            && JSON.stringify(assetInfo) === JSON.stringify(currentAssetInfo)
+            && JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current))
+            return;
+        if (isDebouncing) {
+            clearTimeout(imageData.timer);
+            setIsDebouncing(false);
+            doItAll();
+        }
+        // When asset property or key path changes, debounce to ensure all data is up to date before executing api calls
+        else if (currentAssetInfo &&
+            ((currentAssetInfo.property && assetInfo.property && currentAssetInfo.property !== assetInfo.property)
+                || (currentAssetInfo.keyPath && assetInfo.keyPath && currentAssetInfo.keyPath !== assetInfo.keyPath))) {
+            setIsDebouncing(true);
+            setImageDataAtom(dataKey.current, Object.assign(Object.assign({}, imageData), { timer: setTimeout(() => {
+                    setIsDebouncing(false);
+                    doItAll();
+                }, 300) }));
+        }
+        else {
+            doItAll();
+        }
+    }, [props.node, assetInfo, cmsApi]);
     const doItAll = () => {
         const newDiffRenderData = getDiffRenderData(props.node);
         if (newDiffRenderData && newDiffRenderData.renderedStrings) {
@@ -9786,13 +9842,13 @@ function ImageNodeRenderer(props) {
             }
             setDiffRenderData(newDiffRenderData);
         }
-        else if (currentSrc.current !== props.node.src || currentAssetInfo.current.property !== assetInfo.property || currentAssetInfo.current.keyPath !== assetInfo.keyPath
+        else if (imageData.currentSrc !== props.node.src || currentAssetInfo.property !== assetInfo.property || currentAssetInfo.keyPath !== assetInfo.keyPath
             || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
-            currentSrc.current = props.node.src;
-            currentAssetInfo.current = {
+            setImageDataAtom(dataKey.current, Object.assign(Object.assign({}, imageData), { currentSrc: props.node.src, currentNode: props.node }));
+            setAssetInfo({
                 property: assetInfo.property,
                 keyPath: assetInfo.keyPath
-            };
+            });
             currentCmsApi.current = cmsApi;
             // This path contains an api call to get image asset content. Only proceed if the property, keypath, and api are present
             if (assetInfo.property && assetInfo.keyPath && cmsApi) {
@@ -9804,64 +9860,6 @@ function ImageNodeRenderer(props) {
             }
         }
     };
-    useEffect$5(() => {
-        if (JSON.stringify(props.node) === JSON.stringify(currentNode.current)
-            && JSON.stringify(assetInfo) === JSON.stringify(currentAssetInfo.current)
-            && JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current))
-            return;
-        if (isDebouncing) {
-            clearTimeout(timer.current);
-            setIsDebouncing(false);
-            doItAll();
-        }
-        else if (currentAssetInfo.current &&
-            ((currentAssetInfo.current.property && assetInfo.property && currentAssetInfo.current.property !== assetInfo.property)
-                || (currentAssetInfo.current.keyPath && assetInfo.keyPath && currentAssetInfo.current.keyPath !== assetInfo.keyPath))) {
-            setIsDebouncing(true);
-            timer.current = setTimeout(() => {
-                setIsDebouncing(false);
-                doItAll();
-            }, 300);
-        }
-        else {
-            doItAll();
-        }
-        // const newDiffRenderData: DiffRenderData = getDiffRenderData(props.node);
-        // if (newDiffRenderData && newDiffRenderData.renderedStrings) {
-        // 	if (newDiffRenderData.renderedStrings['title']) {
-        // 		setOldTitle(newDiffRenderData.renderedStrings['title'].oldString);
-        // 		setNewTitle(newDiffRenderData.renderedStrings['title'].newString);
-        // 	}
-        // 	if (newDiffRenderData.renderedStrings['alt']) {
-        // 		setOldAlt(newDiffRenderData.renderedStrings['alt'].oldString);
-        // 		setNewAlt(newDiffRenderData.renderedStrings['alt'].newString);
-        // 	}
-        // 	if (newDiffRenderData.renderedStrings['src']) {
-        // 		(async () => {
-        // 			const oldImgSrc = await getImgSrc(newDiffRenderData.renderedStrings['src'].oldString);
-        // 			if (oldImgSrc) setOldSrc(oldImgSrc);
-        // 			const newImgSrc = await getImgSrc(newDiffRenderData.renderedStrings['src'].newString);
-        // 			if (newImgSrc) setNewSrc(newImgSrc);
-        // 		})();
-        // 	}
-        // 	setDiffRenderData(newDiffRenderData);
-        // } else if (
-        // 	currentSrc.current !== props.node.src || currentProperty.current !== assetInfo.property || currentKeyPath.current !== assetInfo.keyPath
-        // 		|| JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)
-        // ) {
-        // 	currentSrc.current = props.node.src;
-        // 	currentProperty.current = assetInfo.property;
-        // 	currentKeyPath.current = assetInfo.keyPath;
-        // 	currentCmsApi.current = cmsApi;
-        // 	// This path contains an api call to get image asset content. Only proceed if the property, keypath, and api are present
-        // 	if (assetInfo.property && assetInfo.keyPath && cmsApi) {
-        // 		(async () => {
-        // 			const newSrc = await getImgSrc(props.node.src);
-        // 			if (newSrc) setImgSrc(newSrc);
-        // 		})();
-        // 	}
-        // }
-    }, [props.node, assetInfo, cmsApi]);
     const getImgSrc = (src) => __awaiter(this, void 0, void 0, function* () {
         setLoadingError(undefined);
         setImgSrc(undefined);

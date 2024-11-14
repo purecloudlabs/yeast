@@ -4,10 +4,11 @@ import { ImageNode } from 'yeast-core';
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import { AssetInfo, useAssetInfo } from '../atoms/AssetInfoAtom';
+import { AssetInfo, setAssetInfo, useAssetInfo, usePrevAssetInfo } from '../atoms/AssetInfoAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 import CmsApi, { CMSProperties } from '../helpers/types';
+import { addImageDataAtom, useImageDataAtom, setImageDataAtom } from '../atoms/ImageDataAtom';
 
 interface IProps {
 	node: ImageNode;
@@ -34,11 +35,52 @@ export default function ImageNodeRenderer(props: IProps) {
 
 	const key1 = useKey();
 	const key2 = useKey();
-	const currentSrc = useRef<string>();
-	const currentAssetInfo = useRef<AssetInfo>();
-	const currentCmsApi = useRef<CmsApi>();
-	const currentNode = useRef<ImageNode>();
-	const timer = useRef<NodeJS.Timeout>();
+	const dataKey = useKey();
+	const currentAssetInfo = usePrevAssetInfo();
+	const imageData = useImageDataAtom(dataKey.current);
+	const currentCmsApi = useRef<CmsApi>(cmsApi);
+	// const currentSrc = useRef<string>();
+	// const currentNode = useRef<ImageNode>();
+	// const timer = useRef<NodeJS.Timeout>();
+
+	useEffect(() => {
+		addImageDataAtom(dataKey.current, {
+			currentSrc: '',
+			currentNode: undefined,
+			timer: undefined
+		});
+	}, []);
+
+	useEffect(() => {
+		if (
+			JSON.stringify(props.node) === JSON.stringify(imageData.currentNode)
+				&& JSON.stringify(assetInfo) === JSON.stringify(currentAssetInfo)
+				&& JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current)
+		) return;
+
+		if (isDebouncing) {
+			clearTimeout(imageData.timer);
+			setIsDebouncing(false);
+			doItAll();
+		}
+		// When asset property or key path changes, debounce to ensure all data is up to date before executing api calls
+		else if (
+			currentAssetInfo &&
+				((currentAssetInfo.property && assetInfo.property && currentAssetInfo.property !== assetInfo.property) 
+				|| (currentAssetInfo.keyPath && assetInfo.keyPath && currentAssetInfo.keyPath !== assetInfo.keyPath))
+		) {
+			setIsDebouncing(true);
+			setImageDataAtom(dataKey.current, {
+				...imageData,
+				timer: setTimeout(() => {
+					setIsDebouncing(false);
+					doItAll();
+				}, 300)
+			});
+		} else {
+			doItAll();
+		}
+	}, [props.node, assetInfo, cmsApi]);
 
 	const doItAll = () => {
 		const newDiffRenderData: DiffRenderData = getDiffRenderData(props.node);
@@ -62,15 +104,18 @@ export default function ImageNodeRenderer(props: IProps) {
 
 			setDiffRenderData(newDiffRenderData);
 		} else if (
-			currentSrc.current !== props.node.src || currentAssetInfo.current.property !== assetInfo.property || currentAssetInfo.current.keyPath !== assetInfo.keyPath
+			imageData.currentSrc !== props.node.src || currentAssetInfo.property !== assetInfo.property || currentAssetInfo.keyPath !== assetInfo.keyPath
 				|| JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)
 		) {
-
-			currentSrc.current = props.node.src;
-			currentAssetInfo.current = {
+			setImageDataAtom(dataKey.current, {
+				...imageData,
+				currentSrc: props.node.src,
+				currentNode: props.node
+			});
+			setAssetInfo({
 				property: assetInfo.property,
 				keyPath: assetInfo.keyPath
-			}
+			});
 			currentCmsApi.current = cmsApi;
 
 			// This path contains an api call to get image asset content. Only proceed if the property, keypath, and api are present
@@ -82,71 +127,6 @@ export default function ImageNodeRenderer(props: IProps) {
 			}
 		}
 	};
-
-	useEffect(() => {
-		if (
-			JSON.stringify(props.node) === JSON.stringify(currentNode.current)
-				&& JSON.stringify(assetInfo) === JSON.stringify(currentAssetInfo.current)
-				&& JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current)
-		) return;
-
-		if (isDebouncing) {
-			clearTimeout(timer.current);
-			setIsDebouncing(false);
-			doItAll();
-		} else if (
-			currentAssetInfo.current &&
-				((currentAssetInfo.current.property && assetInfo.property && currentAssetInfo.current.property !== assetInfo.property) 
-				|| (currentAssetInfo.current.keyPath && assetInfo.keyPath && currentAssetInfo.current.keyPath !== assetInfo.keyPath))
-		) {
-			setIsDebouncing(true);
-			timer.current = setTimeout(() => {
-				setIsDebouncing(false);
-				doItAll();
-			}, 300);
-		} else {
-			doItAll();
-		}
-
-		// const newDiffRenderData: DiffRenderData = getDiffRenderData(props.node);
-		// if (newDiffRenderData && newDiffRenderData.renderedStrings) {
-		// 	if (newDiffRenderData.renderedStrings['title']) {
-		// 		setOldTitle(newDiffRenderData.renderedStrings['title'].oldString);
-		// 		setNewTitle(newDiffRenderData.renderedStrings['title'].newString);
-		// 	}
-		// 	if (newDiffRenderData.renderedStrings['alt']) {
-		// 		setOldAlt(newDiffRenderData.renderedStrings['alt'].oldString);
-		// 		setNewAlt(newDiffRenderData.renderedStrings['alt'].newString);
-		// 	}
-		// 	if (newDiffRenderData.renderedStrings['src']) {
-		// 		(async () => {
-		// 			const oldImgSrc = await getImgSrc(newDiffRenderData.renderedStrings['src'].oldString);
-		// 			if (oldImgSrc) setOldSrc(oldImgSrc);
-		// 			const newImgSrc = await getImgSrc(newDiffRenderData.renderedStrings['src'].newString);
-		// 			if (newImgSrc) setNewSrc(newImgSrc);
-		// 		})();
-		// 	}
-
-		// 	setDiffRenderData(newDiffRenderData);
-		// } else if (
-		// 	currentSrc.current !== props.node.src || currentProperty.current !== assetInfo.property || currentKeyPath.current !== assetInfo.keyPath
-		// 		|| JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)
-		// ) {
-
-		// 	currentSrc.current = props.node.src;
-		// 	currentProperty.current = assetInfo.property;
-		// 	currentKeyPath.current = assetInfo.keyPath;
-		// 	currentCmsApi.current = cmsApi;
-
-		// 	// This path contains an api call to get image asset content. Only proceed if the property, keypath, and api are present
-		// 	if (assetInfo.property && assetInfo.keyPath && cmsApi) {
-		// 		(async () => {
-		// 			const newSrc = await getImgSrc(props.node.src);
-		// 			if (newSrc) setImgSrc(newSrc);
-		// 		})();
-		// 	}
-		// }
-	}, [props.node, assetInfo, cmsApi]);
 
 	const getImgSrc = async (src: string): Promise<string | undefined> => {
 		setLoadingError(undefined);
