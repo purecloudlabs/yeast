@@ -5,7 +5,7 @@ import { ImageNode } from 'yeast-core';
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import { assetInfoAtom, prevAssetInfoAtom, setPrevAssetInfo, usePrevAssetInfo } from '../atoms/AssetInfoAtom';
+import { assetInfoAtom, prevAssetInfoAtom } from '../atoms/AssetInfoAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 import CmsApi from '../helpers/types';
@@ -29,7 +29,6 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [newAlt, setNewAlt] = useState<string>();
 	const [oldTitle, setOldTitle] = useState<string>();
 	const [newTitle, setNewTitle] = useState<string>();
-	const [isDebouncing, setIsDebouncing] = useState<boolean>();
 	const [diffRenderData, setDiffRenderData] = useState<DiffRenderData>();
 	const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
 	const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
@@ -50,9 +49,12 @@ export default function ImageNodeRenderer(props: IProps) {
 				&& JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current)
 		) return;
 
-		if (isDebouncing) {
+		if (imageData.isDebouncing) {
 			imageData && clearTimeout(imageData.timer);
-			setIsDebouncing(false);
+			setImageDataAtom({
+				...imageData,
+				isDebouncing: false
+			});
 			doItAll();
 		}
 		// When asset property or key path changes, debounce to ensure all data is up to date before executing api calls
@@ -61,11 +63,17 @@ export default function ImageNodeRenderer(props: IProps) {
 				((prevAssetInfo.property && assetInfo.property && prevAssetInfo.property !== assetInfo.property) 
 				|| (prevAssetInfo.keyPath && assetInfo.keyPath && prevAssetInfo.keyPath !== assetInfo.keyPath))
 		) {
-			setIsDebouncing(true);
+			setImageDataAtom({
+				...imageData,
+				isDebouncing: true
+			});
 			setImageDataAtom({
 				...imageData,
 				timer: setTimeout(() => {
-					setIsDebouncing(false);
+					setImageDataAtom({
+						...imageData,
+						isDebouncing: false
+					});
 					doItAll();
 				}, 300)
 			});

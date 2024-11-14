@@ -9649,6 +9649,19 @@ var es = /*#__PURE__*/Object.freeze({
 	waitForNone: Recoil_index_16
 });
 
+const assetInfoAtom = Recoil_index_8({
+    key: 'asset-info',
+    default: {}
+});
+/*
+ * The "previous" atom is needed because ImageNodeRenderer.tsx is unmounting and remounting between renders,
+ * which causes refs that would normally be used for this purpose to be reinitialized on those renders, making them useless.
+ */
+const prevAssetInfoAtom = Recoil_index_8({
+    key: 'prev-asset-info',
+    default: {}
+});
+
 function getAugmentedNamespace(n) {
 	if (n.__esModule) return n;
 	var a = Object.defineProperty({}, '__esModule', {value: true});
@@ -9718,25 +9731,6 @@ function resetRecoil(atom) {
 }
 RecoilNexus$1.resetRecoil = resetRecoil;
 
-const assetInfoAtom = Recoil_index_8({
-    key: 'asset-info',
-    default: {}
-});
-function useAssetInfo() {
-    return Recoil_index_20(assetInfoAtom);
-}
-function setAssetInfo(assetInfo) {
-    setRecoil_1(assetInfoAtom, assetInfo);
-}
-/*
- * The "previous" atom is needed because ImageNodeRenderer.tsx is unmounting and remounting between renders,
- * which causes refs that would normally be used for this purpose to be reinitialized on those renders, making them useless.
- */
-const prevAssetInfoAtom = Recoil_index_8({
-    key: 'prev-asset-info',
-    default: {}
-});
-
 const cmsApiAtom = Recoil_index_8({
     key: 'CmsApi',
     default: {}
@@ -9771,7 +9765,6 @@ function ImageNodeRenderer(props) {
     const [newAlt, setNewAlt] = useState$3();
     const [oldTitle, setOldTitle] = useState$3();
     const [newTitle, setNewTitle] = useState$3();
-    const [isDebouncing, setIsDebouncing] = useState$3();
     const [diffRenderData, setDiffRenderData] = useState$3();
     const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
     const [prevAssetInfo, setPrevAssetInfo] = Recoil_index_22(prevAssetInfoAtom);
@@ -9788,18 +9781,18 @@ function ImageNodeRenderer(props) {
             && JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)
             && JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current))
             return;
-        if (isDebouncing) {
+        if (imageData.isDebouncing) {
             imageData && clearTimeout(imageData.timer);
-            setIsDebouncing(false);
+            setImageDataAtom(Object.assign(Object.assign({}, imageData), { isDebouncing: false }));
             doItAll();
         }
         // When asset property or key path changes, debounce to ensure all data is up to date before executing api calls
         else if (prevAssetInfo &&
             ((prevAssetInfo.property && assetInfo.property && prevAssetInfo.property !== assetInfo.property)
                 || (prevAssetInfo.keyPath && assetInfo.keyPath && prevAssetInfo.keyPath !== assetInfo.keyPath))) {
-            setIsDebouncing(true);
+            setImageDataAtom(Object.assign(Object.assign({}, imageData), { isDebouncing: true }));
             setImageDataAtom(Object.assign(Object.assign({}, imageData), { timer: setTimeout(() => {
-                    setIsDebouncing(false);
+                    setImageDataAtom(Object.assign(Object.assign({}, imageData), { isDebouncing: false }));
                     doItAll();
                 }, 300) }));
         }
@@ -10193,8 +10186,8 @@ class ReactRenderer {
 }
 
 function YeastNodeState(props) {
-    const assetInfo = useAssetInfo();
     const cmsApi = useCmsApi();
+    const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
     useEffect$5(() => {
         if (props.assetInfo !== assetInfo)
             setAssetInfo(props.assetInfo);

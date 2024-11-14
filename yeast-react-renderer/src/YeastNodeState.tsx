@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
+import { useRecoilState } from 'recoil';
 
 import CmsApi from './helpers/types';
-import { AssetInfo, setAssetInfo, useAssetInfo } from './atoms/AssetInfoAtom';
+import { AssetInfo, assetInfoAtom } from './atoms/AssetInfoAtom';
 import { setCmsApi, useCmsApi } from './atoms/CmsApiAtom';
 
 export interface YeastNodeStateProps {
@@ -10,8 +11,8 @@ export interface YeastNodeStateProps {
 }
 
 export default function YeastNodeState(props: YeastNodeStateProps) {
-    const assetInfo: AssetInfo = useAssetInfo();
     const cmsApi = useCmsApi();
+    const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
 
     useEffect(() => {
 		if (props.assetInfo !== assetInfo) setAssetInfo(props.assetInfo);
