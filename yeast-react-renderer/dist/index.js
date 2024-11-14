@@ -9789,7 +9789,7 @@ function ImageNodeRenderer(props) {
             setTimer(setTimeout(() => {
                 setIsDebouncing(false);
                 doItAll();
-            }, 300));
+            }, 3000));
         }
         else {
             clearTimeout(timer);
