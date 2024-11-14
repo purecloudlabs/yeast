@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState }  from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { ImageNode } from 'yeast-core';
 
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import { assetInfoAtom, prevAssetInfoAtom } from '../atoms/AssetInfoAtom';
+import { assetInfoAtom, debounceAtom, prevAssetInfoAtom, timerAtom, timerCallbackAtom } from '../atoms/AssetInfoAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 import CmsApi from '../helpers/types';
-import { debounceAtom, imageDataAtom, timerAtom } from '../atoms/ImageDataAtom';
+import { imageDataAtom } from '../atoms/ImageDataAtom';
 
 interface IProps {
 	node: ImageNode;
@@ -30,16 +30,23 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [oldTitle, setOldTitle] = useState<string>();
 	const [newTitle, setNewTitle] = useState<string>();
 	const [diffRenderData, setDiffRenderData] = useState<DiffRenderData>();
-	const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
+	const assetInfo = useRecoilValue(assetInfoAtom);
 	const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
 	const [imageData, setImageData] = useRecoilState(imageDataAtom);
-	const [timer, setTimer] = useRecoilState(timerAtom);
+	const timer = useRecoilValue(timerAtom);
 	const [isDebouncing, setIsDebouncing] = useRecoilState(debounceAtom);
+	const [timerCallback, setTimerCallback] = useRecoilState(timerCallbackAtom);
 	const cmsApi = useCmsApi();
 
 	const key1 = useKey();
 	const key2 = useKey();
 	const currentCmsApi = useRef<CmsApi>(cmsApi);
+
+	useEffect(() => {
+		if (timerCallback !== doItAll) {
+			setTimerCallback(doItAll);
+		}
+	}, []);
 
 	useEffect(() => {
 		if (
@@ -50,21 +57,8 @@ export default function ImageNodeRenderer(props: IProps) {
 
 		if (isDebouncing) {
 			clearTimeout(timer);
-			setTimer(undefined);
 			setIsDebouncing(false);
 			doItAll();
-		}
-		// When asset property or key path changes, debounce to ensure all data is up to date before executing api calls
-		else if (
-			prevAssetInfo &&
-				((prevAssetInfo.property && assetInfo.property && prevAssetInfo.property !== assetInfo.property) 
-				|| (prevAssetInfo.keyPath && assetInfo.keyPath && prevAssetInfo.keyPath !== assetInfo.keyPath))
-		) {
-			setIsDebouncing(true);
-			setTimer(setTimeout(() => {
-				setIsDebouncing(false)
-				doItAll();
-			}, 300));
 		} else {
 			doItAll();
 		}

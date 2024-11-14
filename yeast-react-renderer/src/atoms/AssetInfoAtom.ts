@@ -20,3 +20,22 @@ export const prevAssetInfoAtom = atom<AssetInfo>({
     key: 'prev-asset-info',
     default: {} as AssetInfo
 });
+
+/*
+ * Asset updates need to be debounced to avoid API errors in ImageNodeRenderer.tsx
+ */
+
+export const timerAtom = atom({
+    key: 'asset-timer',
+    default: {} as NodeJS.Timeout
+});
+
+export const debounceAtom = atom({
+    key: 'asset-debounce',
+    default: false
+});
+
+export const timerCallbackAtom = atom({
+    key: 'asset-timer-callback',
+    default: () => {}
+});
