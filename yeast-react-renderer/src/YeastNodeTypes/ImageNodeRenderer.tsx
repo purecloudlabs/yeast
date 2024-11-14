@@ -9,7 +9,7 @@ import { assetInfoAtom, prevAssetInfoAtom } from '../atoms/AssetInfoAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 import CmsApi from '../helpers/types';
-import { useImageDataAtom, setImageDataAtom } from '../atoms/ImageDataAtom';
+import { imageDataAtom } from '../atoms/ImageDataAtom';
 
 interface IProps {
 	node: ImageNode;
@@ -32,15 +32,12 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [diffRenderData, setDiffRenderData] = useState<DiffRenderData>();
 	const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
 	const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
+	const [imageData, setImageDataAtom] = useRecoilState(imageDataAtom)
 	const cmsApi = useCmsApi();
 
 	const key1 = useKey();
 	const key2 = useKey();
-	const imageData = useImageDataAtom();
 	const currentCmsApi = useRef<CmsApi>(cmsApi);
-	// const currentSrc = useRef<string>();
-	// const currentNode = useRef<ImageNode>();
-	// const timer = useRef<NodeJS.Timeout>();
 
 	useEffect(() => {
 		if (

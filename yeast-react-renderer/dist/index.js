@@ -9746,12 +9746,6 @@ const imageDataAtom = Recoil_index_8({
     key: 'image-data',
     default: {}
 });
-function useImageDataAtom() {
-    return Recoil_index_20(imageDataAtom);
-}
-function setImageDataAtom(data) {
-    setRecoil_1(imageDataAtom, data);
-}
 
 const hostnameRegex = /^https?:\/\//i;
 const changesetFilepathRegex = /^\/changesets\/(.+\.(jpg|jpeg|png|svg))$/i;
@@ -9768,14 +9762,11 @@ function ImageNodeRenderer(props) {
     const [diffRenderData, setDiffRenderData] = useState$3();
     const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
     const [prevAssetInfo, setPrevAssetInfo] = Recoil_index_22(prevAssetInfoAtom);
+    const [imageData, setImageDataAtom] = Recoil_index_22(imageDataAtom);
     const cmsApi = useCmsApi();
     const key1 = useKey();
     const key2 = useKey();
-    const imageData = useImageDataAtom();
     const currentCmsApi = useRef$6(cmsApi);
-    // const currentSrc = useRef<string>();
-    // const currentNode = useRef<ImageNode>();
-    // const timer = useRef<NodeJS.Timeout>();
     useEffect$5(() => {
         if (JSON.stringify(props.node) === JSON.stringify(imageData === null || imageData === void 0 ? void 0 : imageData.currentNode)
             && JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)

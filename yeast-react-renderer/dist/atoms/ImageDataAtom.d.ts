@@ -7,10 +7,5 @@ interface ImageData {
     timer: NodeJS.Timeout;
     isDebouncing: boolean;
 }
-export declare const imageDataAtoms: {
-    [key: string]: RecoilState<ImageData | undefined>;
-};
 export declare const imageDataAtom: RecoilState<ImageData>;
-export declare function useImageDataAtom(): ImageData;
-export declare function setImageDataAtom(data: ImageData): void;
 export {};
