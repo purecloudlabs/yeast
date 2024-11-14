@@ -44,7 +44,7 @@ export default function ImageNodeRenderer(props: IProps) {
 
 	useEffect(() => {
 		if (timerCallback !== doItAll) {
-			setTimerCallback(() => doItAll);
+			setTimerCallback(() => doItAll());
 		}
 	}, []);
 

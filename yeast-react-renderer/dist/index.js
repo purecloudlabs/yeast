@@ -9787,7 +9787,7 @@ function ImageNodeRenderer(props) {
     const currentCmsApi = useRef$6(cmsApi);
     useEffect$5(() => {
         if (timerCallback !== doItAll) {
-            setTimerCallback(() => doItAll);
+            setTimerCallback(() => doItAll());
         }
     }, []);
     useEffect$5(() => {
