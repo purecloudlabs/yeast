@@ -9672,10 +9672,6 @@ const debounceAtom = Recoil_index_8({
     key: 'asset-debounce',
     default: false
 });
-const timerCallbackAtom = Recoil_index_8({
-    key: 'asset-timer-callback',
-    default: () => { }
-});
 
 function getAugmentedNamespace(n) {
 	if (n.__esModule) return n;
@@ -9775,32 +9771,29 @@ function ImageNodeRenderer(props) {
     const [oldTitle, setOldTitle] = useState$3();
     const [newTitle, setNewTitle] = useState$3();
     const [diffRenderData, setDiffRenderData] = useState$3();
-    const assetInfo = Recoil_index_20(assetInfoAtom);
+    const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
     const [prevAssetInfo, setPrevAssetInfo] = Recoil_index_22(prevAssetInfoAtom);
     const [imageData, setImageData] = Recoil_index_22(imageDataAtom);
-    const timer = Recoil_index_20(timerAtom);
+    const [timer, setTimer] = Recoil_index_22(timerAtom);
     const [isDebouncing, setIsDebouncing] = Recoil_index_22(debounceAtom);
-    const [timerCallback, setTimerCallback] = Recoil_index_22(timerCallbackAtom);
     const cmsApi = useCmsApi();
     const key1 = useKey();
     const key2 = useKey();
     const currentCmsApi = useRef$6(cmsApi);
-    useEffect$5(() => {
-        if (timerCallback !== doItAll) {
-            setTimerCallback(() => doItAll());
-        }
-    }, []);
     useEffect$5(() => {
         if (JSON.stringify(props.node) === JSON.stringify(imageData === null || imageData === void 0 ? void 0 : imageData.currentNode)
             && JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)
             && JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current))
             return;
         if (isDebouncing) {
-            clearTimeout(timer);
-            setIsDebouncing(false);
+            setTimer(setTimeout(() => {
+                setIsDebouncing(false);
+                doItAll();
+            }, 300));
             doItAll();
         }
         else {
+            clearTimeout(timer);
             doItAll();
         }
     }, [props.node, assetInfo, cmsApi]);
@@ -10194,21 +10187,18 @@ function YeastNodeState(props) {
     const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
     const prevAssetInfo = Recoil_index_20(prevAssetInfoAtom);
     const [isDebouncing, setIsDebouncing] = Recoil_index_22(debounceAtom);
-    const [timer, setTimer] = Recoil_index_22(timerAtom);
-    const timerCallback = Recoil_index_20(timerCallbackAtom);
     useEffect$5(() => {
         if (props.assetInfo !== assetInfo)
             setAssetInfo(props.assetInfo);
         if (props.api !== cmsApi)
             setCmsApi(props.api);
-        if (prevAssetInfo &&
+        if (isDebouncing) {
+            setIsDebouncing(false);
+        }
+        else if (prevAssetInfo &&
             ((prevAssetInfo.property && assetInfo.property && prevAssetInfo.property !== assetInfo.property)
                 || (prevAssetInfo.keyPath && assetInfo.keyPath && prevAssetInfo.keyPath !== assetInfo.keyPath))) {
             setIsDebouncing(true);
-            setTimer(setTimeout(() => {
-                setIsDebouncing(false);
-                timerCallback();
-            }, 300));
         }
     }, [props.api, props.assetInfo]);
     return React.createElement(React.Fragment, null);

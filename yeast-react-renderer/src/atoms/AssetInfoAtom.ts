@@ -34,8 +34,3 @@ export const debounceAtom = atom({
     key: 'asset-debounce',
     default: false
 });
-
-export const timerCallbackAtom = atom({
-    key: 'asset-timer-callback',
-    default: () => {}
-});

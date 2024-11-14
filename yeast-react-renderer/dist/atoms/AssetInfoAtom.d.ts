@@ -8,4 +8,3 @@ export declare const assetInfoAtom: import("recoil").RecoilState<AssetInfo>;
 export declare const prevAssetInfoAtom: import("recoil").RecoilState<AssetInfo>;
 export declare const timerAtom: import("recoil").RecoilState<NodeJS.Timeout>;
 export declare const debounceAtom: import("recoil").RecoilState<boolean>;
-export declare const timerCallbackAtom: import("recoil").RecoilState<() => void>;

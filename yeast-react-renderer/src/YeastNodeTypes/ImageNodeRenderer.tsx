@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState }  from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { ImageNode } from 'yeast-core';
 
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import { assetInfoAtom, debounceAtom, prevAssetInfoAtom, timerAtom, timerCallbackAtom } from '../atoms/AssetInfoAtom';
+import { assetInfoAtom, debounceAtom, prevAssetInfoAtom, timerAtom } from '../atoms/AssetInfoAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 import CmsApi from '../helpers/types';
@@ -30,23 +30,16 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [oldTitle, setOldTitle] = useState<string>();
 	const [newTitle, setNewTitle] = useState<string>();
 	const [diffRenderData, setDiffRenderData] = useState<DiffRenderData>();
-	const assetInfo = useRecoilValue(assetInfoAtom);
+	const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
 	const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
 	const [imageData, setImageData] = useRecoilState(imageDataAtom);
-	const timer = useRecoilValue(timerAtom);
+	const [timer, setTimer] = useRecoilState(timerAtom);
 	const [isDebouncing, setIsDebouncing] = useRecoilState(debounceAtom);
-	const [timerCallback, setTimerCallback] = useRecoilState(timerCallbackAtom);
 	const cmsApi = useCmsApi();
 
 	const key1 = useKey();
 	const key2 = useKey();
 	const currentCmsApi = useRef<CmsApi>(cmsApi);
-
-	useEffect(() => {
-		if (timerCallback !== doItAll) {
-			setTimerCallback(() => doItAll());
-		}
-	}, []);
 
 	useEffect(() => {
 		if (
@@ -56,10 +49,13 @@ export default function ImageNodeRenderer(props: IProps) {
 		) return;
 
 		if (isDebouncing) {
-			clearTimeout(timer);
-			setIsDebouncing(false);
+			setTimer(setTimeout(() => {
+				setIsDebouncing(false)
+				doItAll();
+			}, 300));
 			doItAll();
 		} else {
+			clearTimeout(timer);
 			doItAll();
 		}
 	}, [props.node, assetInfo, cmsApi]);
