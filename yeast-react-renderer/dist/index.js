@@ -9798,12 +9798,12 @@ function ImageNodeRenderer(props) {
         });
     }, []);
     useEffect$5(() => {
-        if (JSON.stringify(props.node) === JSON.stringify(imageData.currentNode)
+        if (JSON.stringify(props.node) === JSON.stringify(imageData === null || imageData === void 0 ? void 0 : imageData.currentNode)
             && JSON.stringify(assetInfo) === JSON.stringify(currentAssetInfo)
             && JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current))
             return;
         if (isDebouncing) {
-            clearTimeout(imageData.timer);
+            imageData && clearTimeout(imageData.timer);
             setIsDebouncing(false);
             doItAll();
         }
@@ -9844,7 +9844,7 @@ function ImageNodeRenderer(props) {
             }
             setDiffRenderData(newDiffRenderData);
         }
-        else if (imageData.currentSrc !== props.node.src || currentAssetInfo.property !== assetInfo.property || currentAssetInfo.keyPath !== assetInfo.keyPath
+        else if ((imageData && imageData.currentSrc !== props.node.src) || currentAssetInfo.property !== assetInfo.property || currentAssetInfo.keyPath !== assetInfo.keyPath
             || JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) {
             setImageDataAtom(dataKey.current, Object.assign(Object.assign({}, imageData), { currentSrc: props.node.src, currentNode: props.node }));
             setAssetInfo({
