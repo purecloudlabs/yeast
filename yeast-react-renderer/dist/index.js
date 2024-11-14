@@ -9790,7 +9790,6 @@ function ImageNodeRenderer(props) {
                 setIsDebouncing(false);
                 doItAll();
             }, 300));
-            doItAll();
         }
         else {
             clearTimeout(timer);

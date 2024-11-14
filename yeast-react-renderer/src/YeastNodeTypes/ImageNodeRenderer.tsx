@@ -53,7 +53,6 @@ export default function ImageNodeRenderer(props: IProps) {
 				setIsDebouncing(false)
 				doItAll();
 			}, 300));
-			doItAll();
 		} else {
 			clearTimeout(timer);
 			doItAll();
