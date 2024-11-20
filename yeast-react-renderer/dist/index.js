@@ -9833,8 +9833,9 @@ function ImageNodeRenderer(props) {
     const timer = useTimer();
     useEffect$5(() => {
         return () => {
-            if (timer)
-                pauseTimer();
+            if (!timer)
+                return;
+            pauseTimer();
         };
     }, []);
     useEffect$5(() => {

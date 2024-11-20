@@ -44,7 +44,8 @@ export default function ImageNodeRenderer(props: IProps) {
 
 	useEffect(() => {
 		return () => {
-			if (timer) pauseTimer();
+			if (!timer) return;
+			pauseTimer();
 		};
 	}, []);
 
