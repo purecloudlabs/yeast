@@ -63,10 +63,11 @@ export default function ImageNodeRenderer(props: IProps) {
 				imageSetup();
 			}
 			setTimer(timerCb, 3000);
-		} else {
-			clearTimer();
-			imageSetup();
+			return;
 		}
+		
+		clearTimer();
+		imageSetup();
 	}, [props.node, assetInfo, cmsApi]);
 
 	const imageSetup = () => {

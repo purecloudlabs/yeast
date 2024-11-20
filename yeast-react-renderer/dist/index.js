@@ -9837,11 +9837,10 @@ function ImageNodeRenderer(props) {
                 imageSetup();
             };
             setTimer(timerCb, 3000);
+            return;
         }
-        else {
-            clearTimer();
-            imageSetup();
-        }
+        clearTimer();
+        imageSetup();
     }, [props.node, assetInfo, cmsApi]);
     const imageSetup = () => {
         const newDiffRenderData = getDiffRenderData(props.node);
