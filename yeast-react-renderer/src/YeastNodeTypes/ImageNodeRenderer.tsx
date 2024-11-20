@@ -5,7 +5,7 @@ import { ImageNode } from 'yeast-core';
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import { assetInfoAtom, debounceAtom, prevAssetInfoAtom, timerAtom } from '../atoms/AssetInfoAtom';
+import { assetInfoAtom, useIsDebouncing, setIsDebouncing, prevAssetInfoAtom, setTimer, useTimer, clearTimer, pauseTimer } from '../atoms/AssetInfoAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 import CmsApi from '../helpers/types';
@@ -33,13 +33,20 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
 	const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
 	const [imageData, setImageData] = useRecoilState(imageDataAtom);
-	const [timer, setTimer] = useRecoilState(timerAtom);
-	const [isDebouncing, setIsDebouncing] = useRecoilState(debounceAtom);
 	const cmsApi = useCmsApi();
+	const isDebouncing = useIsDebouncing();
+
 
 	const key1 = useKey();
 	const key2 = useKey();
 	const currentCmsApi = useRef<CmsApi>(cmsApi);
+	const timer = useTimer();
+
+	useEffect(() => {
+		return () => {
+			if (timer) pauseTimer();
+		};
+	}, []);
 
 	useEffect(() => {
 		if (
@@ -49,17 +56,18 @@ export default function ImageNodeRenderer(props: IProps) {
 		) return;
 
 		if (isDebouncing) {
-			setTimer(setTimeout(() => {
-				setIsDebouncing(false)
-				doItAll();
-			}, 3000));
+			const timerCb = () => {
+				setIsDebouncing(false);
+				imageSetup();
+			}
+			setTimer(timerCb, 3000);
 		} else {
-			clearTimeout(timer);
-			doItAll();
+			if (timer) clearTimer();
+			imageSetup();
 		}
 	}, [props.node, assetInfo, cmsApi]);
 
-	const doItAll = () => {
+	const imageSetup = () => {
 		const newDiffRenderData: DiffRenderData = getDiffRenderData(props.node);
 		if (newDiffRenderData && newDiffRenderData.renderedStrings) {
 			if (newDiffRenderData.renderedStrings['title']) {
