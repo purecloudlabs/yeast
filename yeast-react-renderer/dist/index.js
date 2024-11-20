@@ -9839,8 +9839,7 @@ function ImageNodeRenderer(props) {
             setTimer(timerCb, 3000);
         }
         else {
-            if (timer)
-                clearTimer();
+            clearTimer();
             imageSetup();
         }
     }, [props.node, assetInfo, cmsApi]);

@@ -64,7 +64,7 @@ export default function ImageNodeRenderer(props: IProps) {
 			}
 			setTimer(timerCb, 3000);
 		} else {
-			if (timer) clearTimer();
+			clearTimer();
 			imageSetup();
 		}
 	}, [props.node, assetInfo, cmsApi]);
