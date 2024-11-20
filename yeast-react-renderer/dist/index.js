@@ -9649,30 +9649,6 @@ var es = /*#__PURE__*/Object.freeze({
 	waitForNone: Recoil_index_16
 });
 
-const assetInfoAtom = Recoil_index_8({
-    key: 'asset-info',
-    default: {}
-});
-/*
- * The "previous" atom is needed because ImageNodeRenderer.tsx is unmounting and remounting between renders,
- * which causes refs that would normally be used for this purpose to be reinitialized on those renders, making them useless.
- */
-const prevAssetInfoAtom = Recoil_index_8({
-    key: 'prev-asset-info',
-    default: {}
-});
-/*
- * Asset updates need to be debounced to avoid API errors in ImageNodeRenderer.tsx
- */
-const timerAtom = Recoil_index_8({
-    key: 'asset-timer',
-    default: {}
-});
-const debounceAtom = Recoil_index_8({
-    key: 'asset-debounce',
-    default: false
-});
-
 function getAugmentedNamespace(n) {
 	if (n.__esModule) return n;
 	var a = Object.defineProperty({}, '__esModule', {value: true});
@@ -9742,6 +9718,81 @@ function resetRecoil(atom) {
 }
 RecoilNexus$1.resetRecoil = resetRecoil;
 
+const assetInfoAtom = Recoil_index_8({
+    key: 'asset-info',
+    default: JSON.parse(localStorage.getItem('asset-info')) || {}
+});
+/*
+ * The "previous" atom is needed because ImageNodeRenderer.tsx is unmounting and remounting between renders,
+ * which causes refs that would normally be used for this purpose to be reinitialized on those renders, making them useless.
+ */
+const prevAssetInfoAtom = Recoil_index_8({
+    key: 'prev-asset-info',
+    default: JSON.parse(localStorage.getItem('prev-asset-info')) || {}
+});
+/*
+ * Asset updates need to be debounced to avoid API errors in ImageNodeRenderer.tsx
+ */
+const timerAtom = Recoil_index_8({
+    key: 'asset-timer',
+    default: initializeTimer()
+});
+function initializeTimer() {
+    const existingTimer = JSON.parse(localStorage.getItem('asset-timer'));
+    if (existingTimer && existingTimer.remainingMs && existingTimer.cb) {
+        return {
+            timer: setTimeout(existingTimer.cb, existingTimer.remainingMs),
+            remainingMs: existingTimer.remainingMs,
+            cb: existingTimer.cb
+        };
+    }
+    return {};
+}
+function setTimer(cb, timeoutMs) {
+    const timerData = {
+        timer: setTimeout(cb, timeoutMs),
+        timeoutMs,
+        startTime: Date.now(),
+        remainingMs: timeoutMs
+    };
+    setRecoil_1(timerAtom, timerData);
+    localStorage.setItem('asset-timer', JSON.stringify(timerData));
+}
+function useTimer() {
+    return Recoil_index_20(timerAtom);
+}
+function clearTimer() {
+    const timerData = Recoil_index_20(timerAtom);
+    if (timerData.timer)
+        clearTimeout(timerData.timer);
+    setRecoil_1(timerAtom, {});
+    localStorage.removeItem('asset-timer');
+}
+function pauseTimer() {
+    const existingTimer = Recoil_index_20(timerAtom);
+    if (existingTimer.timer && existingTimer.cb) {
+        clearTimeout(existingTimer.timer);
+        const now = Date.now();
+        const remainingMs = existingTimer.timeoutMs - (now - existingTimer.startTime);
+        setRecoil_1(timerAtom, {
+            remainingMs,
+            cb: existingTimer.cb,
+        });
+        localStorage.setItem('asset-timer', JSON.stringify(existingTimer));
+    }
+}
+const debounceAtom = Recoil_index_8({
+    key: 'asset-debounce',
+    default: localStorage.getItem('asset-debounce') === 'true' || false
+});
+function setIsDebouncing(isDebouncing) {
+    setRecoil_1(debounceAtom, isDebouncing);
+    localStorage.setItem('asset-debounce', isDebouncing.toString());
+}
+function useIsDebouncing() {
+    return Recoil_index_20(debounceAtom);
+}
+
 const cmsApiAtom = Recoil_index_8({
     key: 'CmsApi',
     default: {}
@@ -9755,7 +9806,7 @@ function setCmsApi(cmsApi) {
 
 const imageDataAtom = Recoil_index_8({
     key: 'image-data',
-    default: {}
+    default: JSON.parse(localStorage.getItem('image-data')) || {}
 });
 
 const hostnameRegex = /^https?:\/\//i;
@@ -9774,29 +9825,37 @@ function ImageNodeRenderer(props) {
     const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
     const [prevAssetInfo, setPrevAssetInfo] = Recoil_index_22(prevAssetInfoAtom);
     const [imageData, setImageData] = Recoil_index_22(imageDataAtom);
-    const [timer, setTimer] = Recoil_index_22(timerAtom);
-    const [isDebouncing, setIsDebouncing] = Recoil_index_22(debounceAtom);
     const cmsApi = useCmsApi();
+    const isDebouncing = useIsDebouncing();
     const key1 = useKey();
     const key2 = useKey();
     const currentCmsApi = useRef$6(cmsApi);
+    const timer = useTimer();
+    useEffect$5(() => {
+        return () => {
+            if (timer)
+                pauseTimer();
+        };
+    }, []);
     useEffect$5(() => {
         if (JSON.stringify(props.node) === JSON.stringify(imageData === null || imageData === void 0 ? void 0 : imageData.currentNode)
             && JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)
             && JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current))
             return;
         if (isDebouncing) {
-            setTimer(setTimeout(() => {
+            const timerCb = () => {
                 setIsDebouncing(false);
-                doItAll();
-            }, 3000));
+                imageSetup();
+            };
+            setTimer(timerCb, 3000);
         }
         else {
-            clearTimeout(timer);
-            doItAll();
+            if (timer)
+                clearTimer();
+            imageSetup();
         }
     }, [props.node, assetInfo, cmsApi]);
-    const doItAll = () => {
+    const imageSetup = () => {
         const newDiffRenderData = getDiffRenderData(props.node);
         if (newDiffRenderData && newDiffRenderData.renderedStrings) {
             if (newDiffRenderData.renderedStrings['title']) {
