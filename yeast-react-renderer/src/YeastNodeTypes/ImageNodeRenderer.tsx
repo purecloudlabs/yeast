@@ -5,7 +5,7 @@ import { ImageNode } from 'yeast-core';
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import { assetInfoAtom, useIsDebouncing, setIsDebouncing, prevAssetInfoAtom, setTimer, useTimer, clearTimer, pauseTimer } from '../atoms/AssetInfoAtom';
+import { assetInfoAtom, useIsDebouncing, setIsDebouncing, prevAssetInfoAtom, setTimer, useTimer, clearTimer } from '../atoms/AssetInfoAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 import CmsApi from '../helpers/types';
@@ -45,7 +45,8 @@ export default function ImageNodeRenderer(props: IProps) {
 	useEffect(() => {
 		return () => {
 			if (!timer) return;
-			pauseTimer();
+			localStorage.removeItem('asset-timer');
+			// pauseTimer();
 		};
 	}, []);
 

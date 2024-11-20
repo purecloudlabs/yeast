@@ -9768,19 +9768,6 @@ function clearTimer() {
     setRecoil_1(timerAtom, {});
     localStorage.removeItem('asset-timer');
 }
-function pauseTimer() {
-    const existingTimer = Recoil_index_20(timerAtom);
-    if (!existingTimer || !existingTimer.timer || !existingTimer.cb)
-        return;
-    clearTimeout(existingTimer.timer);
-    const now = Date.now();
-    const remainingMs = existingTimer.timeoutMs - (now - existingTimer.startTime);
-    setRecoil_1(timerAtom, {
-        remainingMs,
-        cb: existingTimer.cb,
-    });
-    localStorage.setItem('asset-timer', JSON.stringify(existingTimer));
-}
 const debounceAtom = Recoil_index_8({
     key: 'asset-debounce',
     default: localStorage.getItem('asset-debounce') === 'true' || false
@@ -9835,7 +9822,8 @@ function ImageNodeRenderer(props) {
         return () => {
             if (!timer)
                 return;
-            pauseTimer();
+            localStorage.removeItem('asset-timer');
+            // pauseTimer();
         };
     }, []);
     useEffect$5(() => {
