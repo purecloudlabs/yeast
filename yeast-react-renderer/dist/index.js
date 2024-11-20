@@ -9770,16 +9770,16 @@ function clearTimer() {
 }
 function pauseTimer() {
     const existingTimer = Recoil_index_20(timerAtom);
-    if (existingTimer.timer && existingTimer.cb) {
-        clearTimeout(existingTimer.timer);
-        const now = Date.now();
-        const remainingMs = existingTimer.timeoutMs - (now - existingTimer.startTime);
-        setRecoil_1(timerAtom, {
-            remainingMs,
-            cb: existingTimer.cb,
-        });
-        localStorage.setItem('asset-timer', JSON.stringify(existingTimer));
-    }
+    if (!existingTimer || !existingTimer.timer || !existingTimer.cb)
+        return;
+    clearTimeout(existingTimer.timer);
+    const now = Date.now();
+    const remainingMs = existingTimer.timeoutMs - (now - existingTimer.startTime);
+    setRecoil_1(timerAtom, {
+        remainingMs,
+        cb: existingTimer.cb,
+    });
+    localStorage.setItem('asset-timer', JSON.stringify(existingTimer));
 }
 const debounceAtom = Recoil_index_8({
     key: 'asset-debounce',

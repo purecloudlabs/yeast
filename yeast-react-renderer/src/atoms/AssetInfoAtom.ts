@@ -94,16 +94,16 @@ export function clearTimer() {
 
 export function pauseTimer() {
     const existingTimer = useRecoilValue(timerAtom);
-    if (existingTimer.timer && existingTimer.cb) {
-        clearTimeout(existingTimer.timer);
-        const now = Date.now();
-        const remainingMs = existingTimer.timeoutMs - (now - existingTimer.startTime);
-        setRecoil(timerAtom, {
-            remainingMs,
-            cb: existingTimer.cb,
-        });
-        localStorage.setItem('asset-timer', JSON.stringify(existingTimer));
-    }
+    if (!existingTimer || !existingTimer.timer || !existingTimer.cb) return;
+    
+    clearTimeout(existingTimer.timer);
+    const now = Date.now();
+    const remainingMs = existingTimer.timeoutMs - (now - existingTimer.startTime);
+    setRecoil(timerAtom, {
+        remainingMs,
+        cb: existingTimer.cb,
+    });
+    localStorage.setItem('asset-timer', JSON.stringify(existingTimer));
 }
 
 export const debounceAtom = atom({
