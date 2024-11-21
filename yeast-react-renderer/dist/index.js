@@ -9747,7 +9747,7 @@ function setCmsApi(cmsApi) {
 
 const imageDataAtom = Recoil_index_8({
     key: 'image-data',
-    default: JSON.parse(localStorage.getItem('image-data')) || {}
+    default: {}
 });
 
 const hostnameRegex = /^https?:\/\//i;

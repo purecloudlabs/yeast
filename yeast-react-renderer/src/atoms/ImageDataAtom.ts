@@ -9,12 +9,12 @@ export interface ImageData {
 
 export const imageDataAtom = atom({
     key: 'image-data',
-    default: JSON.parse(localStorage.getItem('image-data')) || {} as ImageData
+    default: {} as ImageData
 });
 
 export function setImageData(data: ImageData) {
     setRecoil(imageDataAtom, data);
-    localStorage.setItem('image-data', JSON.stringify(data));
+    // localStorage.setItem('image-data', JSON.stringify(data));
 }
 
 export function getImageData() {
