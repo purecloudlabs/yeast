@@ -10197,8 +10197,9 @@ class ReactRenderer {
     }
 }
 
-// This component
-function YeastNodeState(props) {
+function YeastNodeRenderer(props) {
+    const key = useKey();
+    const [renderer, setRenderer] = useState$3(new ReactRenderer(props.customRenderers));
     const cmsApi = useCmsApi();
     const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
     useEffect$5(() => {
@@ -10207,12 +10208,6 @@ function YeastNodeState(props) {
         if (JSON.stringify(props.api) !== JSON.stringify(cmsApi))
             setCmsApi(props.api);
     }, [props.api, props.assetInfo]);
-    return React.createElement(React.Fragment, null);
-}
-
-function YeastNodeRenderer(props) {
-    const key = useKey();
-    const [renderer, setRenderer] = useState$3(new ReactRenderer(props.customRenderers));
     useEffect$5(() => {
         if (props.customRenderers === renderer.customRenderers)
             return;
@@ -10220,7 +10215,6 @@ function YeastNodeRenderer(props) {
     }, [props.customRenderers]);
     return (React.createElement(Recoil_index_5, null,
         React.createElement(_default, null),
-        React.createElement(YeastNodeState, { api: props.api, assetInfo: props.assetInfo }),
         React.createElement(React.Fragment, { key: key.current }, renderer.renderComponents(props.nodes))));
 }
 
