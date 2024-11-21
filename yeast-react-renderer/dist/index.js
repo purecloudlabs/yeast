@@ -9762,7 +9762,7 @@ function ImageNodeRenderer(props) {
     const [newAlt, setNewAlt] = useState$3();
     const [oldTitle, setOldTitle] = useState$3();
     const [newTitle, setNewTitle] = useState$3();
-    const [isDebouncing, setIsDebouncing] = useState$3();
+    useState$3();
     const [diffRenderData, setDiffRenderData] = useState$3();
     const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
     const [prevAssetInfo, setPrevAssetInfo] = Recoil_index_22(prevAssetInfoAtom);
@@ -9783,23 +9783,23 @@ function ImageNodeRenderer(props) {
             && JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)
             && JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current))
             return;
-        if (!isDebouncing && assetInfo &&
-            ((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property)
-                || (assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))) {
-            setIsDebouncing(true);
-            timer.current = setTimeout(() => {
-                setIsDebouncing(false);
-                imageSetup();
-            }, 300);
-        }
-        else if (isDebouncing) {
-            clearTimeout(timer.current);
-            setIsDebouncing(false);
-            imageSetup();
-        }
-        else {
-            imageSetup();
-        }
+        imageSetup();
+        // if (!isDebouncing && assetInfo &&
+        // 		((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property) 
+        // 		|| (assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))
+        // ) {
+        // 	setIsDebouncing(true)
+        // 	timer.current = setTimeout(() => {
+        // 		setIsDebouncing(false);
+        // 		imageSetup();
+        // 	}, 300);
+        // } else if (isDebouncing) {
+        // 	clearTimeout(timer.current);
+        // 	setIsDebouncing(false);
+        // 	imageSetup();
+        // } else {
+        // 	imageSetup();
+        // }
     }, [props.node, assetInfo, cmsApi]);
     const imageSetup = () => {
         const newDiffRenderData = getDiffRenderData(props.node);

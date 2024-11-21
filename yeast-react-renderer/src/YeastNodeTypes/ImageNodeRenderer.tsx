@@ -54,22 +54,24 @@ export default function ImageNodeRenderer(props: IProps) {
 				&& JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current)
 		) return;
 
-		if (!isDebouncing && assetInfo &&
-				((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property) 
-				|| (assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))
-		) {
-			setIsDebouncing(true)
-			timer.current = setTimeout(() => {
-				setIsDebouncing(false);
-				imageSetup();
-			}, 300);
-		} else if (isDebouncing) {
-			clearTimeout(timer.current);
-			setIsDebouncing(false);
-			imageSetup();
-		} else {
-			imageSetup();
-		}
+		imageSetup();
+
+		// if (!isDebouncing && assetInfo &&
+		// 		((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property) 
+		// 		|| (assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))
+		// ) {
+		// 	setIsDebouncing(true)
+		// 	timer.current = setTimeout(() => {
+		// 		setIsDebouncing(false);
+		// 		imageSetup();
+		// 	}, 300);
+		// } else if (isDebouncing) {
+		// 	clearTimeout(timer.current);
+		// 	setIsDebouncing(false);
+		// 	imageSetup();
+		// } else {
+		// 	imageSetup();
+		// }
 
 	}, [props.node, assetInfo, cmsApi]);
 
