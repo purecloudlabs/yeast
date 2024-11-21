@@ -5,11 +5,11 @@ import { ImageNode } from 'yeast-core';
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import { assetInfoAtom, prevAssetInfoAtom } from '../atoms/AssetInfoAtom';
+import { assetInfoAtom, prevAssetInfoAtom, AssetInfo } from '../atoms/AssetInfoAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 import CmsApi from '../helpers/types';
-import { imageDataAtom } from '../atoms/ImageDataAtom';
+import { imageDataAtom, ImageData } from '../atoms/ImageDataAtom';
 
 interface IProps {
 	node: ImageNode;
@@ -31,9 +31,12 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [newTitle, setNewTitle] = useState<string>();
 	const [isDebouncing, setIsDebouncing] = useState<boolean>();
 	const [diffRenderData, setDiffRenderData] = useState<DiffRenderData>();
-	const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
-	const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
-	const [imageData, setImageData] = useRecoilState(imageDataAtom);
+	// const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
+	const [assetInfo, setAssetInfo] = useState<AssetInfo>();
+	// const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
+	const [prevAssetInfo, setPrevAssetInfo] = useState<AssetInfo>();
+	// const [imageData, setImageData] = useRecoilState(imageDataAtom);
+	const [imageData, setImageData] = useState<ImageData>();
 	const cmsApi = useCmsApi();
 
 	const key1 = useKey();
@@ -54,24 +57,22 @@ export default function ImageNodeRenderer(props: IProps) {
 				&& JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current)
 		) return;
 
-		imageSetup();
-
-		// if (!isDebouncing && assetInfo &&
-		// 		((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property) 
-		// 		|| (assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))
-		// ) {
-		// 	setIsDebouncing(true)
-		// 	timer.current = setTimeout(() => {
-		// 		setIsDebouncing(false);
-		// 		imageSetup();
-		// 	}, 300);
-		// } else if (isDebouncing) {
-		// 	clearTimeout(timer.current);
-		// 	setIsDebouncing(false);
-		// 	imageSetup();
-		// } else {
-		// 	imageSetup();
-		// }
+		if (!isDebouncing && assetInfo &&
+				((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property) 
+				|| (assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))
+		) {
+			setIsDebouncing(true)
+			timer.current = setTimeout(() => {
+				setIsDebouncing(false);
+				imageSetup();
+			}, 300);
+		} else if (isDebouncing) {
+			clearTimeout(timer.current);
+			setIsDebouncing(false);
+			imageSetup();
+		} else {
+			imageSetup();
+		}
 
 	}, [props.node, assetInfo, cmsApi]);
 

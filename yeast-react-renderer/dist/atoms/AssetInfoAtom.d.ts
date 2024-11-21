@@ -1,15 +1,7 @@
-/// <reference types="node" />
 import { CMSProperties } from '../helpers/types';
 export interface AssetInfo {
     property?: CMSProperties;
     keyPath?: string;
-}
-export interface TimerData {
-    timer?: NodeJS.Timeout;
-    timeoutMs?: number;
-    remainingMs?: number;
-    startTime?: number;
-    cb?: () => any;
 }
 export declare const assetInfoAtom: import("recoil").RecoilState<AssetInfo>;
 export declare function setAssetInfo(assetInfo: AssetInfo): void;

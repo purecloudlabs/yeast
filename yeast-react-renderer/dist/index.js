@@ -9718,22 +9718,6 @@ function resetRecoil(atom) {
 }
 RecoilNexus$1.resetRecoil = resetRecoil;
 
-const assetInfoAtom = Recoil_index_8({
-    key: 'asset-info',
-    default: JSON.parse(localStorage.getItem('asset-info')) || {}
-});
-/*
- * The "previous" atom is needed because ImageNodeRenderer.tsx is unmounting and remounting between renders,
- * which causes refs that would normally be used for this purpose to be reinitialized on those renders, making them useless.
- */
-const prevAssetInfoAtom = Recoil_index_8({
-    key: 'prev-asset-info',
-    default: JSON.parse(localStorage.getItem('prev-asset-info')) || {}
-});
-/*
- * Asset updates need to be debounced to avoid API errors in ImageNodeRenderer.tsx
- */
-
 const cmsApiAtom = Recoil_index_8({
     key: 'CmsApi',
     default: {}
@@ -9744,11 +9728,6 @@ function useCmsApi() {
 function setCmsApi(cmsApi) {
     setRecoil_1(cmsApiAtom, cmsApi);
 }
-
-const imageDataAtom = Recoil_index_8({
-    key: 'image-data',
-    default: JSON.parse(localStorage.getItem('image-data')) || {}
-});
 
 const hostnameRegex = /^https?:\/\//i;
 const changesetFilepathRegex = /^\/changesets\/(.+\.(jpg|jpeg|png|svg))$/i;
@@ -9762,11 +9741,14 @@ function ImageNodeRenderer(props) {
     const [newAlt, setNewAlt] = useState$3();
     const [oldTitle, setOldTitle] = useState$3();
     const [newTitle, setNewTitle] = useState$3();
-    useState$3();
+    const [isDebouncing, setIsDebouncing] = useState$3();
     const [diffRenderData, setDiffRenderData] = useState$3();
-    const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
-    const [prevAssetInfo, setPrevAssetInfo] = Recoil_index_22(prevAssetInfoAtom);
-    const [imageData, setImageData] = Recoil_index_22(imageDataAtom);
+    // const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
+    const [assetInfo, setAssetInfo] = useState$3();
+    // const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
+    const [prevAssetInfo, setPrevAssetInfo] = useState$3();
+    // const [imageData, setImageData] = useRecoilState(imageDataAtom);
+    const [imageData, setImageData] = useState$3();
     const cmsApi = useCmsApi();
     const key1 = useKey();
     const key2 = useKey();
@@ -9783,23 +9765,23 @@ function ImageNodeRenderer(props) {
             && JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)
             && JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current))
             return;
-        imageSetup();
-        // if (!isDebouncing && assetInfo &&
-        // 		((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property) 
-        // 		|| (assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))
-        // ) {
-        // 	setIsDebouncing(true)
-        // 	timer.current = setTimeout(() => {
-        // 		setIsDebouncing(false);
-        // 		imageSetup();
-        // 	}, 300);
-        // } else if (isDebouncing) {
-        // 	clearTimeout(timer.current);
-        // 	setIsDebouncing(false);
-        // 	imageSetup();
-        // } else {
-        // 	imageSetup();
-        // }
+        if (!isDebouncing && assetInfo &&
+            ((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property)
+                || (assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))) {
+            setIsDebouncing(true);
+            timer.current = setTimeout(() => {
+                setIsDebouncing(false);
+                imageSetup();
+            }, 300);
+        }
+        else if (isDebouncing) {
+            clearTimeout(timer.current);
+            setIsDebouncing(false);
+            imageSetup();
+        }
+        else {
+            imageSetup();
+        }
     }, [props.node, assetInfo, cmsApi]);
     const imageSetup = () => {
         const newDiffRenderData = getDiffRenderData(props.node);
@@ -10185,6 +10167,22 @@ class ReactRenderer {
         return component;
     }
 }
+
+const assetInfoAtom = Recoil_index_8({
+    key: 'asset-info',
+    default: JSON.parse(localStorage.getItem('asset-info')) || {}
+});
+/*
+ * The "previous" atom is needed because ImageNodeRenderer.tsx is unmounting and remounting between renders,
+ * which causes refs that would normally be used for this purpose to be reinitialized on those renders, making them useless.
+ */
+Recoil_index_8({
+    key: 'prev-asset-info',
+    default: JSON.parse(localStorage.getItem('prev-asset-info')) || {}
+});
+/*
+ * Asset updates need to be debounced to avoid API errors in ImageNodeRenderer.tsx
+ */
 
 function YeastNodeState(props) {
     const cmsApi = useCmsApi();

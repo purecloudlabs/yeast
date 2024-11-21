@@ -7,14 +7,6 @@ export interface AssetInfo {
     keyPath?: string;
 }
 
-export interface TimerData {
-    timer?: NodeJS.Timeout;
-    timeoutMs?: number;
-    remainingMs?: number;
-    startTime?: number;
-    cb?: () => any;
-}
-
 export const assetInfoAtom = atom<AssetInfo>({
     key: 'asset-info',
     default: JSON.parse(localStorage.getItem('asset-info')) || {} as AssetInfo

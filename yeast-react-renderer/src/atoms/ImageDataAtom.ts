@@ -2,7 +2,7 @@ import { atom, useRecoilValue } from "recoil";
 import { setRecoil } from "recoil-nexus";
 import { ImageNode } from "yeast-core";
 
-interface ImageData {
+export interface ImageData {
     currentSrc: string;
     currentNode: ImageNode;
 }
