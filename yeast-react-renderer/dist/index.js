@@ -9745,6 +9745,11 @@ function setCmsApi(cmsApi) {
     setRecoil_1(cmsApiAtom, cmsApi);
 }
 
+const imageDataAtom = Recoil_index_8({
+    key: 'image-data',
+    default: JSON.parse(localStorage.getItem('image-data')) || {}
+});
+
 const hostnameRegex = /^https?:\/\//i;
 const changesetFilepathRegex = /^\/changesets\/(.+\.(jpg|jpeg|png|svg))$/i;
 const keyPathRegex = /^(.+)\/[^\/]+$/i;
@@ -9761,8 +9766,7 @@ function ImageNodeRenderer(props) {
     const [diffRenderData, setDiffRenderData] = useState$3();
     const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
     const [prevAssetInfo, setPrevAssetInfo] = Recoil_index_22(prevAssetInfoAtom);
-    // const [imageData, setImageData] = useRecoilState(imageDataAtom);
-    const [imageData, setImageData] = useState$3({});
+    const [imageData, setImageData] = Recoil_index_22(imageDataAtom);
     const cmsApi = useCmsApi();
     const key1 = useKey();
     const key2 = useKey();
