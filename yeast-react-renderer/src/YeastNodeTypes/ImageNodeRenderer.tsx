@@ -5,7 +5,7 @@ import { ImageNode } from 'yeast-core';
 import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
-import { assetInfoAtom, useIsDebouncing, setIsDebouncing, prevAssetInfoAtom, setTimer, useTimer, clearTimer } from '../atoms/AssetInfoAtom';
+import { assetInfoAtom, prevAssetInfoAtom } from '../atoms/AssetInfoAtom';
 import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 import CmsApi from '../helpers/types';
@@ -29,24 +29,21 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [newAlt, setNewAlt] = useState<string>();
 	const [oldTitle, setOldTitle] = useState<string>();
 	const [newTitle, setNewTitle] = useState<string>();
+	const [isDebouncing, setIsDebouncing] = useState<boolean>();
 	const [diffRenderData, setDiffRenderData] = useState<DiffRenderData>();
 	const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
 	const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
 	const [imageData, setImageData] = useRecoilState(imageDataAtom);
 	const cmsApi = useCmsApi();
-	const isDebouncing = useIsDebouncing();
-
 
 	const key1 = useKey();
 	const key2 = useKey();
 	const currentCmsApi = useRef<CmsApi>(cmsApi);
-	const timer = useTimer();
+	const timer = useRef<NodeJS.Timeout>();
 
 	useEffect(() => {
 		return () => {
-			if (!timer) return;
-			localStorage.removeItem('asset-timer');
-			// pauseTimer();
+			if (timer.current) clearTimeout(timer.current);
 		};
 	}, []);
 
@@ -57,17 +54,23 @@ export default function ImageNodeRenderer(props: IProps) {
 				&& JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current)
 		) return;
 
-		if (isDebouncing) {
-			const timerCb = () => {
+		if (!isDebouncing && assetInfo &&
+				((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property) 
+				|| (assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))
+		) {
+			setIsDebouncing(true)
+			timer.current = setTimeout(() => {
 				setIsDebouncing(false);
 				imageSetup();
-			}
-			setTimer(timerCb, 3000);
-			return;
+			}, 300);
+		} else if (isDebouncing) {
+			clearTimeout(timer.current);
+			setIsDebouncing(false);
+			imageSetup();
+		} else {
+			imageSetup();
 		}
-		
-		clearTimer();
-		imageSetup();
+
 	}, [props.node, assetInfo, cmsApi]);
 
 	const imageSetup = () => {
