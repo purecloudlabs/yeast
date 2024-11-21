@@ -32,11 +32,11 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [isDebouncing, setIsDebouncing] = useState<boolean>();
 	const [diffRenderData, setDiffRenderData] = useState<DiffRenderData>();
 	// const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
-	const [assetInfo, setAssetInfo] = useState<AssetInfo>();
+	const [assetInfo, setAssetInfo] = useState<AssetInfo>({});
 	// const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
-	const [prevAssetInfo, setPrevAssetInfo] = useState<AssetInfo>();
+	const [prevAssetInfo, setPrevAssetInfo] = useState<AssetInfo>({});
 	// const [imageData, setImageData] = useRecoilState(imageDataAtom);
-	const [imageData, setImageData] = useState<ImageData>();
+	const [imageData, setImageData] = useState<ImageData>({} as ImageData);
 	const cmsApi = useCmsApi();
 
 	const key1 = useKey();

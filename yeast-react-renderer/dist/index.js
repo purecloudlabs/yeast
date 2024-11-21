@@ -9744,11 +9744,11 @@ function ImageNodeRenderer(props) {
     const [isDebouncing, setIsDebouncing] = useState$3();
     const [diffRenderData, setDiffRenderData] = useState$3();
     // const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
-    const [assetInfo, setAssetInfo] = useState$3();
+    const [assetInfo, setAssetInfo] = useState$3({});
     // const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
-    const [prevAssetInfo, setPrevAssetInfo] = useState$3();
+    const [prevAssetInfo, setPrevAssetInfo] = useState$3({});
     // const [imageData, setImageData] = useRecoilState(imageDataAtom);
-    const [imageData, setImageData] = useState$3();
+    const [imageData, setImageData] = useState$3({});
     const cmsApi = useCmsApi();
     const key1 = useKey();
     const key2 = useKey();
