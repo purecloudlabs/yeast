@@ -5,7 +5,7 @@ import RecoilNexus from 'recoil-nexus';
 
 import { useKey } from './helpers/useKey';
 import { ReactRenderer, NodeRendererMap } from './ReactRenderer';
-import CmsApi, { CMSProperties } from './helpers/types';
+import CmsApi from './helpers/types';
 import YeastNodeState from './YeastNodeState';
 import { AssetInfo } from './atoms/AssetInfoAtom';
 

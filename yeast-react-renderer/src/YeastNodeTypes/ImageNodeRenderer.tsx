@@ -43,19 +43,26 @@ export default function ImageNodeRenderer(props: IProps) {
 
 	useEffect(() => {
 		return () => {
+			// clear timeout when component unmounts
 			if (timer.current) clearTimeout(timer.current);
 		};
 	}, []);
 
 	useEffect(() => {
+		// abort non-updates
 		if (
 			JSON.stringify(props.node) === JSON.stringify(imageData?.currentNode)
 				&& JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)
 				&& JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current)
 		) return;
 
-		if (!isDebouncing && assetInfo &&
-				((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property) 
+		/* 
+		 * API errors occur when retrieving asset/draft content when state for the asset is only partially updated.
+		 * Debouncing prevents the API errors.
+		 */
+		if (
+			!isDebouncing && assetInfo
+				&& ((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property) 
 				|| (assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))
 		) {
 			setIsDebouncing(true)
@@ -64,7 +71,7 @@ export default function ImageNodeRenderer(props: IProps) {
 				imageSetup();
 			}, 300);
 		} else if (isDebouncing) {
-			clearTimeout(timer.current);
+			if (timer.current) clearTimeout(timer.current);
 			setIsDebouncing(false);
 			imageSetup();
 		} else {
@@ -74,6 +81,23 @@ export default function ImageNodeRenderer(props: IProps) {
 	}, [props.node, assetInfo, cmsApi]);
 
 	const imageSetup = () => {
+		// set data
+		if (imageData.currentSrc !== props.node.src || JSON.stringify(imageData.currentNode) !== JSON.stringify(props.node)) {
+			setImageData({
+				...imageData,
+				currentSrc: props.node.src,
+				currentNode: props.node
+			});
+		}
+		if (assetInfo.property !== prevAssetInfo.property || assetInfo.keyPath !== prevAssetInfo.keyPath) {
+			setPrevAssetInfo({
+				property: assetInfo.property,
+				keyPath: assetInfo.keyPath
+			});
+		}
+		if (JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) currentCmsApi.current = cmsApi;
+
+		// handle diff scenario
 		const newDiffRenderData: DiffRenderData = getDiffRenderData(props.node);
 		if (newDiffRenderData && newDiffRenderData.renderedStrings) {
 			if (newDiffRenderData.renderedStrings['title']) {
@@ -94,21 +118,9 @@ export default function ImageNodeRenderer(props: IProps) {
 			}
 
 			setDiffRenderData(newDiffRenderData);
-		} else if (
-			(imageData && imageData.currentSrc !== props.node.src) || prevAssetInfo.property !== assetInfo.property || prevAssetInfo.keyPath !== assetInfo.keyPath
-				|| JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)
-		) {
-			setImageData({
-				...imageData,
-				currentSrc: props.node.src,
-				currentNode: props.node
-			});
-			setPrevAssetInfo({
-				property: assetInfo.property,
-				keyPath: assetInfo.keyPath
-			});
-			currentCmsApi.current = cmsApi;
-
+		}
+		// handle non-diff scenario
+		else {
 			// This path contains an api call to get image asset content. Only proceed if the property, keypath, and api are present
 			if (assetInfo.property && assetInfo.keyPath && cmsApi) {
 				(async () => {

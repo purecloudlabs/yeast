@@ -39,7 +39,3 @@ export function setPrevAssetInfo(prevAssetInfo: AssetInfo) {
 export function getPrevAssetInfo() {
     return useRecoilValue(prevAssetInfoAtom);
 }
-
-/*
- * Asset updates need to be debounced to avoid API errors in ImageNodeRenderer.tsx
- */

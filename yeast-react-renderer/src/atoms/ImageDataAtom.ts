@@ -14,7 +14,6 @@ export const imageDataAtom = atom({
 
 export function setImageData(data: ImageData) {
     setRecoil(imageDataAtom, data);
-    // localStorage.setItem('image-data', JSON.stringify(data));
 }
 
 export function getImageData() {
