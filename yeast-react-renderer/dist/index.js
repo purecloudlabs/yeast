@@ -9718,6 +9718,22 @@ function resetRecoil(atom) {
 }
 RecoilNexus$1.resetRecoil = resetRecoil;
 
+const assetInfoAtom = Recoil_index_8({
+    key: 'asset-info',
+    default: JSON.parse(localStorage.getItem('asset-info')) || {}
+});
+/*
+ * The "previous" atom is needed because ImageNodeRenderer.tsx is unmounting and remounting between renders,
+ * which causes refs that would normally be used for this purpose to be reinitialized on those renders, making them useless.
+ */
+const prevAssetInfoAtom = Recoil_index_8({
+    key: 'prev-asset-info',
+    default: JSON.parse(localStorage.getItem('prev-asset-info')) || {}
+});
+/*
+ * Asset updates need to be debounced to avoid API errors in ImageNodeRenderer.tsx
+ */
+
 const cmsApiAtom = Recoil_index_8({
     key: 'CmsApi',
     default: {}
@@ -9743,10 +9759,8 @@ function ImageNodeRenderer(props) {
     const [newTitle, setNewTitle] = useState$3();
     const [isDebouncing, setIsDebouncing] = useState$3();
     const [diffRenderData, setDiffRenderData] = useState$3();
-    // const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
-    const [assetInfo, setAssetInfo] = useState$3({});
-    // const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
-    const [prevAssetInfo, setPrevAssetInfo] = useState$3({});
+    const [assetInfo, setAssetInfo] = Recoil_index_22(assetInfoAtom);
+    const [prevAssetInfo, setPrevAssetInfo] = Recoil_index_22(prevAssetInfoAtom);
     // const [imageData, setImageData] = useRecoilState(imageDataAtom);
     const [imageData, setImageData] = useState$3({});
     const cmsApi = useCmsApi();
@@ -10167,22 +10181,6 @@ class ReactRenderer {
         return component;
     }
 }
-
-const assetInfoAtom = Recoil_index_8({
-    key: 'asset-info',
-    default: JSON.parse(localStorage.getItem('asset-info')) || {}
-});
-/*
- * The "previous" atom is needed because ImageNodeRenderer.tsx is unmounting and remounting between renders,
- * which causes refs that would normally be used for this purpose to be reinitialized on those renders, making them useless.
- */
-Recoil_index_8({
-    key: 'prev-asset-info',
-    default: JSON.parse(localStorage.getItem('prev-asset-info')) || {}
-});
-/*
- * Asset updates need to be debounced to avoid API errors in ImageNodeRenderer.tsx
- */
 
 function YeastNodeState(props) {
     const cmsApi = useCmsApi();
