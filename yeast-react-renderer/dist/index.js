@@ -9912,12 +9912,13 @@ function ImageNodeRenderer(props) {
                 console.error(err);
             }
             setLoadingError('Failed to load image');
-            addToast({
-                toastType: ToastType.Critical,
-                title: 'API Error',
-                message: 'Failed to load image',
-                timeoutSeconds: 30,
-            });
+            if (addToast)
+                addToast({
+                    toastType: ToastType.Critical,
+                    title: 'API Error',
+                    message: 'Failed to load image',
+                    timeoutSeconds: 30,
+                });
         }
     });
     const getImg = (property, keyPath, suppressError = false) => __awaiter(this, void 0, void 0, function* () {

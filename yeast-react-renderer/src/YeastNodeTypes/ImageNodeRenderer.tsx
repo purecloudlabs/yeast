@@ -165,12 +165,13 @@ export default function ImageNodeRenderer(props: IProps) {
 			}
 
 			setLoadingError('Failed to load image');
-			addToast({
-				toastType: ToastType.Critical,
-				title: 'API Error',
-				message: 'Failed to load image',
-				timeoutSeconds: 30,
-			});
+			if (addToast)
+				addToast({
+					toastType: ToastType.Critical,
+					title: 'API Error',
+					message: 'Failed to load image',
+					timeoutSeconds: 30,
+				});
 		}
 	};
 
