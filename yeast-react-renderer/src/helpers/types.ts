@@ -8,7 +8,24 @@ export default interface CmsApi {
 }
 
 export interface AssetsApi {
-    getAssetContent: (property: string, relativeKeyPath: string, asBlob?: boolean) => Promise<AssetContent | undefined>;
+    getAssetContent: (property: string, relativeKeyPath: string, asBlob?: boolean, suppressToast?: boolean) => Promise<AssetContent | undefined>;
+}
+
+export interface Toast {
+	title?: string;
+	message: string;
+	link?: string;
+	linkText?: string;
+	key?: any;
+	toastType?: ToastType;
+	timeoutSeconds?: number;
+}
+
+export enum ToastType {
+	Info = 'info',
+	Warning = 'warning',
+	Critical = 'critical',
+	Success = 'success',
 }
 
 export enum CMSProperties {

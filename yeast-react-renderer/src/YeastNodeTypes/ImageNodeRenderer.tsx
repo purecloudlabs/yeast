@@ -6,10 +6,10 @@ import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
 import { assetInfoAtom, prevAssetInfoAtom } from '../atoms/AssetInfoAtom';
-import { useCmsApi } from '../atoms/CmsApiAtom';
+import { useAddToast, useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
-import CmsApi from '../helpers/types';
 import { imageDataAtom } from '../atoms/ImageDataAtom';
+import { ToastType } from '../helpers/types';
 
 interface IProps {
 	node: ImageNode;
@@ -35,10 +35,11 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
 	const [imageData, setImageData] = useRecoilState(imageDataAtom);
 	const cmsApi = useCmsApi();
+	const addToast = useAddToast();
 
 	const key1 = useKey();
 	const key2 = useKey();
-	const currentCmsApi = useRef<CmsApi>(cmsApi);
+
 	const timer = useRef<NodeJS.Timeout>();
 
 	useEffect(() => {
@@ -50,11 +51,8 @@ export default function ImageNodeRenderer(props: IProps) {
 
 	useEffect(() => {
 		// abort non-updates
-		if (
-			JSON.stringify(props.node) === JSON.stringify(imageData?.currentNode)
-				&& JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)
-				&& JSON.stringify(cmsApi) === JSON.stringify(currentCmsApi.current)
-		) return;
+		if (JSON.stringify(props.node) === JSON.stringify(imageData?.currentNode) && JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)) 
+			return;
 
 		/* 
 		 * API errors occur when retrieving asset/draft content when state for the asset is only partially updated.
@@ -78,7 +76,7 @@ export default function ImageNodeRenderer(props: IProps) {
 			imageSetup();
 		}
 
-	}, [props.node, assetInfo, cmsApi]);
+	}, [props.node, assetInfo]);
 
 	const imageSetup = () => {
 		// set data
@@ -95,9 +93,8 @@ export default function ImageNodeRenderer(props: IProps) {
 				keyPath: assetInfo.keyPath
 			});
 		}
-		if (JSON.stringify(currentCmsApi.current) !== JSON.stringify(cmsApi)) currentCmsApi.current = cmsApi;
 
-		// handle diff scenario
+		// diff scenario
 		const newDiffRenderData: DiffRenderData = getDiffRenderData(props.node);
 		if (newDiffRenderData && newDiffRenderData.renderedStrings) {
 			if (newDiffRenderData.renderedStrings['title']) {
@@ -119,7 +116,7 @@ export default function ImageNodeRenderer(props: IProps) {
 
 			setDiffRenderData(newDiffRenderData);
 		}
-		// handle non-diff scenario
+		// non-diff scenario
 		else {
 			// This path contains an api call to get image asset content. Only proceed if the property, keypath, and api are present
 			if (assetInfo.property && assetInfo.keyPath && cmsApi) {
@@ -143,7 +140,7 @@ export default function ImageNodeRenderer(props: IProps) {
 				return src;
 			} else {
 				// Load image from API and set src as encoded image data
-				return await getImg(assetInfo.property, newSrc.pathname);
+				return await getImg(assetInfo.property, newSrc.pathname, true);
 			}
 		} catch (err) {
 			const filepathMatch = changesetFilepathRegex.exec(newSrc.pathname);
@@ -160,18 +157,24 @@ export default function ImageNodeRenderer(props: IProps) {
 					return await getImg(assetInfo.property, resolvedSrc);
 				} catch (err) {
 					console.error(err);
-					setLoadingError('Failed to load image');
 				}
 			} else {
-				console.error(err);
-				setLoadingError('Failed to load image');
+				console.error(err);		
 			}
+
+			setLoadingError('Failed to load image');
+			addToast({
+				toastType: ToastType.Critical,
+				title: 'API Error',
+				message: 'Failed to load image',
+				timeoutSeconds: 30,
+			});	
 		}
 	};
 
-	const getImg = async(property: string, keyPath: string): Promise<string | undefined> => {
+	const getImg = async(property: string, keyPath: string, suppressToast: boolean = false): Promise<string | undefined> => {
 		if (property && cmsApi) {
-			const content = await cmsApi.AssetsApi.getAssetContent(property, keyPath, true);
+			const content = await cmsApi.AssetsApi.getAssetContent(property, keyPath, true, suppressToast);
 			if (!content) {
 				setLoadingError('Failed to load image');
 				throw new Error('Failed to load image');
@@ -193,6 +196,8 @@ export default function ImageNodeRenderer(props: IProps) {
 	};
 
 	const className: string = diffRenderData ? diffRenderData.diffClass : '';
+
+	if (loadingError) return <em title={props.node.src}>{loadingError}</em>;
 
 	return diffRenderData && diffRenderData.renderedStrings
 		?

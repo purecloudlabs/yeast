@@ -4,7 +4,7 @@ import { DocumentNode } from 'yeast-core';
 import { NodeRendererMap } from './ReactRenderer';
 import YeastNodeRenderer from './YeastNodeRenderer';
 import { getDiffRenderData, DiffRenderData } from './helpers/diff';
-import CmsApi from './helpers/types';
+import CmsApi, { Toast } from './helpers/types';
 import { AssetInfo } from './atoms/AssetInfoAtom';
 
 interface IProps {
@@ -13,6 +13,7 @@ interface IProps {
 	customRenderers?: NodeRendererMap;
 	api?: CmsApi;
 	assetInfo?: AssetInfo;
+	addToast?: (toast: Toast) => any;
 }
 
 export default function YeastDocumentRenderer(props: IProps) {
@@ -39,7 +40,7 @@ export default function YeastDocumentRenderer(props: IProps) {
 		<div className={className}>
 			<h1>{title}</h1>
 			{author && <h2>{author}</h2>}
-			<YeastNodeRenderer nodes={props.ast?.children} customRenderers={props.customRenderers} api={props.api} assetInfo={props.assetInfo}/>
+			<YeastNodeRenderer nodes={props.ast?.children} customRenderers={props.customRenderers} api={props.api} addToast={props.addToast} assetInfo={props.assetInfo}/>
 		</div>
 	);
 }

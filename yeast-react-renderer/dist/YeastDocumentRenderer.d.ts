@@ -1,7 +1,7 @@
 import React from 'react';
 import { DocumentNode } from 'yeast-core';
 import { NodeRendererMap } from './ReactRenderer';
-import CmsApi from './helpers/types';
+import CmsApi, { Toast } from './helpers/types';
 import { AssetInfo } from './atoms/AssetInfoAtom';
 interface IProps {
     ast: DocumentNode;
@@ -9,6 +9,7 @@ interface IProps {
     customRenderers?: NodeRendererMap;
     api?: CmsApi;
     assetInfo?: AssetInfo;
+    addToast?: (toast: Toast) => any;
 }
 export default function YeastDocumentRenderer(props: IProps): React.JSX.Element;
 export {};

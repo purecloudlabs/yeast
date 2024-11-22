@@ -1,32 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { YeastChild } from 'yeast-core';
-import { RecoilRoot, useRecoilState } from 'recoil';
+import { RecoilRoot } from 'recoil';
 import RecoilNexus from 'recoil-nexus';
 
 import { useKey } from './helpers/useKey';
 import { ReactRenderer, NodeRendererMap } from './ReactRenderer';
-import CmsApi from './helpers/types';
+import CmsApi, { Toast } from './helpers/types';
 import YeastNodeState from './YeastNodeState';
-import { AssetInfo, assetInfoAtom } from './atoms/AssetInfoAtom';
-import { setCmsApi, useCmsApi } from './atoms/CmsApiAtom';
+import { AssetInfo } from './atoms/AssetInfoAtom';
 
 export interface YeastNodeRendererProps {
 	nodes: YeastChild[];
 	customRenderers?: NodeRendererMap;
 	api?: CmsApi;
 	assetInfo?: AssetInfo;
+	addToast?: (toast: Toast) => any;
 }
 
 export default function YeastNodeRenderer(props: YeastNodeRendererProps) {
 	const key = useKey();
 	const [renderer, setRenderer] = useState<ReactRenderer>(new ReactRenderer(props.customRenderers));
-	const cmsApi = useCmsApi();
-    const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
-
-    useEffect(() => {
-		if (JSON.stringify(props.assetInfo) !== JSON.stringify(assetInfo)) setAssetInfo(props.assetInfo);
-		if (JSON.stringify(props.api) !== JSON.stringify(cmsApi)) setCmsApi(props.api);
-	}, [props.api, props.assetInfo]);
 
 	useEffect(() => {
 		if (props.customRenderers === renderer.customRenderers) return;
@@ -36,7 +29,8 @@ export default function YeastNodeRenderer(props: YeastNodeRendererProps) {
 	return (
 		<RecoilRoot>
 			<RecoilNexus />
-			{/* <YeastNodeState api={props.api} assetInfo={props.assetInfo}></YeastNodeState> */}
+			{/* recoil state must be set within the RecoilRoot compoenent, so this components recoil state gets be set in the functional component YeastNodeState */}
+			<YeastNodeState api={props.api} assetInfo={props.assetInfo} addToast={props.addToast} />
 			<React.Fragment key={key.current}>{renderer.renderComponents(props.nodes)}</React.Fragment>
 		</RecoilRoot>
 	);
