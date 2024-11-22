@@ -1,4 +1,4 @@
-import { ImageNode } from "yeast-core";
+import { ImageNode } from 'yeast-core';
 export interface ImageData {
     currentSrc: string;
     currentNode: ImageNode;

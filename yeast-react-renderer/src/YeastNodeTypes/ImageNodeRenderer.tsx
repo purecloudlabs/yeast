@@ -118,16 +118,15 @@ export default function ImageNodeRenderer(props: IProps) {
 			}
 
 			setDiffRenderData(newDiffRenderData);
-		}
-		// non-diff scenario
-		else {
-			// This path contains an api call to get image asset content. Only proceed if the property, keypath, and api are present
-			if (assetInfo.property && assetInfo.keyPath && cmsApi) {
-				(async () => {
-					const newSrc = await getImgSrc(props.node.src);
-					if (newSrc) setImgSrc(newSrc);
-				})();
-			}
+		} else if (props.node?.src) {
+			/*
+			 * non-diff scenario
+			 * This path contains an api call to get image asset content. Only proceed if the property, keypath, and api are present
+			 */
+			(async () => {
+				const newSrc = await getImgSrc(props.node.src);
+				if (newSrc) setImgSrc(newSrc);
+			})();
 		}
 	};
 
@@ -141,7 +140,7 @@ export default function ImageNodeRenderer(props: IProps) {
 			if (match && !isSameHost) {
 				// Set src to URL to let the browser load the image normally
 				return src;
-			} else {
+			} else if (assetInfo.property && assetInfo.keyPath && cmsApi) {
 				// Load image from API and set src as encoded image data
 				return await getImg(assetInfo.property, newSrc.pathname, true);
 			}

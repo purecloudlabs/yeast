@@ -9720,7 +9720,7 @@ RecoilNexus$1.resetRecoil = resetRecoil;
 
 const assetInfoAtom = Recoil_index_8({
     key: 'asset-info',
-    default: JSON.parse(localStorage.getItem('asset-info')) || {}
+    default: JSON.parse(localStorage.getItem('asset-info')) || {},
 });
 /*
  * The "previous" atom is needed because ImageNodeRenderer.tsx is unmounting and remounting between renders,
@@ -9728,12 +9728,12 @@ const assetInfoAtom = Recoil_index_8({
  */
 const prevAssetInfoAtom = Recoil_index_8({
     key: 'prev-asset-info',
-    default: JSON.parse(localStorage.getItem('prev-asset-info')) || {}
+    default: JSON.parse(localStorage.getItem('prev-asset-info')) || {},
 });
 
 const cmsApiAtom = Recoil_index_8({
     key: 'CmsApi',
-    default: {}
+    default: {},
 });
 function useCmsApi() {
     return Recoil_index_20(cmsApiAtom);
@@ -9751,7 +9751,7 @@ function setAddToast(addToast) {
 
 const imageDataAtom = Recoil_index_8({
     key: 'image-data',
-    default: {}
+    default: {},
 });
 
 var ToastType;
@@ -9800,15 +9800,17 @@ function ImageNodeRenderer(props) {
     }, []);
     useEffect$5(() => {
         // abort non-updates
-        if (JSON.stringify(props.node) === JSON.stringify(imageData === null || imageData === void 0 ? void 0 : imageData.currentNode) && JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo))
+        if (JSON.stringify(props.node) === JSON.stringify(imageData === null || imageData === void 0 ? void 0 : imageData.currentNode) &&
+            JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo))
             return;
         /*
          * API errors occur when retrieving asset/draft content when state for the asset is only partially updated.
          * Debouncing prevents the API errors.
          */
-        if (!isDebouncing && assetInfo
-            && ((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property)
-                || (assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))) {
+        if (!isDebouncing &&
+            assetInfo &&
+            ((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property) ||
+                (assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))) {
             setIsDebouncing(true);
             timer.current = setTimeout(() => {
                 setIsDebouncing(false);
@@ -9826,6 +9828,7 @@ function ImageNodeRenderer(props) {
         }
     }, [props.node, assetInfo]);
     const imageSetup = () => {
+        var _a;
         // set data
         if (imageData.currentSrc !== props.node.src || JSON.stringify(imageData.currentNode) !== JSON.stringify(props.node)) {
             setImageData(Object.assign(Object.assign({}, imageData), { currentSrc: props.node.src, currentNode: props.node }));
@@ -9833,7 +9836,7 @@ function ImageNodeRenderer(props) {
         if (assetInfo.property !== prevAssetInfo.property || assetInfo.keyPath !== prevAssetInfo.keyPath) {
             setPrevAssetInfo({
                 property: assetInfo.property,
-                keyPath: assetInfo.keyPath
+                keyPath: assetInfo.keyPath,
             });
         }
         // diff scenario
@@ -9859,16 +9862,16 @@ function ImageNodeRenderer(props) {
             }
             setDiffRenderData(newDiffRenderData);
         }
-        // non-diff scenario
-        else {
-            // This path contains an api call to get image asset content. Only proceed if the property, keypath, and api are present
-            if (assetInfo.property && assetInfo.keyPath && cmsApi) {
-                (() => __awaiter(this, void 0, void 0, function* () {
-                    const newSrc = yield getImgSrc(props.node.src);
-                    if (newSrc)
-                        setImgSrc(newSrc);
-                }))();
-            }
+        else if ((_a = props.node) === null || _a === void 0 ? void 0 : _a.src) {
+            /*
+             * non-diff scenario
+             * This path contains an api call to get image asset content. Only proceed if the property, keypath, and api are present
+             */
+            (() => __awaiter(this, void 0, void 0, function* () {
+                const newSrc = yield getImgSrc(props.node.src);
+                if (newSrc)
+                    setImgSrc(newSrc);
+            }))();
         }
     };
     const getImgSrc = (src) => __awaiter(this, void 0, void 0, function* () {
@@ -9882,7 +9885,7 @@ function ImageNodeRenderer(props) {
                 // Set src to URL to let the browser load the image normally
                 return src;
             }
-            else {
+            else if (assetInfo.property && assetInfo.keyPath && cmsApi) {
                 // Load image from API and set src as encoded image data
                 return yield getImg(assetInfo.property, newSrc.pathname, true);
             }
@@ -9944,14 +9947,9 @@ function ImageNodeRenderer(props) {
     const className = diffRenderData ? diffRenderData.diffClass : '';
     if (loadingError)
         return React.createElement("em", { title: props.node.src }, loadingError);
-    return diffRenderData && diffRenderData.renderedStrings
-        ?
-            React.createElement(React.Fragment, null,
-                React.createElement("img", { key: key1.current, alt: oldAlt, src: oldSrc, title: oldTitle, className: className }),
-                React.createElement("img", { key: key2.current, alt: newAlt, src: newSrc, title: newTitle, className: className }))
-        : imgSrc
-            ? React.createElement("img", { key: key1.current, alt: props.node.alt, src: imgSrc, title: props.node.title, className: className })
-            : React.createElement(LoadingPlaceholder, null);
+    return diffRenderData && diffRenderData.renderedStrings ? (React.createElement(React.Fragment, null,
+        React.createElement("img", { key: key1.current, alt: oldAlt, src: oldSrc, title: oldTitle, className: className }),
+        React.createElement("img", { key: key2.current, alt: newAlt, src: newSrc, title: newTitle, className: className }))) : imgSrc ? (React.createElement("img", { key: key1.current, alt: props.node.alt, src: imgSrc, title: props.node.title, className: className })) : (React.createElement(LoadingPlaceholder, null));
 }
 
 function InlineCodeNodeRenderer(props) {
@@ -10193,9 +10191,7 @@ class ReactRenderer {
             if (node.text) {
                 const diffRenderData = getDiffRenderData(node);
                 const typedNode = node;
-                return diffRenderData && diffRenderData.renderedNodes
-                    ? React.createElement(React.Fragment, { key: i }, diffRenderData.renderedNodes['text'])
-                    : React.createElement(React.Fragment, { key: i }, typedNode.text);
+                return diffRenderData && diffRenderData.renderedNodes ? (React.createElement(React.Fragment, { key: i }, diffRenderData.renderedNodes['text'])) : (React.createElement(React.Fragment, { key: i }, typedNode.text));
             }
             else {
                 console.warn('Unhandled node', node);
