@@ -9724,7 +9724,7 @@ const assetInfoAtom = Recoil_index_8({
 });
 /*
  * The "previous" atom is needed because ImageNodeRenderer.tsx is unmounting and remounting between renders,
- * which causes refs that would normally be used for this purpose to be reinitialized on those renders, making them useless.
+ * which causes refs that would normally be used for this purpose to be reinitialized on those renders.
  */
 const prevAssetInfoAtom = Recoil_index_8({
     key: 'prev-asset-info',
