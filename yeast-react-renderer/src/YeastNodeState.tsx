@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 
-import CmsApi, { Toast } from './helpers/types';
+import CmsApi, { ToastFn } from './helpers/types';
 import { AssetInfo, assetInfoAtom } from './atoms/AssetInfoAtom';
 import { setCmsApi, useCmsApi, setAddToast, useAddToast } from './atoms/CmsApiAtom';
 
 export interface YeastNodeStateProps {
 	api: CmsApi;
 	assetInfo: AssetInfo;
-    addToast: (toast: Toast) => any;
+    addToast: ToastFn;
 }
 
 // This component

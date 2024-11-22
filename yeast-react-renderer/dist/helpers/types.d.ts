@@ -17,6 +17,7 @@ export interface Toast {
     toastType?: ToastType;
     timeoutSeconds?: number;
 }
+export type ToastFn = (toast: Toast) => any;
 export declare enum ToastType {
     Info = "info",
     Warning = "warning",

@@ -46,7 +46,6 @@ import TableNodeRenderer from './YeastNodeTypes/TableNodeRenderer';
 import HorizontalRuleNodeRenderer from './YeastNodeTypes/HorizontalRuleNodeRenderer';
 
 import { DiffRenderData, getDiffRenderData } from './helpers/diff';
-import CmsApi, { CMSProperties } from './helpers/types';
 
 export interface NodeRendererPlugin {
 	(node: YeastChild, renderer: ReactRenderer): ReactNode | undefined;
