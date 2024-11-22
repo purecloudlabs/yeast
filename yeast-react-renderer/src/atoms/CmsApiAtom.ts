@@ -15,7 +15,7 @@ export function setCmsApi(cmsApi: CmsApi) {
 	setRecoil(cmsApiAtom, cmsApi);
 }
 
-export const addToastAtom = atom<(toast: Toast) => any>({ key: 'addToast' });
+export const addToastAtom = atom<(toast: Toast) => any>({ key: 'addToast', default: undefined });
 
 export function useAddToast() {
 	return useRecoilValue(addToastAtom);

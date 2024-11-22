@@ -9741,7 +9741,7 @@ function useCmsApi() {
 function setCmsApi(cmsApi) {
     setRecoil_1(cmsApiAtom, cmsApi);
 }
-const addToastAtom = Recoil_index_8({ key: 'addToast' });
+const addToastAtom = Recoil_index_8({ key: 'addToast', default: undefined });
 function useAddToast() {
     return Recoil_index_20(addToastAtom);
 }
