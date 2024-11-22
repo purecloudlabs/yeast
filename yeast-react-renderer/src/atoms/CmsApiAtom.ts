@@ -3,8 +3,8 @@ import { setRecoil } from 'recoil-nexus';
 import CmsApi, { Toast } from '../helpers/types';
 
 export const cmsApiAtom = atom<CmsApi>({
-    key: 'CmsApi',
-    default: {} as CmsApi
+	key: 'CmsApi',
+	default: {} as CmsApi,
 });
 
 export function useCmsApi() {

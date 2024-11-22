@@ -146,9 +146,11 @@ export class ReactRenderer {
 			if ((node as YeastText).text) {
 				const diffRenderData: DiffRenderData = getDiffRenderData(node);
 				const typedNode = node as YeastText;
-				return diffRenderData && diffRenderData.renderedNodes
-					? <React.Fragment key={i}>{diffRenderData.renderedNodes['text']}</React.Fragment>
-					: <React.Fragment key={i}>{typedNode.text}</React.Fragment>;
+				return diffRenderData && diffRenderData.renderedNodes ? (
+					<React.Fragment key={i}>{diffRenderData.renderedNodes['text']}</React.Fragment>
+				) : (
+					<React.Fragment key={i}>{typedNode.text}</React.Fragment>
+				);
 			} else {
 				console.warn('Unhandled node', node);
 				return;

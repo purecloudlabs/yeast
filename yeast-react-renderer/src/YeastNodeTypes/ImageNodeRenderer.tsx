@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState }  from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { ImageNode } from 'yeast-core';
 
@@ -51,19 +51,23 @@ export default function ImageNodeRenderer(props: IProps) {
 
 	useEffect(() => {
 		// abort non-updates
-		if (JSON.stringify(props.node) === JSON.stringify(imageData?.currentNode) && JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)) 
+		if (
+			JSON.stringify(props.node) === JSON.stringify(imageData?.currentNode) &&
+			JSON.stringify(assetInfo) === JSON.stringify(prevAssetInfo)
+		)
 			return;
 
-		/* 
+		/*
 		 * API errors occur when retrieving asset/draft content when state for the asset is only partially updated.
 		 * Debouncing prevents the API errors.
 		 */
 		if (
-			!isDebouncing && assetInfo
-				&& ((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property) 
-				|| (assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))
+			!isDebouncing &&
+			assetInfo &&
+			((assetInfo.property && prevAssetInfo.property && assetInfo.property !== prevAssetInfo.property) ||
+				(assetInfo.keyPath && prevAssetInfo.keyPath && assetInfo.keyPath !== prevAssetInfo.keyPath))
 		) {
-			setIsDebouncing(true)
+			setIsDebouncing(true);
 			timer.current = setTimeout(() => {
 				setIsDebouncing(false);
 				imageSetup();
@@ -75,7 +79,6 @@ export default function ImageNodeRenderer(props: IProps) {
 		} else {
 			imageSetup();
 		}
-
 	}, [props.node, assetInfo]);
 
 	const imageSetup = () => {
@@ -84,13 +87,13 @@ export default function ImageNodeRenderer(props: IProps) {
 			setImageData({
 				...imageData,
 				currentSrc: props.node.src,
-				currentNode: props.node
+				currentNode: props.node,
 			});
 		}
 		if (assetInfo.property !== prevAssetInfo.property || assetInfo.keyPath !== prevAssetInfo.keyPath) {
 			setPrevAssetInfo({
 				property: assetInfo.property,
-				keyPath: assetInfo.keyPath
+				keyPath: assetInfo.keyPath,
 			});
 		}
 
@@ -159,7 +162,7 @@ export default function ImageNodeRenderer(props: IProps) {
 					console.error(err);
 				}
 			} else {
-				console.error(err);		
+				console.error(err);
 			}
 
 			setLoadingError('Failed to load image');
@@ -168,11 +171,11 @@ export default function ImageNodeRenderer(props: IProps) {
 				title: 'API Error',
 				message: 'Failed to load image',
 				timeoutSeconds: 30,
-			});	
+			});
 		}
 	};
 
-	const getImg = async(property: string, keyPath: string, suppressError: boolean = false): Promise<string | undefined> => {
+	const getImg = async (property: string, keyPath: string, suppressError: boolean = false): Promise<string | undefined> => {
 		if (property && cmsApi) {
 			const content = await cmsApi.AssetsApi.getAssetContent(property, keyPath, true, suppressError);
 			if (!content) {
@@ -187,7 +190,7 @@ export default function ImageNodeRenderer(props: IProps) {
 		}
 	};
 
-	const readBlob = async(imageBlob: Blob) => {
+	const readBlob = async (imageBlob: Blob) => {
 		const reader = new FileReader();
 		return new Promise<string>((resolve) => {
 			reader.onloadend = () => resolve(reader.result as string);
@@ -199,13 +202,14 @@ export default function ImageNodeRenderer(props: IProps) {
 
 	if (loadingError) return <em title={props.node.src}>{loadingError}</em>;
 
-	return diffRenderData && diffRenderData.renderedStrings
-		?
-			<React.Fragment>
-				<img key={key1.current} alt={oldAlt} src={oldSrc} title={oldTitle} className={className}/>
-				<img key={key2.current} alt={newAlt} src={newSrc} title={newTitle} className={className}/>
-			</React.Fragment>
-		: imgSrc
-			? <img key={key1.current} alt={props.node.alt} src={imgSrc} title={props.node.title} className={className} />
-			: <LoadingPlaceholder />;
+	return diffRenderData && diffRenderData.renderedStrings ? (
+		<React.Fragment>
+			<img key={key1.current} alt={oldAlt} src={oldSrc} title={oldTitle} className={className} />
+			<img key={key2.current} alt={newAlt} src={newSrc} title={newTitle} className={className} />
+		</React.Fragment>
+	) : imgSrc ? (
+		<img key={key1.current} alt={props.node.alt} src={imgSrc} title={props.node.title} className={className} />
+	) : (
+		<LoadingPlaceholder />
+	);
 }

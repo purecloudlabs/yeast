@@ -3,22 +3,22 @@ import { CMSProperties } from '../helpers/types';
 import { setRecoil } from 'recoil-nexus';
 
 export interface AssetInfo {
-    property?: CMSProperties;
-    keyPath?: string;
+	property?: CMSProperties;
+	keyPath?: string;
 }
 
 export const assetInfoAtom = atom<AssetInfo>({
-    key: 'asset-info',
-    default: JSON.parse(localStorage.getItem('asset-info')) || {} as AssetInfo
+	key: 'asset-info',
+	default: JSON.parse(localStorage.getItem('asset-info')) || ({} as AssetInfo),
 });
 
 export function setAssetInfo(assetInfo: AssetInfo) {
-    setRecoil(assetInfoAtom, assetInfo);
-    localStorage.setItem('asset-info', JSON.stringify(assetInfo));
+	setRecoil(assetInfoAtom, assetInfo);
+	localStorage.setItem('asset-info', JSON.stringify(assetInfo));
 }
 
 export function getAssetInfo() {
-    return useRecoilValue(assetInfoAtom);
+	return useRecoilValue(assetInfoAtom);
 }
 
 /*
@@ -27,15 +27,15 @@ export function getAssetInfo() {
  */
 
 export const prevAssetInfoAtom = atom<AssetInfo>({
-    key: 'prev-asset-info',
-    default: JSON.parse(localStorage.getItem('prev-asset-info')) || {} as AssetInfo
+	key: 'prev-asset-info',
+	default: JSON.parse(localStorage.getItem('prev-asset-info')) || ({} as AssetInfo),
 });
 
 export function setPrevAssetInfo(prevAssetInfo: AssetInfo) {
-    setRecoil(prevAssetInfoAtom, prevAssetInfo);
-    localStorage.setItem('prev-asset-info', JSON.stringify(prevAssetInfo));
+	setRecoil(prevAssetInfoAtom, prevAssetInfo);
+	localStorage.setItem('prev-asset-info', JSON.stringify(prevAssetInfo));
 }
 
 export function getPrevAssetInfo() {
-    return useRecoilValue(prevAssetInfoAtom);
+	return useRecoilValue(prevAssetInfoAtom);
 }

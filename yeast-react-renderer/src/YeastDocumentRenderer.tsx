@@ -20,7 +20,7 @@ export default function YeastDocumentRenderer(props: IProps) {
 	const diffRenderData: DiffRenderData = getDiffRenderData(props.ast);
 	const classList: string[] = [];
 	if (props.className) classList.push(props.className);
-	if (diffRenderData) classList.push(diffRenderData.diffClass); 
+	if (diffRenderData) classList.push(diffRenderData.diffClass);
 	const className: string = classList.join(' ').trim();
 
 	let title: ReactNode | string = props.ast?.title || '';
@@ -40,7 +40,13 @@ export default function YeastDocumentRenderer(props: IProps) {
 		<div className={className}>
 			<h1>{title}</h1>
 			{author && <h2>{author}</h2>}
-			<YeastNodeRenderer nodes={props.ast?.children} customRenderers={props.customRenderers} api={props.api} addToast={props.addToast} assetInfo={props.assetInfo}/>
+			<YeastNodeRenderer
+				nodes={props.ast?.children}
+				customRenderers={props.customRenderers}
+				api={props.api}
+				addToast={props.addToast}
+				assetInfo={props.assetInfo}
+			/>
 		</div>
 	);
 }

@@ -8,20 +8,20 @@ import { setCmsApi, useCmsApi, setAddToast, useAddToast } from './atoms/CmsApiAt
 export interface YeastNodeStateProps {
 	api: CmsApi;
 	assetInfo: AssetInfo;
-    addToast: ToastFn;
+	addToast: ToastFn;
 }
 
 // This component
 export default function YeastNodeState(props: YeastNodeStateProps) {
-    const cmsApi = useCmsApi();
-    const addToast = useAddToast();
-    const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
+	const cmsApi = useCmsApi();
+	const addToast = useAddToast();
+	const [assetInfo, setAssetInfo] = useRecoilState(assetInfoAtom);
 
-    useEffect(() => {
+	useEffect(() => {
 		if (JSON.stringify(props.assetInfo) !== JSON.stringify(assetInfo)) setAssetInfo(props.assetInfo);
 		if (JSON.stringify(props.api) !== JSON.stringify(cmsApi)) setCmsApi(props.api);
-        if (JSON.stringify(props.addToast) !== JSON.stringify(addToast)) setAddToast(props.addToast);
+		if (JSON.stringify(props.addToast) !== JSON.stringify(addToast)) setAddToast(props.addToast);
 	}, [props.api, props.assetInfo, props.addToast]);
 
-    return <></>;
+	return <></>;
 }
