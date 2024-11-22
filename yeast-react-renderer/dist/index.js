@@ -9917,18 +9917,20 @@ function ImageNodeRenderer(props) {
             });
         }
     });
-    const getImg = (property, keyPath, suppressToast = false) => __awaiter(this, void 0, void 0, function* () {
+    const getImg = (property, keyPath, suppressError = false) => __awaiter(this, void 0, void 0, function* () {
         if (property && cmsApi) {
-            const content = yield cmsApi.AssetsApi.getAssetContent(property, keyPath, true, suppressToast);
+            const content = yield cmsApi.AssetsApi.getAssetContent(property, keyPath, true, suppressError);
             if (!content) {
-                setLoadingError('Failed to load image');
+                if (!suppressError)
+                    setLoadingError('Failed to load image');
                 throw new Error('Failed to load image');
             }
             let str = yield readBlob(content === null || content === void 0 ? void 0 : content.content);
             return str;
         }
         else {
-            setLoadingError('Failed to load image');
+            if (!suppressError)
+                setLoadingError('Failed to load image');
             throw new Error('Failed to load image');
         }
     });

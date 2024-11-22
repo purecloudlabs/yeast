@@ -172,17 +172,17 @@ export default function ImageNodeRenderer(props: IProps) {
 		}
 	};
 
-	const getImg = async(property: string, keyPath: string, suppressToast: boolean = false): Promise<string | undefined> => {
+	const getImg = async(property: string, keyPath: string, suppressError: boolean = false): Promise<string | undefined> => {
 		if (property && cmsApi) {
-			const content = await cmsApi.AssetsApi.getAssetContent(property, keyPath, true, suppressToast);
+			const content = await cmsApi.AssetsApi.getAssetContent(property, keyPath, true, suppressError);
 			if (!content) {
-				setLoadingError('Failed to load image');
+				if (!suppressError) setLoadingError('Failed to load image');
 				throw new Error('Failed to load image');
 			}
 			let str = await readBlob(content?.content);
 			return str;
 		} else {
-			setLoadingError('Failed to load image');
+			if (!suppressError) setLoadingError('Failed to load image');
 			throw new Error('Failed to load image');
 		}
 	};
