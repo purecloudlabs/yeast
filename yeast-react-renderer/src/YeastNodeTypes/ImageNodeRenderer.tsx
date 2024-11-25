@@ -175,7 +175,7 @@ export default function ImageNodeRenderer(props: IProps) {
 		}
 	};
 
-	const resolveParentPath = (src: string, assetKeyPath: string, parentMatch: RegExpMatchArray) => {
+	const resolveParentPath = (src: string, assetKeyPath: string, parentMatch: RegExpMatchArray): string => {
 		if (!parentMatch || !assetKeyPath.includes('/')) return src;
 		let dir = assetKeyPath.substring(0, assetKeyPath.lastIndexOf('/'));
 
@@ -183,6 +183,8 @@ export default function ImageNodeRenderer(props: IProps) {
 			if (!assetKeyPath.lastIndexOf('/')) return src;
 			dir = dir.substring(0, assetKeyPath.lastIndexOf('/'));
 		}
+
+		return dir;
 	};
 
 	const getImg = async (property: string, keyPath: string): Promise<string | undefined> => {

@@ -9912,6 +9912,7 @@ function ImageNodeRenderer(props) {
                 return src;
             dir = dir.substring(0, assetKeyPath.lastIndexOf('/'));
         }
+        return dir;
     };
     const getImg = (property, keyPath) => __awaiter(this, void 0, void 0, function* () {
         if (property && cmsApi) {
