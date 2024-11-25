@@ -18,7 +18,8 @@ interface IProps {
 
 const hostnameRegex = /^https?:\/\//i;
 const changesetFilepathRegex = /^\/changesets\/(.+\.(jpg|jpeg|png|svg))$/i;
-const keyPathRegex = /^(.+)\/[^\/]+$/i;
+const assetKeyPathRegex = /^(.+)\/[^\/]+$/i;
+const parentRegex = /(?<=(?:..\/)|^)(..\/)/g
 
 export default function ImageNodeRenderer(props: IProps) {
 	const [imgSrc, setImgSrc] = useState<string>();
@@ -131,61 +132,70 @@ export default function ImageNodeRenderer(props: IProps) {
 	};
 
 	const getImgSrc = async (src: string): Promise<string | undefined> => {
+		// reset
 		setLoadingError(undefined);
 		setImgSrc(undefined);
+
 		const match = hostnameRegex.exec(src);
 		let newSrc = new URL(src, window.location.href);
 		const isSameHost = window.location.hostname.toLowerCase() === newSrc.hostname.toLowerCase();
+		const changesetPathMatch = changesetFilepathRegex.exec(newSrc.pathname);
+
 		try {
 			if (match && !isSameHost) {
 				// Set src to URL to let the browser load the image normally
 				return src;
 			} else if (assetInfo.property && assetInfo.keyPath && cmsApi) {
+				let resolvedSrc = newSrc.pathname;
+				const parentMatch = src.match(parentRegex);
+				if (parentMatch) {
+					// if image src starts with parent dir, resolve that against the asset key path (e.g. ../../src.png)
+					const parentPath: string = resolveParentPath(src, assetInfo.property, parentMatch);
+					if (parentPath !== src) {
+						resolvedSrc = parentPath + '/' + resolvedSrc
+					}
+				} else if (changesetPathMatch) {
+					// on observation, the src of some images in changesets start with "/changesets" and need to be replaced with asset key path prefix
+					const keyPathMatch = assetKeyPathRegex.exec(assetInfo.keyPath);
+					if (!keyPathMatch || !keyPathMatch[1]) {
+						setLoadingError('Failed to load image');
+						return;
+					}
+					const prefix: string = keyPathMatch[1];
+					const filename: string = changesetPathMatch[1];
+					resolvedSrc = prefix + '/' + filename;
+				}
+
 				// Load image from API and set src as encoded image data
-				return await getImg(assetInfo.property, newSrc.pathname, true);
+				return await getImg(assetInfo.property, resolvedSrc);
 			}
 		} catch (err) {
-			const filepathMatch = changesetFilepathRegex.exec(newSrc.pathname);
-			if (filepathMatch && assetInfo.keyPath) {
-				const keyPathMatch = keyPathRegex.exec(assetInfo.keyPath);
-				if (!keyPathMatch || !keyPathMatch[1]) {
-					setLoadingError('Failed to load image');
-					return;
-				}
-				const prefix: string = keyPathMatch[1];
-				const filename: string = filepathMatch[1];
-				try {
-					const resolvedSrc = prefix + '/' + filename;
-					return await getImg(assetInfo.property, resolvedSrc);
-				} catch (err) {
-					console.error(err);
-				}
-			} else {
-				console.error(err);
-			}
-
+			console.error(err);
 			setLoadingError('Failed to load image');
-			if (addToast)
-				addToast({
-					toastType: ToastType.Critical,
-					title: 'API Error',
-					message: 'Failed to load image',
-					timeoutSeconds: 30,
-				});
 		}
 	};
 
-	const getImg = async (property: string, keyPath: string, suppressError: boolean = false): Promise<string | undefined> => {
+	const resolveParentPath = (src: string, assetKeyPath: string, parentMatch: RegExpMatchArray) => {
+		if (!parentMatch || !assetKeyPath.includes('/')) return src;
+		let dir = assetKeyPath.substring(0, assetKeyPath.lastIndexOf('/'));
+
+		for (let i = 0; i < parentMatch.length; i++) {
+			if (!assetKeyPath.lastIndexOf('/')) return src;
+			dir = dir.substring(0, assetKeyPath.lastIndexOf('/'));
+		}
+	};
+
+	const getImg = async (property: string, keyPath: string): Promise<string | undefined> => {
 		if (property && cmsApi) {
-			const content = await cmsApi.AssetsApi.getAssetContent(property, keyPath, true, suppressError);
+			const content = await cmsApi.AssetsApi.getAssetContent(property, keyPath, true);
 			if (!content) {
-				if (!suppressError) setLoadingError('Failed to load image');
+				setLoadingError('Failed to load image');
 				throw new Error('Failed to load image');
 			}
 			let str = await readBlob(content?.content);
 			return str;
 		} else {
-			if (!suppressError) setLoadingError('Failed to load image');
+			setLoadingError('Failed to load image');
 			throw new Error('Failed to load image');
 		}
 	};

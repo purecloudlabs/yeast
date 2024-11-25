@@ -8,7 +8,7 @@ export default interface CmsApi {
 }
 
 export interface AssetsApi {
-    getAssetContent: (property: string, relativeKeyPath: string, asBlob?: boolean, suppressToast?: boolean) => Promise<AssetContent | undefined>;
+    getAssetContent: (property: string, relativeKeyPath: string, asBlob?: boolean) => Promise<AssetContent | undefined>;
 }
 
 export interface Toast {
