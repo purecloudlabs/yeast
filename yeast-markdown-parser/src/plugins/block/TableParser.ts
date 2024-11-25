@@ -167,6 +167,7 @@ const abbreviateAlignment = (alignments: string[]) => {
 		.join('|');
 };
 
+//This function ensures unescaped pipes are surrounded by whitespace , to validate empty cells (i.e 'foo|bar||' becomes a row of 3 cells) and ensure pipes are not touching other characters
 function normalizePipeString(input: string): string {
 	//Replace escaped pipes (\|) with a placeholder to protect them during splitting
 	const placeholder = "__ESCAPED_PIPE__"; 
