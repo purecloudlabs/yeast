@@ -20,7 +20,7 @@ export class TableParserPlugin implements BlockParserPlugin {
 	parse(text: string, parser: YeastParser): void | BlockParserPluginResult {
 		const tableNode = YeastNodeFactory.CreateTableNode();
 
-		const lines = text.trim().split('\n');
+		const lines = text.trim().split('\n').map(line=> normalizePipeString(line));
 
 		let l = 0;
 		if (lines.length < 2 || !IS_TABLE.exec(lines[0]) || !IS_TABLE.exec(lines[1])) return;
@@ -178,3 +178,12 @@ const abbreviateAlignment = (alignments: string[]) => {
 		})
 		.join('|');
 };
+
+function normalizePipeString(input: string): string {
+    return input
+    .split(/(\|)/) //split and retain pip characters
+    .map(part => (part === '|' ? ' | ' : part.trim())) //Add spaces around pipes and trim other parts
+    .join('') //Join back to single string
+    .replace(/\s+/g, ' ') //normalize spaces to single space
+    .trim()
+}

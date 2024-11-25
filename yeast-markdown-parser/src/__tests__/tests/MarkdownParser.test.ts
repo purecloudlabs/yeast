@@ -144,6 +144,7 @@ test('MarkdownParser using CustomComponentParserPlugin', () => {
 	checkAstStructureForDefaultDocument(ast, 8);
 });
 
+
 test('MarkdownParser using TableParserPlugin', () => {
 	// Initialize parser
 	const parser = new MarkdownParser();
@@ -161,6 +162,25 @@ test('MarkdownParser using TableParserPlugin', () => {
 
 	// Validate AST
 	expect(JSON.stringify(ast)).toBe(JSON.stringify(TABLE_AST));
+});
+
+test.only('MarkdownParser using TableParserPlugin and Parsing empty cells', () => {
+	// Initialize parser
+	const parser = new MarkdownParser();
+	parser.registerBlockPlugin(new CustomComponentParserPlugin());
+	parser.registerBlockPlugin(new TableParserPlugin());
+	parser.registerBlockPlugin(new ParagraphParserPlugin());
+
+	// Check plugins
+	checkParserPlugins(parser, 13, standardInlinePluginCount);
+
+	const documentText = fs.readFileSync(path.join(__dirname, '../resources/tables-empty-column.md'), 'utf8');
+	const ast = parser.parse(documentText);
+	expect((ast.children[0] as TableNode).children[0].header).toBeTruthy();
+	expect(((ast.children[0] as TableNode).children[0] as TableRowNode).children.length).toBe(5)
+	expect(((ast.children[0] as TableNode).children[1] as TableRowNode).children.length).toBe(5)
+	expect(((ast.children[0] as TableNode).children[2] as TableRowNode).children.length).toBe(5)
+	expect((ast.children[0] as TableNode).align).toBe('L|L|L|L|L')
 });
 
 test('MarkdownParser using BlockquoteParserPlugin', () => {
