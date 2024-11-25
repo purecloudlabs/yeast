@@ -1,4 +1,4 @@
 | Syntax ||| Description ||
 | ------ | ----------- |-|-|-|
 | Header || Title |||
-| Lower  ||| NoTitle||
+| Escaped Pipes | The pipe character: \| -- like a\|b\|c ||||

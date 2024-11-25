@@ -164,7 +164,7 @@ test('MarkdownParser using TableParserPlugin', () => {
 	expect(JSON.stringify(ast)).toBe(JSON.stringify(TABLE_AST));
 });
 
-test.only('MarkdownParser using TableParserPlugin and Parsing empty cells', () => {
+test('MarkdownParser using TableParserPlugin and Parsing empty cells', () => {
 	// Initialize parser
 	const parser = new MarkdownParser();
 	parser.registerBlockPlugin(new CustomComponentParserPlugin());

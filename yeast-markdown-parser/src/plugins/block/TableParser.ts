@@ -20,7 +20,7 @@ export class TableParserPlugin implements BlockParserPlugin {
 	parse(text: string, parser: YeastParser): void | BlockParserPluginResult {
 		const tableNode = YeastNodeFactory.CreateTableNode();
 
-		const lines = text.trim().split('\n').map(line=> normalizePipeString(line));
+		const lines = (text.trim().split('\n')).map(line=> normalizePipeString(line));
 
 		let l = 0;
 		if (lines.length < 2 || !IS_TABLE.exec(lines[0]) || !IS_TABLE.exec(lines[1])) return;
@@ -88,7 +88,6 @@ const parseLine = (line: string, alignment: string[], parser: YeastParser) => {
 	const row = YeastNodeFactory.CreateTableRowNode();
 	row.children = [];
 
-	let colspanColStart;
 	let isCell = false;
 
 	// Prepare content and find indentation
@@ -105,17 +104,6 @@ const parseLine = (line: string, alignment: string[], parser: YeastParser) => {
 	let columnNumber = -1;
 	do {
 		columnNumber++;
-
-		// Check for colspan
-		if (remainingLine.startsWith('|')) {
-			colspanColStart = colspanColStart || row.children.length - 1;
-			row.children[colspanColStart].colspan = row.children[colspanColStart].colspan || 1;
-			row.children[colspanColStart].colspan++;
-			isCell = true;
-			row.children.push(undefined);
-			remainingLine = remainingLine.substring(1);
-			continue;
-		}
 
 		// Parse cell content
 		const cellContentMatch = CELL_CONTENT.exec(remainingLine);
@@ -180,10 +168,17 @@ const abbreviateAlignment = (alignments: string[]) => {
 };
 
 function normalizePipeString(input: string): string {
-    return input
-    .split(/(\|)/) //split and retain pip characters
-    .map(part => (part === '|' ? ' | ' : part.trim())) //Add spaces around pipes and trim other parts
-    .join('') //Join back to single string
-    .replace(/\s+/g, ' ') //normalize spaces to single space
-    .trim()
+	//Replace escaped pipes (\|) with a placeholder to protect them during splitting
+	const placeholder = "__ESCAPED_PIPE__"; 
+	const escapedInput = input.replace(/\\\|/g, placeholder)
+
+	//Split input string by unescaped pipes and retain the pipes 
+	const normalized = escapedInput
+		.split(/(\|)/)
+		.map(part => part.replaceAll('|', ' | ').replaceAll(placeholder, '\\|'))
+		.join('')
+		.replace(/\s+/g, ' ')
+		.trim();
+	
+	return normalized
 }
