@@ -6,10 +6,9 @@ import { useKey } from '../helpers/useKey';
 import { DiffRenderData, getDiffRenderData } from '../helpers/diff';
 import { ReactRenderer } from '../ReactRenderer';
 import { assetInfoAtom, prevAssetInfoAtom } from '../atoms/AssetInfoAtom';
-import { useAddToast, useCmsApi } from '../atoms/CmsApiAtom';
+import { useCmsApi } from '../atoms/CmsApiAtom';
 import { LoadingPlaceholder } from 'genesys-react-components';
 import { imageDataAtom } from '../atoms/ImageDataAtom';
-import { ToastType } from '../helpers/types';
 
 interface IProps {
 	node: ImageNode;
@@ -36,7 +35,6 @@ export default function ImageNodeRenderer(props: IProps) {
 	const [prevAssetInfo, setPrevAssetInfo] = useRecoilState(prevAssetInfoAtom);
 	const [imageData, setImageData] = useRecoilState(imageDataAtom);
 	const cmsApi = useCmsApi();
-	const addToast = useAddToast();
 
 	const key1 = useKey();
 	const key2 = useKey();
@@ -155,7 +153,7 @@ export default function ImageNodeRenderer(props: IProps) {
 						resolvedSrc = parentPath + '/' + resolvedSrc
 					}
 				} else if (changesetPathMatch) {
-					// on observation, the src of some images in changesets start with "/changesets" and need to be replaced with asset key path prefix
+					// on observation, the src of some images in changesets start with "/changesets" and prefix needs to be replaced with asset key path prefix
 					const keyPathMatch = assetKeyPathRegex.exec(assetInfo.keyPath);
 					if (!keyPathMatch || !keyPathMatch[1]) {
 						setLoadingError('Failed to load image');
