@@ -9910,7 +9910,7 @@ function ImageNodeRenderer(props) {
         for (let i = 0; i < parentMatch.length; i++) {
             if (!assetKeyPath.lastIndexOf('/'))
                 return src;
-            dir = dir.substring(0, assetKeyPath.lastIndexOf('/'));
+            dir = dir.substring(0, dir.lastIndexOf('/'));
         }
         return dir;
     };
