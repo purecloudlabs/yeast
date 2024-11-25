@@ -150,7 +150,7 @@ export default function ImageNodeRenderer(props: IProps) {
 				const parentMatch = src.match(parentRegex);
 				if (parentMatch) {
 					// if image src starts with parent dir, resolve that against the asset key path (e.g. ../../src.png)
-					const parentPath: string = resolveParentPath(src, assetInfo.property, parentMatch);
+					const parentPath: string = resolveParentPath(src, assetInfo.keyPath, parentMatch);
 					if (parentPath !== src) {
 						resolvedSrc = parentPath + '/' + resolvedSrc
 					}
