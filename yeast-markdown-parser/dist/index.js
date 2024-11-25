@@ -710,7 +710,7 @@ const TABLE_CLASS = /^\s*\{:\s*class\s*=\s*["'](.+?)["']\s*\}/i;
 class TableParserPlugin {
     parse(text, parser) {
         const tableNode = YeastNodeFactory.CreateTableNode();
-        const lines = text.trim().split('\n');
+        const lines = (text.trim().split('\n')).map(line => normalizePipeString(line));
         let l = 0;
         if (lines.length < 2 || !IS_TABLE.exec(lines[0]) || !IS_TABLE.exec(lines[1]))
             return;
@@ -767,7 +767,6 @@ const parseLine = (line, alignment, parser) => {
         return;
     const row = YeastNodeFactory.CreateTableRowNode();
     row.children = [];
-    let colspanColStart;
     let isCell = false;
     const lineContent = parseIndentation(line);
     let remainingLine = lineContent.content;
@@ -778,15 +777,6 @@ const parseLine = (line, alignment, parser) => {
     let columnNumber = -1;
     do {
         columnNumber++;
-        if (remainingLine.startsWith('|')) {
-            colspanColStart = colspanColStart || row.children.length - 1;
-            row.children[colspanColStart].colspan = row.children[colspanColStart].colspan || 1;
-            row.children[colspanColStart].colspan++;
-            isCell = true;
-            row.children.push(undefined);
-            remainingLine = remainingLine.substring(1);
-            continue;
-        }
         const cellContentMatch = CELL_CONTENT.exec(remainingLine);
         isCell = cellContentMatch !== null;
         if (!isCell)
@@ -834,6 +824,17 @@ const abbreviateAlignment = (alignments) => {
     })
         .join('|');
 };
+function normalizePipeString(input) {
+    const placeholder = "__ESCAPED_PIPE__";
+    const escapedInput = input.replace(/\\\|/g, placeholder);
+    const normalized = escapedInput
+        .split(/(\|)/)
+        .map(part => part.replaceAll('|', ' | ').replaceAll(placeholder, '\\|'))
+        .join('')
+        .replace(/\s+/g, ' ')
+        .trim();
+    return normalized;
+}
 
 class PsuedoParagraphScrubber {
     parse(astDoc, parser) {
