@@ -676,7 +676,7 @@ class ReactRenderer {
         // Untyped nodes aren't handled here
         if (!node.type)
             return;
-        const typedNode = node;
+        const typedNode = Object.assign({}, node);
         typedNode.children = typedNode.children || [];
         // Process renderers
         let component;
@@ -729,5 +729,5 @@ function YeastDocumentRenderer(props) {
         React.createElement(YeastNodeRenderer, { nodes: (_c = props.ast) === null || _c === void 0 ? void 0 : _c.children, customRenderers: props.customRenderers })));
 }
 
-export { ReactRenderer, YeastDocumentRenderer, YeastNodeRenderer, useKey };
+export { ReactRenderer, YeastDocumentRenderer, YeastNodeRenderer, getDiffRenderData, useKey };
 //# sourceMappingURL=index.js.map
