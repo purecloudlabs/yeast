@@ -13,15 +13,15 @@ interface BlockCodeAttributes {
 }
 
 const BACKTICK_BLOCKCODE_REGEX = /^(?:\s*\n)*([ \t]*)`{3,}(.*)\n([\s\S]+?)\n\s*`{3,}.*(?:\n|$)\n?([\s\S]*)/i;
-const LITERAL_BACKTICK_BLOCKCODE_REGEX = /^(?:\s*\n)*([ \t]*)`{4,}(.*)\n([\s\S]+?)\n\s*`{4,}.*(?:\n|$)\n?([\s\S]*)/i;
+const LONG_BACKTICK_BLOCKCODE_REGEX = /^(?:\s*\n)*([ \t]*)`{4,}(.*)\n([\s\S]+?)\n\s*`{4,}.*(?:\n|$)\n?([\s\S]*)/i;
 const TILDE_BLOCKCODE_REGEX = /^(?:\s*\n)*([ \t]*)~{3,}(.*)\n([\s\S]+?)\n\s*~{3,}.*(?:\n|$)\n?([\s\S]*)/i;
-const LITERAL_TILDE_BLOCKCODE_REGEX = /^(?:\s*\n)*([ \t]*)~{4,}(.*)\n([\s\S]+?)\n\s*~{4,}.*(?:\n|$)\n?([\s\S]*)/i;
+const LONG_TILDE_BLOCKCODE_REGEX = /^(?:\s*\n)*([ \t]*)~{4,}(.*)\n([\s\S]+?)\n\s*~{4,}.*(?:\n|$)\n?([\s\S]*)/i;
 const INLINE_LANGUAGE_MATCH_REGEX = /^#!(.*)\s*/i;
 
 export class CodeParserPlugin implements BlockParserPlugin {
 	parse(text: string, parser: YeastParser): void | BlockParserPluginResult {
-		let match = text.match(LITERAL_BACKTICK_BLOCKCODE_REGEX);
-		if (!match) match = text.match(LITERAL_TILDE_BLOCKCODE_REGEX);
+		let match = text.match(LONG_BACKTICK_BLOCKCODE_REGEX);
+		if (!match) match = text.match(LONG_TILDE_BLOCKCODE_REGEX);
 		if (!match) match = text.match(BACKTICK_BLOCKCODE_REGEX);
 		if (!match) match = text.match(TILDE_BLOCKCODE_REGEX);
 
