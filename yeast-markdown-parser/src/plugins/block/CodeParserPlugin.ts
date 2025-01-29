@@ -81,7 +81,7 @@ export class CodeParserPlugin implements BlockParserPlugin {
 		}
 
 		const node = YeastNodeFactory.CreateBlockCodeNode();
-		node.value = code;
+		node.value = 'E';
 		node.language = attrs.language;
 		node.noCollapse = attrs.noCollapse;
 		node.title = attrs.title;
