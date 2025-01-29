@@ -348,6 +348,7 @@ const LITERAL_TILDE_BLOCKCODE_REGEX = /^(?:\s*\n)*([ \t]*)~{4,}(.*)\n([\s\S]+?)\
 const INLINE_LANGUAGE_MATCH_REGEX = /^#!(.*)\s*/i;
 class CodeParserPlugin {
     parse(text, parser) {
+        console.log('TEXT', text);
         let match = text.match(LITERAL_BACKTICK_BLOCKCODE_REGEX);
         if (!match)
             match = text.match(LITERAL_TILDE_BLOCKCODE_REGEX);
@@ -397,15 +398,15 @@ class CodeParserPlugin {
             }
             code = code.replace(/\t/gi, spaces);
         }
+        code = code.replace(/^(\s*)\\([`~]{3,}.*$)/gm, '$1$2');
         const node = YeastNodeFactory.CreateBlockCodeNode();
-        node.value = 'E';
+        node.value = code;
         node.language = attrs.language;
         node.noCollapse = attrs.noCollapse;
         node.title = attrs.title;
         node.showLineNumbers = attrs.showLineNumbers;
         node.noCollapse = attrs.noCollapse;
         node.indentation = fenceIndentation;
-        code = code.replace(/^(\s*)\\([`~]{3,}.*$)/gm, '$1$2');
         return {
             remainingText: match[4],
             nodes: [node],
