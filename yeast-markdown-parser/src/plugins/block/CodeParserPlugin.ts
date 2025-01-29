@@ -20,7 +20,6 @@ const INLINE_LANGUAGE_MATCH_REGEX = /^#!(.*)\s*/i;
 
 export class CodeParserPlugin implements BlockParserPlugin {
 	parse(text: string, parser: YeastParser): void | BlockParserPluginResult {
-		console.log('TEXT', text)
 		let match = text.match(LITERAL_BACKTICK_BLOCKCODE_REGEX);
 		if (!match) match = text.match(LITERAL_TILDE_BLOCKCODE_REGEX);
 		if (!match) match = text.match(BACKTICK_BLOCKCODE_REGEX);

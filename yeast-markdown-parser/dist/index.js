@@ -348,7 +348,6 @@ const LITERAL_TILDE_BLOCKCODE_REGEX = /^(?:\s*\n)*([ \t]*)~{4,}(.*)\n([\s\S]+?)\
 const INLINE_LANGUAGE_MATCH_REGEX = /^#!(.*)\s*/i;
 class CodeParserPlugin {
     parse(text, parser) {
-        console.log('TEXT', text);
         let match = text.match(LITERAL_BACKTICK_BLOCKCODE_REGEX);
         if (!match)
             match = text.match(LITERAL_TILDE_BLOCKCODE_REGEX);
