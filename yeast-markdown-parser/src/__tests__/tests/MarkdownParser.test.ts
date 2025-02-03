@@ -246,10 +246,10 @@ test('MarkdownParser using CodeParserPlugin', () => {
 	// Parse
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/codeblock.md'), 'utf8');
 	const ast = parser.parse(documentText);
-	expect(ast.children.length).toBe(2);
+	expect(ast.children.length).toBe(8);
 
 	// Check document
-	checkAstStructureForDefaultDocument(ast, 2);
+	checkAstStructureForDefaultDocument(ast, 8);
 });
 
 test('MarkdownParser using ContentGroupParserPlugin', () => {

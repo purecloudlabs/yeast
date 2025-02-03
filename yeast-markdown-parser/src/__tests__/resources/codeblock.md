@@ -49,3 +49,43 @@
   "completionDate": "2019-07-01T15:26:08.209Z"
 }
 ```
+
+````{"language":""}
+// literal code block example by adding an extra backtick to the surrounding top and bottom code block
+```
+// Code goes here
+String str = "my string";
+```
+````
+
+```{"language":""}
+// next block after the literal example still gets parsed correctly
+String str = "my string";
+```
+
+```{"language":""}
+\```java
+// literal code block example can also be done by escaping the literal backticks with a backslash
+String str = "my string";
+\```
+```
+
+```{"language":"java"}
+// next block after the literal example still gets parsed correctly
+String str = "my string";
+```
+
+````{"language":""}
+```{ "title": "JavaScript", "language": "javascript"}
+````
+
+```{"language":"nohighlight","noCollapse":true}
+let thisCode = "not highlighted";
+
+## Markdown just displays unrendered
+
+* No
+* Lists
+
+or `inline` code
+```
