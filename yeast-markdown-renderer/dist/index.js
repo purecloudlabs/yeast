@@ -41,8 +41,8 @@ function renderBlockCodeNode(node, renderer) {
         tabsToSpaces: node.tabsToSpaces,
         showLineNumbers: node.showLineNumbers,
     };
-    node.value.replace(LITERAL_BACKTICK_REGEX, '$1\\$2');
-    const tildeEscapedVal = node.value.replace(LITERAL_TILDE_REGEX, '$1\\$2');
+    const backtickEscapedVal = node.value.replace(LITERAL_BACKTICK_REGEX, '$1\\$2');
+    const tildeEscapedVal = backtickEscapedVal.replace(LITERAL_TILDE_REGEX, '$1\\$2');
     const children = tildeEscapedVal.split('\n');
     let finalVal = '';
     const indentation = '\t';
