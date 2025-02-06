@@ -30,6 +30,8 @@ function renderCustomComponent(node) {
     return `\n${root.end({ prettyPrint: true })}\n`;
 }
 
+const LITERAL_BACKTICK_REGEX = /((?:^|\n+)(?:\t+|\s+)*)(`{3})/ig;
+const LITERAL_TILDE_REGEX = /((?:^|\n+)(?:\t+|\s+)*)(~{3})/ig;
 function renderBlockCodeNode(node, renderer) {
     const jsonOptions = {
         title: node.title,
@@ -39,7 +41,9 @@ function renderBlockCodeNode(node, renderer) {
         tabsToSpaces: node.tabsToSpaces,
         showLineNumbers: node.showLineNumbers,
     };
-    const children = node.value.split('\n');
+    node.value.replace(LITERAL_BACKTICK_REGEX, '$1\\$2');
+    const tildeEscapedVal = node.value.replace(LITERAL_TILDE_REGEX, '$1\\$2');
+    const children = tildeEscapedVal.split('\n');
     let finalVal = '';
     const indentation = '\t';
     children.forEach((child, index) => {
@@ -51,7 +55,7 @@ function renderBlockCodeNode(node, renderer) {
     const hasOptions = Object.keys(node).some((key) => node[key] !== undefined && key !== 'language' && key !== 'type' && key !== 'value' && key !== 'indentation');
     if (!hasOptions)
         return `\n${indentation.repeat(node.indentation)}\`\`\`${node.language}\n${finalVal}\n${indentation.repeat(node.indentation)}\`\`\`\n`;
-    return `\n${indentation.repeat(node.indentation)}\`\`\`${JSON.stringify(jsonOptions)}\n${node.value}\n${indentation.repeat(node.indentation)}\`\`\`\n`;
+    return `\n${indentation.repeat(node.indentation)}\`\`\`${JSON.stringify(jsonOptions)}\n${tildeEscapedVal}\n${indentation.repeat(node.indentation)}\`\`\`\n`;
 }
 
 function renderBlockquoteNode(node, renderer) {
