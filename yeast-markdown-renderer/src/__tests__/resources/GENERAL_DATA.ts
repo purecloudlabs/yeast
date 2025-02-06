@@ -96,7 +96,6 @@ export const GENERAL_DATA = {
 			type: 'code',
 			language: 'java',
 			indentation: 2,
-			// value: "derp",
 			value: "```\n// Code goes here\nString str = \"my string\";\n```",
 		},
 		{
