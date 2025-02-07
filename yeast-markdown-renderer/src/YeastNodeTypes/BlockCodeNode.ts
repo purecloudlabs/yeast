@@ -1,6 +1,10 @@
 import { MarkdownRenderer } from '../MarkdownRenderer';
 import { BlockCodeNode } from 'yeast-core';
 
+// Matches case when codeblock content is a literal codeblock example
+const LITERAL_BACKTICK_REGEX = /((?:^|\n+)(?:\t+|\s+)*)(`{3})/ig;
+const LITERAL_TILDE_REGEX = /((?:^|\n+)(?:\t+|\s+)*)(~{3})/ig;
+
 export default function renderBlockCodeNode(node: BlockCodeNode, renderer: MarkdownRenderer) {
 	const jsonOptions = {
 		title: node.title,
@@ -10,7 +14,9 @@ export default function renderBlockCodeNode(node: BlockCodeNode, renderer: Markd
 		tabsToSpaces: node.tabsToSpaces,
 		showLineNumbers: node.showLineNumbers,
 	};
-	const children = node.value.split('\n');
+	const backtickEscapedVal = node.value.replace(LITERAL_BACKTICK_REGEX, '$1\\$2');
+	const tildeEscapedVal = backtickEscapedVal.replace(LITERAL_TILDE_REGEX, '$1\\$2');
+	const children = tildeEscapedVal.split('\n');
 	let finalVal = '';
 	const indentation = '\t';
 	children.forEach((child, index) => {
@@ -23,7 +29,7 @@ export default function renderBlockCodeNode(node: BlockCodeNode, renderer: Markd
 	);
 	if (!hasOptions)
 		return `\n${indentation.repeat(node.indentation)}\`\`\`${node.language}\n${finalVal}\n${indentation.repeat(node.indentation)}\`\`\`\n`;
-	return `\n${indentation.repeat(node.indentation)}\`\`\`${JSON.stringify(jsonOptions)}\n${node.value}\n${indentation.repeat(
+	return `\n${indentation.repeat(node.indentation)}\`\`\`${JSON.stringify(jsonOptions)}\n${tildeEscapedVal}\n${indentation.repeat(
 		node.indentation
 	)}\`\`\`\n`;
 }

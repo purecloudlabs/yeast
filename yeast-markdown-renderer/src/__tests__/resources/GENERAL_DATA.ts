@@ -96,7 +96,7 @@ export const GENERAL_DATA = {
 			type: 'code',
 			language: 'java',
 			indentation: 2,
-			value: "console.log('hello world, I'm codefence')",
+			value: "```\n// Code goes here\nString str = \"my string\";\n```",
 		},
 		{
 			type: 'callout',
