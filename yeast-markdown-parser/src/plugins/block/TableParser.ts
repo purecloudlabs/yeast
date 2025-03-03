@@ -20,7 +20,10 @@ export class TableParserPlugin implements BlockParserPlugin {
 	parse(text: string, parser: YeastParser): void | BlockParserPluginResult {
 		const tableNode = YeastNodeFactory.CreateTableNode();
 
-		const lines = (text.trim().split('\n')).map(line=> normalizePipeString(line));
+		const lines = text
+			.trim()
+			.split('\n')
+			.map((line) => normalizePipeString(line));
 
 		let l = 0;
 		if (lines.length < 2 || !IS_TABLE.exec(lines[0]) || !IS_TABLE.exec(lines[1])) return;
@@ -170,16 +173,19 @@ const abbreviateAlignment = (alignments: string[]) => {
 //This function ensures unescaped pipes are surrounded by whitespace , to validate empty cells (i.e 'foo|bar||' becomes a row of 3 cells) and ensure pipes are not touching other characters
 function normalizePipeString(input: string): string {
 	//Replace escaped pipes (\|) with a placeholder to protect them during splitting
-	const placeholder = "__ESCAPED_PIPE__"; 
-	const escapedInput = input.replace(/\\\|/g, placeholder)
+	const placeholder = '__ESCAPED_PIPE__';
+	const escapedInput = input.replace(/\\\|/g, placeholder);
 
-	//Split input string by unescaped pipes and retain the pipes 
+	const pipeLength = escapedInput.split(/(\|)/).length;
+	if (pipeLength === 1) return input; //return original string if no pipes in string
+
+	//Split input string by unescaped pipes and retain the pipes
 	const normalized = escapedInput
 		.split(/(\|)/)
-		.map(part => part.replaceAll('|', ' | ').replaceAll(placeholder, '\\|'))
+		.map((part) => part.replaceAll('|', ' | ').replaceAll(placeholder, '\\|'))
 		.join('')
 		.replace(/\s+/g, ' ')
-		.trim();
-	
-	return normalized
+		.trim(); //DEVENGAGE-2953 THE TRIM REMOVES THE SPACE FOR INDENT HERE
+
+	return normalized;
 }
