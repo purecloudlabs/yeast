@@ -185,7 +185,7 @@ function normalizePipeString(input: string): string {
 		.map((part) => part.replaceAll('|', ' | ').replaceAll(placeholder, '\\|'))
 		.join('')
 		.replace(/\s+/g, ' ')
-		.trim(); //DEVENGAGE-2953 THE TRIM REMOVES THE SPACE FOR INDENT HERE
+		.trim();
 
 	return normalized;
 }
