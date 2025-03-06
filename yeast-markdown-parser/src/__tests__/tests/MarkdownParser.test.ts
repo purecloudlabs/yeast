@@ -41,6 +41,7 @@ import { IMAGE_AST, IMAGE_LINKS_AST, IMAGE_LINKS_MARKDOWN, IMAGE_MARKDOWN } from
 import { LINK_AST, LINK_MARKDOWN } from '../resources/links';
 import { TABLE_AST } from '../resources/table-data';
 import { EVERYTHING_INLINE_AST } from '../resources/everythinginline';
+import { TABLE_CODE_RESULT } from '../resources/table-and-codeblock';
 
 const standardBlockPluginCount = 10;
 const standardInlinePluginCount = 7;
@@ -144,7 +145,6 @@ test('MarkdownParser using CustomComponentParserPlugin', () => {
 	checkAstStructureForDefaultDocument(ast, 8);
 });
 
-
 test('MarkdownParser using TableParserPlugin', () => {
 	// Initialize parser
 	const parser = new MarkdownParser();
@@ -177,10 +177,10 @@ test('MarkdownParser using TableParserPlugin and Parsing empty cells', () => {
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/tables-empty-column.md'), 'utf8');
 	const ast = parser.parse(documentText);
 	expect((ast.children[0] as TableNode).children[0].header).toBeTruthy();
-	expect(((ast.children[0] as TableNode).children[0] as TableRowNode).children.length).toBe(5)
-	expect(((ast.children[0] as TableNode).children[1] as TableRowNode).children.length).toBe(5)
-	expect(((ast.children[0] as TableNode).children[2] as TableRowNode).children.length).toBe(5)
-	expect((ast.children[0] as TableNode).align).toBe('L|L|L|L|L')
+	expect(((ast.children[0] as TableNode).children[0] as TableRowNode).children.length).toBe(5);
+	expect(((ast.children[0] as TableNode).children[1] as TableRowNode).children.length).toBe(5);
+	expect(((ast.children[0] as TableNode).children[2] as TableRowNode).children.length).toBe(5);
+	expect((ast.children[0] as TableNode).align).toBe('L|L|L|L|L');
 });
 
 test('MarkdownParser using BlockquoteParserPlugin', () => {
@@ -494,6 +494,23 @@ test('MarkdownParser parses hyperlink in text', () => {
 
 	expect(JSON.stringify(ast)).toBe(JSON.stringify(LINK_AST));
 });
+
+test('MarkdownParser on document with table and codeblock', () => {
+	// Initialize parser
+	const parser = new MarkdownParser();
+
+	// Check plugins
+	checkParserPlugins(parser, standardBlockPluginCount, standardInlinePluginCount);
+
+	// Parse
+	const documentText = fs.readFileSync(path.join(__dirname, '../resources/table-and-codeblock.md'), 'utf8');
+	const ast = parser.parse(documentText);
+	// debugAST('table-and-codeblock', ast);
+
+	// Validate AST
+	expect(JSON.stringify(ast)).toBe(JSON.stringify(TABLE_CODE_RESULT));
+});
+
 // /**
 //  * Helper functions
 //  */

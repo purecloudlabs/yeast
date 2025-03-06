@@ -716,7 +716,10 @@ const TABLE_CLASS = /^\s*\{:\s*class\s*=\s*["'](.+?)["']\s*\}/i;
 class TableParserPlugin {
     parse(text, parser) {
         const tableNode = YeastNodeFactory.CreateTableNode();
-        const lines = (text.trim().split('\n')).map(line => normalizePipeString(line));
+        const lines = text
+            .trim()
+            .split('\n')
+            .map((line) => normalizePipeString(line));
         let l = 0;
         if (lines.length < 2 || !IS_TABLE.exec(lines[0]) || !IS_TABLE.exec(lines[1]))
             return;
@@ -831,11 +834,14 @@ const abbreviateAlignment = (alignments) => {
         .join('|');
 };
 function normalizePipeString(input) {
-    const placeholder = "__ESCAPED_PIPE__";
+    const placeholder = '__ESCAPED_PIPE__';
     const escapedInput = input.replace(/\\\|/g, placeholder);
+    const pipeLength = escapedInput.split(/(\|)/).length;
+    if (pipeLength === 1)
+        return input;
     const normalized = escapedInput
         .split(/(\|)/)
-        .map(part => part.replaceAll('|', ' | ').replaceAll(placeholder, '\\|'))
+        .map((part) => part.replaceAll('|', ' | ').replaceAll(placeholder, '\\|'))
         .join('')
         .replace(/\s+/g, ' ')
         .trim();
