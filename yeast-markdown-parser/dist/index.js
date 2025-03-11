@@ -160,7 +160,7 @@ class ListParserPlugin {
                 continue;
             }
             lines.shift();
-            let children = parser.parseBlock(match[3]);
+            let children = parser.parse(match[3]).children;
             if (children.length === 1 &&
                 (isYeastNodeType(children[0], YeastBlockNodeTypes.Paragraph) || isYeastNodeType(children[0], YeastBlockNodeTypes.PseudoParagraph))) {
                 children = children[0].children;
@@ -932,6 +932,8 @@ class ParagraphDenester {
     }
 }
 function denest(nodes) {
+    if (!nodes)
+        return nodes;
     let reprocess = false;
     do {
         reprocess = false;

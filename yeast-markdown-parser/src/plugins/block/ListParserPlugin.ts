@@ -81,7 +81,7 @@ export class ListParserPlugin implements BlockParserPlugin {
 			lines.shift();
 
 			// Parse content as block, but strip paragraph container. The list item is the container.
-			let children: YeastChild[] = parser.parseBlock(match[3]);
+			let children: YeastChild[] = parser.parse(match[3]).children;
 			if (
 				children.length === 1 &&
 				(isYeastNodeType(children[0], YeastBlockNodeTypes.Paragraph) || isYeastNodeType(children[0], YeastBlockNodeTypes.PseudoParagraph))

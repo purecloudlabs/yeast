@@ -17,6 +17,7 @@ export class ParagraphDenester implements PostProcessorPlugin {
 }
 
 function denest(nodes: YeastChild[]) {
+	if (!nodes) return nodes;
 	let reprocess = false;
 
 	// Process this list of children till it runs clean
