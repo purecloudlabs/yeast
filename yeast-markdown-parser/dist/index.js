@@ -160,11 +160,16 @@ class ListParserPlugin {
                 continue;
             }
             lines.shift();
+            let children = parser.parseBlock(match[3]);
+            if (children.length === 1 &&
+                (isYeastNodeType(children[0], YeastBlockNodeTypes.Paragraph) || isYeastNodeType(children[0], YeastBlockNodeTypes.PseudoParagraph))) {
+                children = children[0].children;
+            }
             const listItem = {
                 type: YeastBlockNodeTypes.ListItem,
                 level: parseIndentation(match[1]).indentation,
                 marker: match[2],
-                children: parser.parseInline(match[3]),
+                children,
             };
             if (!firstItemMarker) {
                 firstItemMarker = match[2];

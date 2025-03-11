@@ -39,6 +39,7 @@ import { InlineEmphasisPlugin } from '../../plugins/inline/InlineEmphasisPlugin'
 
 import { IMAGE_AST, IMAGE_LINKS_AST, IMAGE_LINKS_MARKDOWN, IMAGE_MARKDOWN } from '../resources/images';
 import { LINK_AST, LINK_MARKDOWN } from '../resources/links';
+import { LIST_AST, LIST_MARKDOWN } from '../resources/lists';
 import { TABLE_AST } from '../resources/table-data';
 import { EVERYTHING_INLINE_AST } from '../resources/everythinginline';
 import { TABLE_CODE_RESULT } from '../resources/table-and-codeblock';
@@ -342,34 +343,16 @@ test('MarkdownParser using HeadingParserPlugin', () => {
 test('MarkdownParser using ListParserPlugin', () => {
 	// Initialize parser
 	const parser = new MarkdownParser();
-	parser.clearBlockPlugins();
-	parser.clearInlinePlugins();
-	parser.registerBlockPlugin(new ListParserPlugin());
-	parser.registerBlockPlugin(new ParagraphParserPlugin());
 
 	// Check plugins
-	checkParserPlugins(parser, 2, 0);
+	checkParserPlugins(parser, standardBlockPluginCount, standardInlinePluginCount);
 
 	// Parse
-	const documentText = fs.readFileSync(path.join(__dirname, '../resources/lists.md'), 'utf8');
-	const ast = parser.parse(documentText);
-
-	// Check document
-	checkAstStructureForDefaultDocument(ast, 10);
+	const ast = parser.parse(LIST_MARKDOWN);
+	// debugAST('lists', ast);
 
 	// check for JSON equivalency
-	expect(JSON.stringify(ast)).toBe(
-		`{"type":"document","title":"Default Page Title","children":[{"type":"list","children":[{"type":"listitem","level":0,"children":[{"text":"asterisk list 1"}]},{"type":"listitem","level":0,"children":[{"text":"more asterisk 2"}]},{"type":"list","children":[{"type":"listitem","level":1,"children":[{"text":"two spaces in - 2.1"}]},{"type":"listitem","level":1,"children":[{"text":"one tab in - 2.2"}]},{"type":"list","children":[{"type":"listitem","level":2,"children":[{"text":"mixing in a hyphen 2.2.1"}]}],"ordered":false,"level":2}],"ordered":false,"level":1},{"type":"listitem","level":0,"children":[{"text":"Root level back to asterisk 3"}]},{"type":"listitem","level":0,"children":[{"text":"Skipped a single line 4"}]},{"type":"list","children":[{"type":"list","children":[{"type":"listitem","level":2,"children":[{"text":"skipped an indentation level 4.1.1"}]}],"ordered":false,"level":2}],"ordered":false,"level":1}],"ordered":false,"level":0},{"type":"list","children":[{"type":"list","children":[{"type":"list","children":[{"type":"listitem","level":2,"children":[{"text":"Indented two levels and skipped two lines - this is a new list with indentation"}]}],"ordered":false,"level":2}],"ordered":false,"level":1},{"type":"listitem","level":0,"children":[{"text":"Drop back to root level, same list"}]}],"ordered":false,"level":0},{"type":"list","children":[{"type":"listitem","level":0,"children":[{"text":"Ordered list"}]},{"type":"listitem","level":0,"children":[{"text":"Second item"}]},{"type":"listitem","level":0,"children":[{"text":"Third item"}]}],"ordered":true,"level":0,"start":90},{"type":"list","children":[{"type":"listitem","level":0,"children":[{"text":"this"}]},{"type":"listitem","level":0,"children":[{"text":"is"}]},{"type":"listitem","level":0,"children":[{"text":"what"}]},{"type":"list","children":[{"type":"listitem","level":1,"children":[{"text":"nested"}]},{"type":"listitem","level":1,"children":[{"text":"lists"}]},{"type":"list","children":[{"type":"listitem","level":2,"children":[{"text":"look"}]},{"type":"listitem","level":2,"children":[{"text":"like"}]}],"ordered":true,"level":2}],"ordered":true,"level":1}],"ordered":true,"level":0,"start":1},{"type":"list","children":[{"type":"listitem","level":0,"children":[{"text":"Next list with hyphens 1"}]},{"type":"list","children":[{"type":"listitem","level":1,"children":[{"text":"hyphen 1.1"}]}],"ordered":false,"level":1},{"type":"listitem","level":0,"children":[{"text":"hyphen 2"}]}],"ordered":false,"level":0},{"type":"list","children":[{"type":"listitem","level":0,"children":[{"text":"Now let's do a numbered list 1"}]},{"type":"list","children":[{"type":"listitem","level":1,"children":[{"text":"Indented one level 1.1"}]},{"type":"list","children":[{"type":"listitem","level":2,"children":[{"text":"1.1.1 (3)"}]},{"type":"list","children":[{"type":"listitem","level":3,"children":[{"text":"1.1.1.1 (4)"}]},{"type":"list","children":[{"type":"listitem","level":4,"children":[{"text":"1.1.1.1.1 (5)"}]},{"type":"list","children":[{"type":"listitem","level":5,"children":[{"text":"1.1.1.1.1.1 (6)"}]},{"type":"list","children":[{"type":"listitem","level":6,"children":[{"text":"1.1.1.1.1.1.1 (7)"}]},{"type":"list","children":[{"type":"listitem","level":7,"children":[{"text":"1.1.1.1.1.1.1.1 (8)"}]},{"type":"list","children":[{"type":"listitem","level":8,"children":[{"text":"1.1.1.1.1.1.1.1.1 (9)"}]},{"type":"list","children":[{"type":"listitem","level":9,"children":[{"text":"1.1.1.1.1.1.1.1.1.1 (10)"}]}],"ordered":true,"level":9}],"ordered":true,"level":8}],"ordered":true,"level":7}],"ordered":true,"level":6}],"ordered":true,"level":5}],"ordered":true,"level":4}],"ordered":true,"level":3}],"ordered":true,"level":2}],"ordered":true,"level":1},{"type":"listitem","level":0,"children":[{"text":"drop back to root 2"}]},{"type":"list","children":[{"type":"listitem","level":1,"children":[{"text":"indented with a 7 - 2.1"}]}],"ordered":true,"level":1}],"ordered":true,"level":0,"start":1},{"type":"list","children":[{"type":"listitem","level":0,"children":[{"text":"Another UL, but start at 6"}]},{"type":"listitem","level":0,"children":[{"text":"asdf 7"}]}],"ordered":true,"level":0,"start":3},{"type":"list","children":[{"type":"list","children":[{"type":"list","children":[{"type":"list","children":[{"type":"listitem","level":3,"children":[{"text":"Indented 3 levels and starting at 3"}]},{"type":"list","children":[{"type":"listitem","level":4,"children":[{"text":"3.1"}]}],"ordered":true,"level":4}],"ordered":true,"level":3}],"ordered":true,"level":2}],"ordered":true,"level":1}],"ordered":true,"level":0,"start":1},{"type":"paragraph","children":[{"text":"*THIS* is italic text"}],"indentation":0},{"type":"paragraph","children":[{"text":"**THIS** is bold text"}],"indentation":0}]}`
-	);
-
-	expect((ast.children[1] as ListNode).children[1].level).toBe(0);
-	expect(((ast.children[1] as ListNode).children[0].children[0] as ListNode).children[0].level).toBe(2);
-	expect((ast.children[2] as ListNode).start).toBe(90);
-	expect((ast.children[2] as ListNode).ordered).toBe(true);
-	expect((ast.children[3] as ListNode).ordered).toBe(true);
-	expect(((ast.children[3] as ListNode).children[3] as ListNode).ordered).toBe(true);
-	expect((ast.children[4] as ListNode).ordered).toBe(false);
-	expect((ast.children[4] as ListNode).start).toBeUndefined();
+	expect(JSON.stringify(ast)).toBe(JSON.stringify(LIST_AST));
 });
 
 test('MarkdownParser using ParagraphDenester', () => {
@@ -456,6 +439,7 @@ test('MarkdownParser parses image links', () => {
 
 	// Parse
 	const ast = parser.parse(IMAGE_LINKS_MARKDOWN);
+	// debugAST('image-links', ast);
 
 	// Check result
 	expect(ast.type).toBe('document');

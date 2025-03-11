@@ -4,10 +4,12 @@ import {
 	YeastParser,
 	BlockParserPluginResult,
 	ListNode,
-	ListItemNode,
 	MockListItemNode,
 	YeastNodeFactory,
 	YeastBlockNodeTypes,
+	YeastChild,
+	isYeastNodeType,
+	ParagraphNode,
 } from 'yeast-core';
 
 const LIST_ITEM_REGEX = /^(\s*)([-*+]|\d+[.)])\s*(.+)\s*$/;
@@ -78,14 +80,23 @@ export class ListParserPlugin implements BlockParserPlugin {
 			// We're handling this line as a list item, so remove it
 			lines.shift();
 
-			//Add the item to the list
+			// Parse content as block, but strip paragraph container. The list item is the container.
+			let children: YeastChild[] = parser.parseBlock(match[3]);
+			if (
+				children.length === 1 &&
+				(isYeastNodeType(children[0], YeastBlockNodeTypes.Paragraph) || isYeastNodeType(children[0], YeastBlockNodeTypes.PseudoParagraph))
+			) {
+				children = (children[0] as ParagraphNode).children;
+			}
+
+			// Add the item to the list
 			const listItem = {
 				type: YeastBlockNodeTypes.ListItem,
 				level: parseIndentation(match[1]).indentation,
 				marker: match[2],
-				children: parser.parseInline(match[3]),
+				children,
 			} as MockListItemNode;
-			
+
 			if (!firstItemMarker) {
 				firstItemMarker = match[2];
 			}

@@ -360,16 +360,7 @@ export const IMAGE_LINKS_AST = {
 	type: 'document',
 	title: 'Platform API Client SDK - Java',
 	children: [
-		{
-			type: 'heading',
-			children: [
-				{
-					text: 'Resources',
-				},
-			],
-			level: 2,
-			id: 'resources',
-		},
+		{ type: 'heading', children: [{ text: 'Resources' }], level: 2, id: 'resources' },
 		{
 			type: 'paragraph',
 			children: [
@@ -390,20 +381,9 @@ export const IMAGE_LINKS_AST = {
 		{
 			type: 'paragraph',
 			children: [
-				{
-					text: 'Some ',
-				},
-				{
-					type: 'italic',
-					children: [
-						{
-							text: 'italics before',
-						},
-					],
-				},
-				{
-					text: ' the ',
-				},
+				{ text: 'Some ' },
+				{ type: 'italic', children: [{ text: 'italics before' }] },
+				{ text: ' the ' },
 				{
 					type: 'link',
 					children: [
@@ -417,35 +397,16 @@ export const IMAGE_LINKS_AST = {
 					href: 'https://github.com/MyPureCloud/platform-client-sdk-java/blob/master/releaseNotes.md',
 					title: 'link alt text here',
 				},
-				{
-					text: ' ',
-				},
-				{
-					type: 'bold',
-					children: [
-						{
-							text: 'bold after',
-						},
-					],
-				},
-				{
-					text: ' and ',
-				},
+				{ text: ' ' },
+				{ type: 'bold', children: [{ text: 'bold after' }] },
+				{ text: ' and ' },
 				{
 					type: 'link',
-					children: [
-						{
-							type: 'image',
-							src: 'https://genesys.com/fake/image.png',
-							title: 'Another Image',
-						},
-					],
+					children: [{ type: 'image', src: 'https://genesys.com/fake/image.png', title: 'Another Image' }],
 					href: 'https://genesys.com',
 					title: 'Goes to Genesys',
 				},
-				{
-					text: ' also inline.',
-				},
+				{ text: ' also inline.' },
 			],
 			indentation: 0,
 		},
@@ -455,55 +416,9 @@ export const IMAGE_LINKS_AST = {
 				{
 					type: 'listitem',
 					level: 0,
-					children: [
-						{
-							type: 'bold',
-							children: [
-								{
-									text: 'Documentation',
-								},
-							],
-						},
-						{
-							text: ' ',
-						},
-						{
-							type: 'link',
-							children: [
-								{
-									text: 'https://developer.genesys.cloud/devapps/sdk/docexplorer/purecloudjava/',
-								},
-							],
-							href: 'https://developer.genesys.cloud/devapps/sdk/docexplorer/purecloudjava/',
-						},
-					],
+					children: [{ text: '**Documentation** https://developer.genesys.cloud/devapps/sdk/docexplorer/purecloudjava/' }],
 				},
-				{
-					type: 'listitem',
-					level: 0,
-					children: [
-						{
-							type: 'bold',
-							children: [
-								{
-									text: 'Source',
-								},
-							],
-						},
-						{
-							text: ' ',
-						},
-						{
-							type: 'link',
-							children: [
-								{
-									text: 'https://github.com/MyPureCloud/platform-client-sdk-java',
-								},
-							],
-							href: 'https://github.com/MyPureCloud/platform-client-sdk-java',
-						},
-					],
-				},
+				{ type: 'listitem', level: 0, children: [{ text: '**Source** https://github.com/MyPureCloud/platform-client-sdk-java' }] },
 			],
 			ordered: false,
 			level: 0,
