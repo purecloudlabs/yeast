@@ -306,7 +306,7 @@ class InlineCodePlugin {
     }
 }
 
-const LINK_REGEX = /\[\s*([^\[\]]*?(?:\\.[^\[\]]*?)*?)\s*\]\(\s*(\S+)(?:\s+["']\s*(.*?)\s*["'])?\s*\)/gi;
+const LINK_REGEX = /\[\s*(.*?)\s*\]\(\s*(\S+)(?:\s+["']\s*(.*?)\s*["'])?\s*\)/gi;
 class InlineLinkPlugin {
     tokenize(text, parser) {
         const tokens = [];
