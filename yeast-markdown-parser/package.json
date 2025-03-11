@@ -1,6 +1,6 @@
 {
 	"name": "yeast-markdown-parser",
-	"version": "1.5.4",
+	"version": "1.5.5",
 	"description": "Parses markdown to yeAST (Yuri's Empathetic Arbitrary Syntax Tree) documents",
 	"exports": {
 		"require": "./src/index.ts",
