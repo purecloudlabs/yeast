@@ -13,6 +13,16 @@ This is not a link because it's not escaped: \\[brackets \\[inside\\] NOT links]
 Links with whitespace [ why do you do this   ](    #somewhere  ).
 
 and alt text [     lots more poor spacing   ](    #somewhere   "  goes to somewhere's special. '    ).
+
+[[unpaired bracket](whatever.md) [other unpaired bracket]](whatever.md)
+
+[unpaired [ bracket](whatever.md) ok [unpaired [nonsense] bracket](whatever.md)
+
+[[3]](citations/3)
+
+[this is not a link] (for real)
+
+this [link is]( malformed](notvalid.md) and will not parse in a useful way
 `;
 
 export const LINK_AST = {
@@ -215,6 +225,111 @@ export const LINK_AST = {
 				},
 				{
 					text: '.',
+				},
+			],
+			indentation: 0,
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					type: 'link',
+					children: [
+						{
+							text: '[unpaired bracket',
+						},
+					],
+					href: 'whatever.md',
+					title: 'Link',
+				},
+				{
+					text: ' ',
+				},
+				{
+					type: 'link',
+					children: [
+						{
+							text: 'other unpaired bracket]',
+						},
+					],
+					href: 'whatever.md',
+					title: 'Link',
+				},
+			],
+			indentation: 0,
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					type: 'link',
+					children: [
+						{
+							text: 'unpaired [ bracket',
+						},
+					],
+					href: 'whatever.md',
+					title: 'Link',
+				},
+				{
+					text: ' ok ',
+				},
+				{
+					type: 'link',
+					children: [
+						{
+							text: 'unpaired [nonsense] bracket',
+						},
+					],
+					href: 'whatever.md',
+					title: 'Link',
+				},
+			],
+			indentation: 0,
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					type: 'link',
+					children: [
+						{
+							text: '[3]',
+						},
+					],
+					href: 'citations/3',
+					title: 'Link',
+				},
+			],
+			indentation: 0,
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					text: '[this is not a link] (for real)',
+				},
+			],
+			indentation: 0,
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					text: 'this ',
+				},
+				{
+					type: 'link',
+					children: [
+						{
+							text: 'link is',
+						},
+					],
+					href: 'malformed](notvalid.md',
+					title: 'Link',
+				},
+				{
+					text: ' and will not parse in a useful way',
 				},
 			],
 			indentation: 0,

@@ -160,11 +160,16 @@ class ListParserPlugin {
                 continue;
             }
             lines.shift();
+            let children = parser.parse(match[3]).children;
+            if (children.length === 1 &&
+                (isYeastNodeType(children[0], YeastBlockNodeTypes.Paragraph) || isYeastNodeType(children[0], YeastBlockNodeTypes.PseudoParagraph))) {
+                children = children[0].children;
+            }
             const listItem = {
                 type: YeastBlockNodeTypes.ListItem,
                 level: parseIndentation(match[1]).indentation,
                 marker: match[2],
-                children: parser.parseInline(match[3]),
+                children,
             };
             if (!firstItemMarker) {
                 firstItemMarker = match[2];
@@ -306,7 +311,7 @@ class InlineCodePlugin {
     }
 }
 
-const LINK_REGEX = /\[\s*([^\[\]]*?(?:\\.[^\[\]]*?)*?)\s*\]\(\s*(\S+)(?:\s+["']\s*(.*?)\s*["'])?\s*\)/gi;
+const LINK_REGEX = /\[\s*(.*?)\s*\]\(\s*(\S+)(?:\s+["']\s*(.*?)\s*["'])?\s*\)/gi;
 class InlineLinkPlugin {
     tokenize(text, parser) {
         const tokens = [];
@@ -927,6 +932,8 @@ class ParagraphDenester {
     }
 }
 function denest(nodes) {
+    if (!nodes)
+        return nodes;
     let reprocess = false;
     do {
         reprocess = false;
