@@ -2,7 +2,7 @@ import { DocumentNode, isYeastTextNode, isYeastNode, YeastChild, YeastNode, Yeas
 import { MarkdownRenderer } from '../../MarkdownRenderer';
 import { GENERAL_DATA } from '../resources/GENERAL_DATA';
 import { TABLE_DATA } from '../resources/TABLE_DATA';
-import { LIST_DATA } from '../resources/LIST_DATA';
+import { EMPTY_ITEM_LIST, EMPTY_ITEM_LIST_RESULT, LIST_DATA } from '../resources/LIST_DATA';
 import { SIMPLE_TABLE_AST, SIMPLE_TABLE_MARKDOWN } from '../resources/SIMPLE_TABLE';
 import { INLINE_CODE_AST, INLINE_CODE_MARKDOWN } from '../resources/INLINE_CODE_DATA';
 import { UNDEFINED_DATA_AST, UNDEFINED_DATA_MARKDOWN } from '../resources/UNDEFINED_DATA';
@@ -171,4 +171,11 @@ test('undefined in required prop', () => {
 test('image alt element undefined', () => {
 	const markdownString = new MarkdownRenderer().renderMarkdown(IMAGE_DATA_AST as DocumentNode);
 	expect(markdownString.trim()).toEqual(IMAGE_DATA_MARKDOWN.trim());
+});
+
+test('empty list with space and no space should be same', async () => {
+	const markdownRenderer = new MarkdownRenderer();
+	const listAst = EMPTY_ITEM_LIST as DocumentNode;
+	const listMarkdown = markdownRenderer.renderComponents(listAst.children).join('\n');
+	expect(listMarkdown).toEqual(EMPTY_ITEM_LIST_RESULT);
 });
