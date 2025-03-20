@@ -132,7 +132,7 @@ export class MarkdownRenderer {
 			if (!!rendered) return rendered;
 
 			rendered = this.renderComponent(node, this.defaultRenderers);
-			if (rendered == '' || !!rendered) return rendered;
+			if (rendered === '' || !!rendered) return rendered;
 
 			if (!rendered && this.unhandledNodeRenderer) {
 				rendered = this.unhandledNodeRenderer(node, this);
