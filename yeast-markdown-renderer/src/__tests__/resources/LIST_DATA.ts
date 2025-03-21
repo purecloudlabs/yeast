@@ -74,3 +74,50 @@ export const LIST_DATA = {
 		},
 	],
 };
+
+export const EMPTY_ITEM_LIST = {
+	type: 'document',
+	title: 'Default Page Title',
+	children: [
+		{
+			type: 'list',
+			children: [
+				{
+					type: 'listitem',
+					level: 0,
+					children: [
+						{
+							text: 'item',
+						},
+					],
+				},
+				{
+					type: 'listitem',
+					level: 0,
+					children: [
+						{
+							text: ' ',
+						},
+					],
+				},
+				{
+					type: 'listitem',
+					level: 0,
+					children: [
+						{
+							text: '',
+						},
+					],
+				},
+			],
+			ordered: false,
+			level: 0,
+		},
+	],
+};
+
+export const EMPTY_ITEM_LIST_RESULT = `
+- item
+-  
+- 
+`;
