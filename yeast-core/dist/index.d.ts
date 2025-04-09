@@ -142,7 +142,6 @@ export interface TableRowNode extends YeastBlockNode {
 export interface TableCellNode extends YeastBlockNode {
     type: YeastBlockNodeTypes.TableCell;
     children: YeastChild[];
-    colspan?: number;
     align?: string;
 }
 export interface CalloutNode extends YeastBlockNode {
