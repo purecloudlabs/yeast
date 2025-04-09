@@ -399,7 +399,7 @@ function calculateSpaceDiff(oldString, newString, oldIdx, newIdx, oldWords, newW
         }
         return {
             spaceDiff: newNextBounds.wordStart - oldNextBounds.wordStart,
-            spaceDiffType
+            spaceDiffType,
         };
     }
     const isOutOfBounds = oldIdx >= oldWords.length && newIdx >= newWords.length;
@@ -418,7 +418,7 @@ function calculateSpaceDiff(oldString, newString, oldIdx, newIdx, oldWords, newW
         }
         return {
             spaceDiff: newDiff - oldDiff,
-            spaceDiffType
+            spaceDiffType,
         };
     }
     oldPrevBounds = getWordBoundaries(oldString, oldIdx - 1);
@@ -429,7 +429,7 @@ function calculateSpaceDiff(oldString, newString, oldIdx, newIdx, oldWords, newW
     newSpace = newNextBounds.wordStart - newPrevBounds.wordEnd;
     return {
         spaceDiff: newSpace - oldSpace,
-        spaceDiffType
+        spaceDiffType,
     };
 }
 function addSpaceMod(s, boundaries, idx, mods, diffSource, diffType) {
@@ -443,7 +443,7 @@ function addSpaceMod(s, boundaries, idx, mods, diffSource, diffType) {
         startIndex: startIndex,
         endIndex: endIndex,
         diffSource,
-        modSubtype: diffType
+        modSubtype: diffType,
     });
 }
 function addMod(s, words, wordPos, mods, boundaries, modSubtype, diffSource, spaceDiff, initSpaceDiff) {
@@ -466,7 +466,7 @@ function addMod(s, words, wordPos, mods, boundaries, modSubtype, diffSource, spa
         startIndex,
         endIndex,
         diffSource,
-        modSubtype
+        modSubtype,
     });
 }
 function getModificationData(_oldString, _newString) {
@@ -476,8 +476,8 @@ function getModificationData(_oldString, _newString) {
     const newMods = [];
     let oldIdx = 0;
     let newIdx = 0;
-    const oldWords = oldString.split(' ').filter(word => word);
-    const newWords = newString.split(' ').filter(word => word);
+    const oldWords = oldString.split(' ').filter((word) => word);
+    const newWords = newString.split(' ').filter((word) => word);
     while (oldIdx < oldWords.length && newIdx < newWords.length) {
         const oldBoundaries = getWordBoundaries(oldString, oldIdx);
         const newBoundaries = getWordBoundaries(newString, newIdx);
@@ -542,7 +542,7 @@ function getModificationData(_oldString, _newString) {
                 startIndex,
                 endIndex: oldString.length,
                 diffSource: DiffSource.Old,
-                modSubtype: DiffType.Removed
+                modSubtype: DiffType.Removed,
             });
         }
         isLast = oldIdx === oldWords.length - 1 && nextNewIndex < newWords.length;
@@ -561,7 +561,7 @@ function getModificationData(_oldString, _newString) {
                 startIndex,
                 endIndex: newString.length,
                 diffSource: DiffSource.New,
-                modSubtype: DiffType.Added
+                modSubtype: DiffType.Added,
             });
         }
         oldIdx = nextOldIndex;
@@ -576,7 +576,7 @@ function getModificationData(_oldString, _newString) {
                 startIndex: newLastBounds.wordEnd,
                 endIndex: newString.length,
                 diffSource: DiffSource.New,
-                modSubtype: DiffType.Added
+                modSubtype: DiffType.Added,
             });
         }
         else if (spaceDiffType === DiffType.Removed) {
@@ -584,7 +584,7 @@ function getModificationData(_oldString, _newString) {
                 startIndex: oldLastBounds.wordEnd,
                 endIndex: oldString.length,
                 diffSource: DiffSource.Old,
-                modSubtype: DiffType.Removed
+                modSubtype: DiffType.Removed,
             });
         }
         else {
@@ -592,13 +592,13 @@ function getModificationData(_oldString, _newString) {
                 startIndex: oldLastBounds.wordEnd,
                 endIndex: oldString.length,
                 diffSource: DiffSource.Old,
-                modSubtype: DiffType.Modified
+                modSubtype: DiffType.Modified,
             });
             newMods.push({
                 startIndex: newLastBounds.wordEnd,
                 endIndex: newString.length,
                 diffSource: DiffSource.New,
-                modSubtype: DiffType.Modified
+                modSubtype: DiffType.Modified,
             });
         }
     }
@@ -606,7 +606,7 @@ function getModificationData(_oldString, _newString) {
     const joinedNewMods = joinConsecutiveModData(newMods, newString, DiffSource.New);
     return {
         oldModData: joinedOldMods,
-        newModData: joinedNewMods
+        newModData: joinedNewMods,
     };
 }
 function joinConsecutiveModData(mods, s, diffSource) {
@@ -625,7 +625,7 @@ function joinConsecutiveModData(mods, s, diffSource) {
                     startIndex: joinedStart,
                     endIndex: joinedEnd,
                     diffSource,
-                    modSubtype: mods[i].modSubtype
+                    modSubtype: mods[i].modSubtype,
                 });
             }
             consecutiveCount++;
@@ -637,7 +637,7 @@ function joinConsecutiveModData(mods, s, diffSource) {
                 startIndex: joinedStart,
                 endIndex: joinedEnd,
                 diffSource,
-                modSubtype: mods[i - 1].modSubtype
+                modSubtype: mods[i - 1].modSubtype,
             });
             consecutiveCount = 1;
             if (i === mods.length - 1)
@@ -735,7 +735,7 @@ function getDiffData(oldIdx, newIdx, oldEntities, newEntities) {
         return {
             diffType: DiffType.Modified,
             nextOldIdx: oldIdx + 1,
-            nextNewIdx: newIdx + 1
+            nextNewIdx: newIdx + 1,
         };
     }
     if (!isLastNewEntity) {
@@ -779,12 +779,12 @@ function getDiffData(oldIdx, newIdx, oldEntities, newEntities) {
         return {
             diffType: DiffType.Modified,
             nextOldIdx: oldIdx + 1,
-            nextNewIdx: newIdx + 1
+            nextNewIdx: newIdx + 1,
         };
     }
-    const addedScoreMap = { 'added': addedScore };
-    const removedScoreMap = { 'removed': removedScore };
-    const modifiedScoreMap = { 'modified': modifiedScore };
+    const addedScoreMap = { added: addedScore };
+    const removedScoreMap = { removed: removedScore };
+    const modifiedScoreMap = { modified: modifiedScore };
     const scores = [addedScoreMap, removedScoreMap, modifiedScoreMap];
     const descendingScores = scores.sort((prev, next) => {
         const prevVal = prev[Object.keys(prev)[0]];
@@ -804,11 +804,11 @@ function getDiffData(oldIdx, newIdx, oldEntities, newEntities) {
     if (tiedScores.length > 1) {
         let containsModified = tiedScores.some((score) => {
             var _a;
-            return (_a = Object.keys(score)) === null || _a === void 0 ? void 0 : _a.some(k => k === 'modified');
+            return (_a = Object.keys(score)) === null || _a === void 0 ? void 0 : _a.some((k) => k === 'modified');
         });
         let containsAdded = tiedScores.some((score) => {
             var _a;
-            return (_a = Object.keys(score)) === null || _a === void 0 ? void 0 : _a.some(k => k === 'added');
+            return (_a = Object.keys(score)) === null || _a === void 0 ? void 0 : _a.some((k) => k === 'added');
         });
         if (containsModified) {
             return {
@@ -816,7 +816,7 @@ function getDiffData(oldIdx, newIdx, oldEntities, newEntities) {
                 nextOldIdx: nextOldIdxModified,
                 nextNewIdx: nextNewIdxModified,
                 oldMatchIdx: oldMatchIdxModified,
-                newMatchIdx: newMatchIdxModified
+                newMatchIdx: newMatchIdxModified,
             };
         }
         else if (containsAdded) {
@@ -825,7 +825,7 @@ function getDiffData(oldIdx, newIdx, oldEntities, newEntities) {
                 nextOldIdx: nextOldIdxAdded,
                 nextNewIdx: nextNewIdxAdded,
                 oldMatchIdx: oldMatchIdxAdded,
-                newMatchIdx: newMatchIdxAdded
+                newMatchIdx: newMatchIdxAdded,
             };
         }
         else {
@@ -834,7 +834,7 @@ function getDiffData(oldIdx, newIdx, oldEntities, newEntities) {
                 nextOldIdx: nextOldIdxRemoved,
                 nextNewIdx: nextNewIdxRemoved,
                 oldMatchIdx: oldMatchIdxRemoved,
-                newMatchIdx: newMatchIdxRemoved
+                newMatchIdx: newMatchIdxRemoved,
             };
         }
     }
@@ -845,7 +845,7 @@ function getDiffData(oldIdx, newIdx, oldEntities, newEntities) {
             nextOldIdx: nextOldIdxModified,
             nextNewIdx: nextNewIdxModified,
             oldMatchIdx: oldMatchIdxModified,
-            newMatchIdx: newMatchIdxModified
+            newMatchIdx: newMatchIdxModified,
         };
     }
     if (maxScoreKey === DiffType.Added) {
@@ -854,7 +854,7 @@ function getDiffData(oldIdx, newIdx, oldEntities, newEntities) {
             nextOldIdx: nextOldIdxAdded,
             nextNewIdx: nextNewIdxAdded,
             oldMatchIdx: oldMatchIdxAdded,
-            newMatchIdx: newMatchIdxAdded
+            newMatchIdx: newMatchIdxAdded,
         };
     }
     if (maxScoreKey === DiffType.Removed) {
@@ -863,13 +863,13 @@ function getDiffData(oldIdx, newIdx, oldEntities, newEntities) {
             nextOldIdx: nextOldIdxRemoved,
             nextNewIdx: nextNewIdxRemoved,
             oldMatchIdx: oldMatchIdxRemoved,
-            newMatchIdx: newMatchIdxRemoved
+            newMatchIdx: newMatchIdxRemoved,
         };
     }
     return {
         diffType: DiffType.Modified,
         nextOldIdx: oldIdx + 1,
-        nextNewIdx: newIdx + 1
+        nextNewIdx: newIdx + 1,
     };
 }
 function diffInner(oldNodes, newNodes) {
@@ -926,7 +926,7 @@ function diffInner(oldNodes, newNodes) {
                 const diffNode = Object.assign({}, oldNodes[i]);
                 diffNode.hasDiff = true;
                 diffNode.diffType = DiffType.Removed;
-                diffNode.children = updatedChildren;
+                diffNode.children = correctDiffChildren(oldNodes[i].children, DiffType.Removed);
                 diffNodes.push(diffNode);
             }
             break;
@@ -937,7 +937,7 @@ function diffInner(oldNodes, newNodes) {
                 const diffNode = Object.assign({}, newNodes[i]);
                 diffNode.hasDiff = true;
                 diffNode.diffType = DiffType.Added;
-                diffNode.children = updatedChildren;
+                diffNode.children = correctDiffChildren(newNodes[i].children, DiffType.Added);
                 diffNodes.push(diffNode);
             }
             break;
@@ -1010,12 +1010,8 @@ function diffInner(oldNodes, newNodes) {
                         const modAssignment = getModificationData(oldNode[prop], newNode[prop]);
                         modAssignment.newModData = (_a = modAssignment.newModData) === null || _a === void 0 ? void 0 : _a.map((md) => {
                             const updatedModData = Object.assign({}, md);
-                            updatedModData.startIndex = oldNode[prop]
-                                ? md.startIndex + oldNode[prop].length + 1
-                                : md.startIndex;
-                            updatedModData.endIndex = oldNode[prop]
-                                ? md.endIndex + oldNode[prop].length + 1
-                                : md.endIndex;
+                            updatedModData.startIndex = oldNode[prop] ? md.startIndex + oldNode[prop].length + 1 : md.startIndex;
+                            updatedModData.endIndex = oldNode[prop] ? md.endIndex + oldNode[prop].length + 1 : md.endIndex;
                             return updatedModData;
                         });
                         modData[prop] = modAssignment;
@@ -1104,7 +1100,7 @@ function isEntityMatch(oldEntity, newEntity, diffChildren) {
             return {
                 isMatch,
                 isTextModification: true,
-                textProperties: ['text']
+                textProperties: ['text'],
             };
         }
         return { isMatch: oldEntity.text === newEntity.text };
@@ -1292,12 +1288,8 @@ function diff(oldNode, newNode) {
                 const modAssignment = getModificationData(oldNode[prop], newNode[prop]);
                 modAssignment.newModData = (_a = modAssignment.newModData) === null || _a === void 0 ? void 0 : _a.map((md) => {
                     const updatedModData = Object.assign({}, md);
-                    updatedModData.startIndex = oldNode[prop]
-                        ? md.startIndex + oldNode[prop].length + 1
-                        : md.startIndex;
-                    updatedModData.endIndex = oldNode[prop]
-                        ? md.endIndex + oldNode[prop].length + 1
-                        : md.endIndex;
+                    updatedModData.startIndex = oldNode[prop] ? md.startIndex + oldNode[prop].length + 1 : md.startIndex;
+                    updatedModData.endIndex = oldNode[prop] ? md.endIndex + oldNode[prop].length + 1 : md.endIndex;
                     return updatedModData;
                 });
                 diffMods[prop] = modAssignment;

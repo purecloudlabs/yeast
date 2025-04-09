@@ -790,14 +790,14 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 				const diffNode: YeastNode = Object.assign({}, oldNodes[i]) as YeastNode;
 				diffNode.hasDiff = true;
 				diffNode.diffType = DiffType.Removed;
-				diffNode.children = updatedChildren;
+				diffNode.children = correctDiffChildren((oldNodes[i] as YeastNode).children as YeastNode[], DiffType.Removed);
 				diffNodes.push(diffNode);
 			}
 
 			break;
 		}
 
-		// If the old node index is out of bounds, the new node and all its successors have been removed.
+		// If the old node index is out of bounds, the new node and all its successors have been added.
 		if (!oldNodeExists && newNodeExists) {
 			updatedChildren = correctDiffChildren(newNode.children as YeastNode[], DiffType.Added);
 
@@ -805,7 +805,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 				const diffNode: YeastNode = Object.assign({}, newNodes[i] as YeastNode);
 				diffNode.hasDiff = true;
 				diffNode.diffType = DiffType.Added;
-				diffNode.children = updatedChildren;
+				diffNode.children = correctDiffChildren((newNodes[i] as YeastNode).children as YeastNode[], DiffType.Added);
 				diffNodes.push(diffNode);
 			}
 
