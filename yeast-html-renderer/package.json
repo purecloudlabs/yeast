@@ -1,0 +1,51 @@
+{
+	"name": "yeast-html-renderer",
+	"version": "0.1.0",
+	"description": "The yeast HTML renderer project provides a class to render yeast documents as HTML",
+	"exports": {
+		"require": "./src/index.ts",
+		"default": "./dist/index.js"
+	},
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist",
+		"src"
+	],
+	"type": "module",
+	"scripts": {
+		"snyk": "snyk test --file=package-lock.json --org=developer-engagement --severity-threshold=high --skip-unresolved=true",
+		"build": "rm -rf dist && rollup -c rollup.config.js && rm -rf dist/__tests__",
+		"test": "jest"
+	},
+	"author": "Genesys",
+	"license": "MIT",
+	"devDependencies": {
+		"@rollup/plugin-commonjs": "^21.0.3",
+		"@rollup/plugin-node-resolve": "^13.2.0",
+		"@types/jest": "^27.4.1",
+		"jest": "^27.5.1",
+		"prettier": "^2.6.2",
+		"rollup": "^2.70.1",
+		"rollup-plugin-peer-deps-external": "^2.2.4",
+		"rollup-plugin-typescript2": "^0.31.2",
+		"ts-jest": "^27.1.4",
+		"typescript": "^4.6.3"
+	},
+	"peerDependencies": {
+		"xmlbuilder2": "^3.0.2",
+		"yeast-core": "^1.1.0"
+	},
+	"jest": {
+		"preset": "ts-jest",
+		"testEnvironment": "node",
+		"transform": {
+			"^.+\\.ts?$": "ts-jest"
+		},
+		"transformIgnorePatterns": [
+			"/node_modules/(?!(genesys-react-components|genesys-dev-icons|yeast-core)/)"
+		],
+		"roots": [
+			"src/__tests__/tests"
+		]
+	}
+}
