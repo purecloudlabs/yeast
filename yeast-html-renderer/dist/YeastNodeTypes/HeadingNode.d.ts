@@ -1,4 +1,4 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { HeadingNode } from 'yeast-core';
-export default function renderHeadingNode(node: HeadingNode, renderer: HTMLRenderer): string;
+import { HTMLRenderer } from '../HTMLRenderer';
+export default function renderHeadingNode(node: HeadingNode, renderer: HTMLRenderer): HTMLElement;
 //# sourceMappingURL=HeadingNode.d.ts.map

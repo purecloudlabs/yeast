@@ -1,6 +1,14 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { TableRowNode } from 'yeast-core';
 
+import { HTMLRenderer } from '../HTMLRenderer';
+
 export default function renderTableRowNode(node: TableRowNode, renderer: HTMLRenderer) {
-	return `|${renderer.renderComponents(node.children).join('')}\n`;
+	// Create element for node
+	const element = renderer.document.createElement('tr');
+
+	// Render children
+	element.append(...renderer.renderComponents(node.children));
+
+	// Return element
+	return element;
 }

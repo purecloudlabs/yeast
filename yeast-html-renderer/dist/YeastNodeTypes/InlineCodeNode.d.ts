@@ -1,4 +1,4 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { InlineCodeNode } from 'yeast-core';
-export default function renderInlineCodeNode(node: InlineCodeNode, renderer: HTMLRenderer): string;
+import { HTMLRenderer } from '../HTMLRenderer';
+export default function renderInlineCodeNode(node: InlineCodeNode, renderer: HTMLRenderer): HTMLElement;
 //# sourceMappingURL=InlineCodeNode.d.ts.map

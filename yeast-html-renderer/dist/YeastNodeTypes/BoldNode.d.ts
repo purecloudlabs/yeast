@@ -1,4 +1,4 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { BoldNode } from 'yeast-core';
-export default function renderBoldNode(node: BoldNode, renderer: HTMLRenderer): string;
+import { HTMLRenderer } from '../HTMLRenderer';
+export default function renderBoldNode(node: BoldNode, renderer: HTMLRenderer): HTMLElement;
 //# sourceMappingURL=BoldNode.d.ts.map

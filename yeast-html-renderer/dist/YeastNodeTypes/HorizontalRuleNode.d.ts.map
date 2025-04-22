@@ -1,1 +1,1 @@
-{"version":3,"file":"HorizontalRuleNode.d.ts","sourceRoot":"","sources":["../../src/YeastNodeTypes/HorizontalRuleNode.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,OAAO,UAAU,wBAAwB,WAE/C"}
+{"version":3,"file":"HorizontalRuleNode.d.ts","sourceRoot":"","sources":["../../src/YeastNodeTypes/HorizontalRuleNode.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,kBAAkB,EAAE,MAAM,YAAY,CAAC;AAEhD,OAAO,EAAE,YAAY,EAAE,MAAM,iBAAiB,CAAC;AAE/C,MAAM,CAAC,OAAO,UAAU,wBAAwB,CAAC,IAAI,EAAE,kBAAkB,EAAE,QAAQ,EAAE,YAAY,GAAG,WAAW,CAM9G"}

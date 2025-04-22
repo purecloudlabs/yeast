@@ -23,6 +23,7 @@
 		"@rollup/plugin-commonjs": "^21.0.3",
 		"@rollup/plugin-node-resolve": "^13.2.0",
 		"@types/jest": "^27.4.1",
+		"@types/jsdom": "^21.1.7",
 		"jest": "^27.5.1",
 		"prettier": "^2.6.2",
 		"rollup": "^2.70.1",
@@ -32,9 +33,9 @@
 		"typescript": "^4.6.3"
 	},
 	"peerDependencies": {
+		"jsdom": "26.1.0",
 		"xmlbuilder2": "^3.0.2",
-		"yeast-core": "^1.1.0",
-		"jsdom": "26.1.0"
+		"yeast-core": "^1.1.0"
 	},
 	"jest": {
 		"preset": "ts-jest",

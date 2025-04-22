@@ -1,4 +1,4 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { ImageNode } from 'yeast-core';
-export default function renderImageNode(node: ImageNode, renderer: HTMLRenderer): string;
+import { HTMLRenderer } from '../HTMLRenderer';
+export default function renderImageNode(node: ImageNode, renderer: HTMLRenderer): HTMLImageElement;
 //# sourceMappingURL=ImageNode.d.ts.map

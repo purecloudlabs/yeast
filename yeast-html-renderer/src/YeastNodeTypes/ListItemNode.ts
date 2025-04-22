@@ -1,6 +1,14 @@
+import { ListItemNode } from 'yeast-core';
+
 import { HTMLRenderer } from '../HTMLRenderer';
-import { isYeastBlockNode, ListItemNode } from 'yeast-core';
 
 export default function renderListItemNode(node: ListItemNode, renderer: HTMLRenderer) {
-	return `${renderer.renderComponents(node.children).join('')}`;
+	// Create element for node
+	const element = renderer.document.createElement('li');
+
+	// Render children
+	element.append(...renderer.renderComponents(node.children));
+
+	// Return element
+	return element;
 }

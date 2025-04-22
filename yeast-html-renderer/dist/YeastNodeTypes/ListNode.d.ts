@@ -1,4 +1,4 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { ListNode } from 'yeast-core';
-export default function renderListNode(node: ListNode, renderer: HTMLRenderer): string;
+import { HTMLRenderer } from '../HTMLRenderer';
+export default function renderListNode(node: ListNode, renderer: HTMLRenderer): HTMLOListElement | HTMLUListElement;
 //# sourceMappingURL=ListNode.d.ts.map

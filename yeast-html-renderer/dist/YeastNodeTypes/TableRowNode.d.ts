@@ -1,4 +1,4 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { TableRowNode } from 'yeast-core';
-export default function renderTableRowNode(node: TableRowNode, renderer: HTMLRenderer): string;
+import { HTMLRenderer } from '../HTMLRenderer';
+export default function renderTableRowNode(node: TableRowNode, renderer: HTMLRenderer): HTMLTableRowElement;
 //# sourceMappingURL=TableRowNode.d.ts.map

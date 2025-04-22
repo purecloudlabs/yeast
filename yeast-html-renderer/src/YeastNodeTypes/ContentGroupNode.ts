@@ -1,6 +1,14 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { ContentGroupNode } from 'yeast-core';
 
+import { HTMLRenderer } from '../HTMLRenderer';
+
 export default function renderContentGroupNode(node: ContentGroupNode, renderer: HTMLRenderer) {
-	return `\n${renderer.renderComponents(node.children).join('').trim()}\n%%%\n`;
+	// Create element for node
+	const element = renderer.document.createElement('div');
+
+	// Render children
+	element.append(...renderer.renderComponents(node.children));
+
+	// Return element
+	return element;
 }

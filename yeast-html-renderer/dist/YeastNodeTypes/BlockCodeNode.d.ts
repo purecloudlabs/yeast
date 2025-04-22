@@ -1,4 +1,4 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { BlockCodeNode } from 'yeast-core';
-export default function renderBlockCodeNode(node: BlockCodeNode, renderer: HTMLRenderer): string;
+import { HTMLRenderer } from '../HTMLRenderer';
+export default function renderBlockCodeNode(node: BlockCodeNode, renderer: HTMLRenderer): HTMLDivElement;
 //# sourceMappingURL=BlockCodeNode.d.ts.map

@@ -1,4 +1,4 @@
-import { YeastChild, isYeastNode, isYeastTextNode, YeastNode, YeastText } from 'yeast-core';
+import { YeastChild, isYeastNode, isYeastTextNode, YeastNode } from 'yeast-core';
 import { fragment } from 'xmlbuilder2';
 import { XMLBuilder } from 'xmlbuilder2/lib/interfaces';
 

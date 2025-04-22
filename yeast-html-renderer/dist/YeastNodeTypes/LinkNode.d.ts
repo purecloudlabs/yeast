@@ -1,4 +1,4 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { LinkNode } from 'yeast-core';
-export default function renderLinkNode(node: LinkNode, renderer: HTMLRenderer): string;
+import { HTMLRenderer } from '../HTMLRenderer';
+export default function renderLinkNode(node: LinkNode, renderer: HTMLRenderer): HTMLAnchorElement;
 //# sourceMappingURL=LinkNode.d.ts.map

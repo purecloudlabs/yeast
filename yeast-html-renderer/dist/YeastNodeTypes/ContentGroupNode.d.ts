@@ -1,4 +1,4 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { ContentGroupNode } from 'yeast-core';
-export default function renderContentGroupNode(node: ContentGroupNode, renderer: HTMLRenderer): string;
+import { HTMLRenderer } from '../HTMLRenderer';
+export default function renderContentGroupNode(node: ContentGroupNode, renderer: HTMLRenderer): HTMLDivElement;
 //# sourceMappingURL=ContentGroupNode.d.ts.map

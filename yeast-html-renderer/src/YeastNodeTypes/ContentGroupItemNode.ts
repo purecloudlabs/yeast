@@ -1,9 +1,22 @@
-import { ContentGroupItemNode, ContentGroupType } from 'yeast-core';
+import { ContentGroupItemNode } from 'yeast-core';
+
 import { HTMLRenderer } from '../HTMLRenderer';
 
 export default function renderContentGroupItemNode(node: ContentGroupItemNode, renderer: HTMLRenderer) {
-	const jsonOptions = { title: node.title, type: node.groupType };
-	if (node.groupType && node.groupType === ContentGroupType.tabbedContent)
-		return `%%% ${node.title}\n${renderer.renderComponents(node.children).join('')}\n`;
-	return `%%% ${JSON.stringify(jsonOptions)}\n${renderer.renderComponents(node.children).join('')}\n`;
+	// Create element for node
+	const element = renderer.document.createElement('div');
+	if (node.title) {
+		const title = renderer.document.createElement('p');
+		title.textContent = node.title;
+		element.append(title);
+	}
+	if (node.groupType) {
+		element.classList.add(`content-group-${node.groupType}`);
+	}
+
+	// Render children
+	element.append(...renderer.renderComponents(node.children));
+
+	// Return element
+	return element;
 }

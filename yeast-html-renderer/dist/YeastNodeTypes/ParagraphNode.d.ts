@@ -1,4 +1,4 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { ParagraphNode } from 'yeast-core';
-export default function renderParagraphNode(node: ParagraphNode, renderer: HTMLRenderer): string;
+import { HTMLRenderer } from '../HTMLRenderer';
+export default function renderParagraphNode(node: ParagraphNode, renderer: HTMLRenderer): HTMLParagraphElement;
 //# sourceMappingURL=ParagraphNode.d.ts.map

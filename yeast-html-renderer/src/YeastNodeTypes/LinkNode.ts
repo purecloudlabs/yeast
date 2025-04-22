@@ -1,9 +1,17 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { LinkNode } from 'yeast-core';
 
+import { HTMLRenderer } from '../HTMLRenderer';
+
 export default function renderLinkNode(node: LinkNode, renderer: HTMLRenderer) {
-	if (node.title) {
-		return `[${renderer.renderComponents(node.children).join('')}](${node.href} "${node.title}")`;
-	}
-	return `[${renderer.renderComponents(node.children).join('')}](${node.href})`;
+	// Create element for node
+	const element = renderer.document.createElement('a');
+	element.href = node.href;
+	if (node.title) element.title = node.title;
+	if (node.forceNewTab) element.target = '_blank';
+
+	// Render children
+	element.append(...renderer.renderComponents(node.children));
+
+	// Return element
+	return element;
 }

@@ -1,4 +1,4 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { BlockquoteNode } from 'yeast-core';
-export default function renderBlockquoteNode(node: BlockquoteNode, renderer: HTMLRenderer): string;
+import { HTMLRenderer } from '../HTMLRenderer';
+export default function renderBlockquoteNode(node: BlockquoteNode, renderer: HTMLRenderer): HTMLQuoteElement;
 //# sourceMappingURL=BlockquoteNode.d.ts.map

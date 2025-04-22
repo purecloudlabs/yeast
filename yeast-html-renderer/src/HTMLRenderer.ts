@@ -7,6 +7,7 @@ import {
 	ContentGroupNode,
 	DocumentNode,
 	HeadingNode,
+	HorizontalRuleNode,
 	ImageNode,
 	InlineCodeNode,
 	isYeastNode,
@@ -25,7 +26,6 @@ import {
 	YeastChild,
 	YeastInlineNode,
 	YeastInlineNodeTypes,
-	YeastText,
 } from 'yeast-core';
 import { JSDOM } from 'jsdom';
 
@@ -67,60 +67,60 @@ export class HTMLRenderer {
 		[YeastInlineNodeTypes.Bold]: (node: BoldNode, renderer: HTMLRenderer) => {
 			return renderBoldNode(node, renderer);
 		},
-		// [YeastInlineNodeTypes.Code]: (node: InlineCodeNode, renderer: HTMLRenderer) => {
-		// 	return renderInlineCodeNode(node, renderer);
-		// },
-		// [YeastInlineNodeTypes.Italic]: (node: ItalicNode, renderer: HTMLRenderer) => {
-		// 	return renderItalicNode(node, renderer);
-		// },
-		// [YeastInlineNodeTypes.Link]: (node: LinkNode, renderer: HTMLRenderer) => {
-		// 	return renderLinkNode(node, renderer);
-		// },
-		// [YeastInlineNodeTypes.Strikethrough]: (node: StrikethroughNode, renderer: HTMLRenderer) => {
-		// 	return renderStrikethroughode(node, renderer);
-		// },
-		// [YeastBlockNodeTypes.Paragraph]: (node: ParagraphNode, renderer: HTMLRenderer) => {
-		// 	return renderParagraphNode(node, renderer);
-		// },
-		// [YeastBlockNodeTypes.Blockquote]: (node: BlockquoteNode, renderer: HTMLRenderer) => {
-		// 	return renderBlockquoteNode(node, renderer);
-		// },
-		// [YeastBlockNodeTypes.Callout]: (node: CalloutNode, renderer: HTMLRenderer) => {
-		// 	return renderCalloutNode(node, renderer);
-		// },
-		// [YeastBlockNodeTypes.Code]: (node: BlockCodeNode, renderer: HTMLRenderer) => {
-		// 	return renderBlockCodeNode(node, renderer);
-		// },
-		// [YeastBlockNodeTypes.ContentGroup]: (node: ContentGroupNode, renderer: HTMLRenderer) => {
-		// 	return renderContentGroupNode(node, renderer);
-		// },
-		// [YeastBlockNodeTypes.ContentGroupItem]: (node: ContentGroupItemNode, renderer: HTMLRenderer) => {
-		// 	return renderContentGroupItemNode(node, renderer);
-		// },
+		[YeastInlineNodeTypes.Code]: (node: InlineCodeNode, renderer: HTMLRenderer) => {
+			return renderInlineCodeNode(node, renderer);
+		},
+		[YeastInlineNodeTypes.Italic]: (node: ItalicNode, renderer: HTMLRenderer) => {
+			return renderItalicNode(node, renderer);
+		},
+		[YeastInlineNodeTypes.Link]: (node: LinkNode, renderer: HTMLRenderer) => {
+			return renderLinkNode(node, renderer);
+		},
+		[YeastInlineNodeTypes.Strikethrough]: (node: StrikethroughNode, renderer: HTMLRenderer) => {
+			return renderStrikethroughode(node, renderer);
+		},
+		[YeastBlockNodeTypes.Paragraph]: (node: ParagraphNode, renderer: HTMLRenderer) => {
+			return renderParagraphNode(node, renderer);
+		},
+		[YeastBlockNodeTypes.Blockquote]: (node: BlockquoteNode, renderer: HTMLRenderer) => {
+			return renderBlockquoteNode(node, renderer);
+		},
+		[YeastBlockNodeTypes.Callout]: (node: CalloutNode, renderer: HTMLRenderer) => {
+			return renderCalloutNode(node, renderer);
+		},
+		[YeastBlockNodeTypes.Code]: (node: BlockCodeNode, renderer: HTMLRenderer) => {
+			return renderBlockCodeNode(node, renderer);
+		},
+		[YeastBlockNodeTypes.ContentGroup]: (node: ContentGroupNode, renderer: HTMLRenderer) => {
+			return renderContentGroupNode(node, renderer);
+		},
+		[YeastBlockNodeTypes.ContentGroupItem]: (node: ContentGroupItemNode, renderer: HTMLRenderer) => {
+			return renderContentGroupItemNode(node, renderer);
+		},
 		[YeastBlockNodeTypes.Heading]: (node: HeadingNode, renderer: HTMLRenderer) => {
 			return renderHeadingNode(node, renderer);
 		},
-		// [YeastBlockNodeTypes.HorizontalRule]: () => {
-		// 	return renderHorizontalRuleNode();
-		// },
-		// [YeastInlineNodeTypes.Image]: (node: ImageNode, renderer: HTMLRenderer) => {
-		// 	return renderImageNode(node, renderer);
-		// },
-		// [YeastBlockNodeTypes.List]: (node: ListNode, renderer: HTMLRenderer) => {
-		// 	return renderListNode(node, renderer);
-		// },
-		// [YeastBlockNodeTypes.ListItem]: (node: ListItemNode, renderer: HTMLRenderer) => {
-		// 	return renderListItemNode(node, renderer);
-		// },
-		// [YeastBlockNodeTypes.Table]: (node: TableNode, renderer: HTMLRenderer) => {
-		// 	return renderTableNode(node, renderer);
-		// },
-		// [YeastBlockNodeTypes.TableRow]: (node: TableRowNode, renderer: HTMLRenderer) => {
-		// 	return renderTableRowNode(node, renderer);
-		// },
-		// [YeastBlockNodeTypes.TableCell]: (node: TableCellNode, renderer: HTMLRenderer) => {
-		// 	return renderTableCellNode(node, renderer);
-		// },
+		[YeastBlockNodeTypes.HorizontalRule]: (node: HorizontalRuleNode, renderer: HTMLRenderer) => {
+			return renderHorizontalRuleNode(node, renderer);
+		},
+		[YeastInlineNodeTypes.Image]: (node: ImageNode, renderer: HTMLRenderer) => {
+			return renderImageNode(node, renderer);
+		},
+		[YeastBlockNodeTypes.List]: (node: ListNode, renderer: HTMLRenderer) => {
+			return renderListNode(node, renderer);
+		},
+		[YeastBlockNodeTypes.ListItem]: (node: ListItemNode, renderer: HTMLRenderer) => {
+			return renderListItemNode(node, renderer);
+		},
+		[YeastBlockNodeTypes.Table]: (node: TableNode, renderer: HTMLRenderer) => {
+			return renderTableNode(node, renderer);
+		},
+		[YeastBlockNodeTypes.TableRow]: (node: TableRowNode, renderer: HTMLRenderer) => {
+			return renderTableRowNode(node, renderer);
+		},
+		[YeastBlockNodeTypes.TableCell]: (node: TableCellNode, renderer: HTMLRenderer) => {
+			return renderTableCellNode(node, renderer);
+		},
 	};
 	customRenderers?: NodeRendererMap;
 	unhandledNodeRenderer?: NodeRendererPlugin;
@@ -147,7 +147,8 @@ export class HTMLRenderer {
 				if (isYeastTextNode(node) && !isYeastNode(node)) {
 					return node.text;
 				} else {
-					return renderCustomComponent(node, this); //return custom component
+					// Fallback to rendering the unhandled node as a custom component (dumps the yeast XML in a code fence)
+					return renderCustomComponent(node, this);
 				}
 			}
 		});

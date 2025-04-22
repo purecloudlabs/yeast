@@ -1,9 +1,13 @@
-import { isYeastNode, isYeastTextNode, ContentGroupType, YeastBlockNodeTypes, isYeastInlineNode, YeastInlineNodeTypes } from 'yeast-core';
+import { isYeastNode, isYeastTextNode, scrapeText, YeastInlineNodeTypes, YeastBlockNodeTypes } from 'yeast-core';
+import { JSDOM } from 'jsdom';
 import { fragment } from 'xmlbuilder2';
 
-function renderCustomComponent(node) {
+function renderCustomComponent(node, renderer) {
     if (!isYeastNode(node) && !isYeastTextNode(node))
         return;
+    const codeElement = renderer.document.createElement('code');
+    const preElement = renderer.document.createElement('pre');
+    preElement.appendChild(codeElement);
     const root = fragment();
     const buildTree = (node, parent) => {
         if (!node)
@@ -27,290 +31,189 @@ function renderCustomComponent(node) {
         }
     };
     buildTree(node, root);
-    return `\n${root.end({ prettyPrint: true })}\n`;
+    codeElement.textContent = root.end({ prettyPrint: true });
+    return preElement;
 }
 
-const LITERAL_BACKTICK_REGEX = /((?:^|\n+)(?:\t+|\s+)*)(`{3})/gi;
-const LITERAL_TILDE_REGEX = /((?:^|\n+)(?:\t+|\s+)*)(~{3})/gi;
 function renderBlockCodeNode(node, renderer) {
-    const jsonOptions = {
-        title: node.title,
-        language: node.language,
-        autocollapse: node.autoCollapse,
-        noCollapse: node.noCollapse,
-        tabsToSpaces: node.tabsToSpaces,
-        showLineNumbers: node.showLineNumbers,
-    };
-    const backtickEscapedVal = node.value.replace(LITERAL_BACKTICK_REGEX, '$1\\$2');
-    const tildeEscapedVal = backtickEscapedVal.replace(LITERAL_TILDE_REGEX, '$1\\$2');
-    const children = tildeEscapedVal.split('\n');
-    let finalVal = '';
-    const indentation = '\t';
-    children.forEach((child, index) => {
-        if (index !== children.length - 1)
-            finalVal += `${indentation.repeat(node.indentation)}${child}\n`;
-        else if (index === children.length - 1 && child.length !== 0)
-            finalVal += `${indentation.repeat(node.indentation)}${child}`;
-    });
-    const hasOptions = Object.keys(node).some((key) => node[key] !== undefined && key !== 'language' && key !== 'type' && key !== 'value' && key !== 'indentation');
-    if (!hasOptions)
-        return `\n${indentation.repeat(node.indentation)}\`\`\`${node.language}\n${finalVal}\n${indentation.repeat(node.indentation)}\`\`\`\n`;
-    return `\n${indentation.repeat(node.indentation)}\`\`\`${JSON.stringify(jsonOptions)}\n${tildeEscapedVal}\n${indentation.repeat(node.indentation)}\`\`\`\n`;
+    const element = renderer.document.createElement('div');
+    if (node.title) {
+        const title = renderer.document.createElement('p');
+        title.textContent = node.title;
+        element.append(title);
+    }
+    const codeElement = renderer.document.createElement('code');
+    const preElement = renderer.document.createElement('pre');
+    preElement.appendChild(codeElement);
+    element.appendChild(preElement);
+    if (node.language) {
+        codeElement.classList.add(`language-${node.language}`);
+    }
+    codeElement.append(node.value);
+    return element;
 }
 
 function renderBlockquoteNode(node, renderer) {
-    let blockQuoteItems = node.children
-        .map((item) => {
-        return `${renderer.renderComponents([item]).join('')}`;
-    })
-        .join('')
-        .trim();
-    let children = blockQuoteItems.split('\n');
-    let blockQuoteString = '';
-    for (let index = 0; index < children.length; index++) {
-        if (index == children.length - 1) {
-            blockQuoteString += `> ${children[index]}`;
-        }
-        else
-            blockQuoteString += `> ${children[index]}\n`;
-    }
-    return `\n${blockQuoteString}\n`;
+    const element = renderer.document.createElement('blockquote');
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 function renderBoldNode(node, renderer) {
-    return `**${renderer.renderComponents(node.children).join('').trim()}**`;
+    const element = renderer.document.createElement('strong');
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 function renderCalloutNode(node, renderer) {
-    const jsonOption = { alert: node.alertType, title: node.title, collapsible: node.collapsible, autoCollapse: node.autoCollapse };
-    const hasOptions = Object.keys(node).some((key) => node[key] !== undefined && key !== 'alertType' && key !== 'type' && key !== 'children' && key !== 'indentation');
-    const children = renderer.renderComponents(node.children).join('').trim().split('\n');
-    let finalVal = '';
-    const indentation = '\t';
-    children.forEach((child, index) => {
-        if (index !== children.length - 1)
-            finalVal += `${indentation.repeat(node.indentation)}${child}\n`;
-        else if (index === children.length - 1 && child.length !== 0)
-            finalVal += `${indentation.repeat(node.indentation)}${child}`;
-    });
-    if (!hasOptions)
-        return `\n${indentation.repeat(node.indentation)}:::${node.alertType}\n${finalVal}\n${indentation.repeat(node.indentation)}:::\n`;
-    return `\n${indentation.repeat(node.indentation)}:::${JSON.stringify(jsonOption)}\n${finalVal}\n${indentation.repeat(node.indentation)}:::\n`;
+    const element = renderer.document.createElement('div');
+    element.classList.add('callout');
+    if (node.alertType)
+        element.classList.add(`callout-${node.alertType}`);
+    if (node.title) {
+        const title = renderer.document.createElement('p');
+        title.textContent = node.title;
+        element.append(title);
+    }
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 function renderContentGroupItemNode(node, renderer) {
-    const jsonOptions = { title: node.title, type: node.groupType };
-    if (node.groupType && node.groupType === ContentGroupType.tabbedContent)
-        return `%%% ${node.title}\n${renderer.renderComponents(node.children).join('')}\n`;
-    return `%%% ${JSON.stringify(jsonOptions)}\n${renderer.renderComponents(node.children).join('')}\n`;
+    const element = renderer.document.createElement('div');
+    if (node.title) {
+        const title = renderer.document.createElement('p');
+        title.textContent = node.title;
+        element.append(title);
+    }
+    if (node.groupType) {
+        element.classList.add(`content-group-${node.groupType}`);
+    }
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 function renderContentGroupNode(node, renderer) {
-    return `\n${renderer.renderComponents(node.children).join('').trim()}\n%%%\n`;
+    const element = renderer.document.createElement('div');
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 function renderHeadingNode(node, renderer) {
-    const content = renderer.renderComponents(node.children).join('').replace(/#/g, `\\#`);
-    switch (node.level) {
-        case 1: {
-            return `\n# ${content} \n`;
-        }
-        case 2: {
-            return `\n## ${content} \n`;
-        }
-        case 3: {
-            return `\n### ${content} \n`;
-        }
-        case 4: {
-            return `\n#### ${content} \n`;
-        }
-        case 5: {
-            return `\n##### ${content} \n`;
-        }
-        case 6: {
-            return `\n###### ${content} \n`;
-        }
-        case 7: {
-            return `\n####### ${content} \n`;
-        }
+    let level = node.level;
+    if (!level || isNaN(level)) {
+        level = 1;
     }
+    else {
+        if (level < 1)
+            level = 1;
+        if (level > 7)
+            level = 7;
+    }
+    const element = renderer.document.createElement(level === 7 ? 'span' : `h${level}`);
+    if (level === 7)
+        element.className = 'h7';
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
-function renderHorizontalRuleNode() {
-    return `\n\n --- \n\n`;
+function renderHorizontalRuleNode(node, renderer) {
+    const element = renderer.document.createElement('hr');
+    return element;
 }
 
 function renderImageNode(node, renderer) {
-    return `![${node.title || ''}](${node.src} "${node.alt || ''}")`;
+    const element = renderer.document.createElement('img');
+    if (node.title)
+        element.title = node.title;
+    if (node.alt)
+        element.alt = node.alt;
+    element.src = node.src;
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 function renderInlineCodeNode(node, renderer) {
-    const scrapeText = (node) => {
-        let s = '';
-        if (Array.isArray(node.children))
-            s += node.children.map(scrapeText).join();
-        if (node.text)
-            s += node.text;
-        return s;
-    };
-    let marker = '`';
-    if (scrapeText(node).includes('`'))
-        marker = '``';
-    return `${marker}${renderer.renderComponents(node.children).join('')}${marker}`;
+    const element = renderer.document.createElement('code');
+    element.append(scrapeText(node));
+    return element;
 }
 
 function renderItalicNode(node, renderer) {
-    return `*${renderer.renderComponents(node.children).join('')}*`;
+    const element = renderer.document.createElement('i');
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 function renderLinkNode(node, renderer) {
-    if (node.title) {
-        return `[${renderer.renderComponents(node.children).join('')}](${node.href} "${node.title}")`;
-    }
-    return `[${renderer.renderComponents(node.children).join('')}](${node.href})`;
+    const element = renderer.document.createElement('a');
+    element.href = node.href;
+    if (node.title)
+        element.title = node.title;
+    if (node.forceNewTab)
+        element.target = '_blank';
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 function renderListItemNode(node, renderer) {
-    return `${renderer.renderComponents(node.children).join('')}`;
+    const element = renderer.document.createElement('li');
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 function renderListNode(node, renderer) {
-    let indentation = '\t';
-    let level = node.level !== undefined ? node.level : 0;
-    if (node.ordered) {
-        let orderedItems = node.children.map((item, index) => {
-            if (item.type === 'list')
-                return renderer.renderComponents([item]);
-            return `${indentation.repeat(level)}${node.start !== undefined ? node.start + index : 1}. ${renderer
-                .renderComponents([item])
-                .join('')}\n`;
-        });
-        if (level > 0)
-            return orderedItems.join('');
-        return `\n${orderedItems.join('')}`;
-    }
-    let items = node.children.map((item) => {
-        if (item.type === 'list')
-            return renderer.renderComponents([item]);
-        return `${indentation.repeat(level)}- ${renderer.renderComponents([item]).join()}\n`;
-    });
-    if (level > 0)
-        return items.join('');
-    return `\n${items.join('')}`;
+    const element = renderer.document.createElement(node.ordered ? 'ol' : 'ul');
+    if (node.ordered && node.start)
+        element.setAttribute('start', node.start.toString());
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 function renderParagraphNode(node, renderer) {
-    const children = renderer.renderComponents(node.children).join('').split('\n');
-    let finalString = '';
-    const indentation = '\t';
-    children.forEach((child, index) => {
-        if (index !== children.length - 1)
-            finalString += `${indentation.repeat(node.indentation)}${child}\n`;
-        else if (index === children.length - 1 && child.length !== 0)
-            finalString += `${indentation.repeat(node.indentation)}${child}`;
-    });
-    return `\n${finalString}\n`;
+    const element = renderer.document.createElement('p');
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 function renderStrikethroughode(node, renderer) {
-    return `~~${renderer.renderComponents(node.children).join('').replace(/~/g, `\\~`)}~~`;
+    const element = renderer.document.createElement('s');
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 function renderTableCellNode(node, renderer) {
-    const isYeastNodeType = (node, type) => {
-        return node.hasOwnProperty('type') && node.type.toLowerCase() === type.toLowerCase();
-    };
-    let children = node.children;
-    if (children.length === 1 && isYeastNodeType(children[0], YeastBlockNodeTypes.Paragraph)) {
-        children = children[0].children;
-    }
-    return ` ${renderer.renderComponents(children).join('').replace(/\|/g, `\\|`)} |`;
+    const element = renderer.document.createElement('td');
+    if (node.align)
+        element.style.textAlign = node.align;
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 function renderTableNode(node, renderer) {
-    const isInlineOnly = (nodes) => {
-        return !nodes.some((node) => !isYeastInlineNode(node) && !isYeastTextNode(node));
-    };
-    const isYeastNodeType = (node, type) => {
-        return node.hasOwnProperty('type') && node.type.toLowerCase() === type.toLowerCase();
-    };
-    const isComplexTable = node.children.some((row) => {
-        return row.children.some((cell) => {
-            if (cell.children.length === 1 && isYeastNodeType(cell.children[0], YeastBlockNodeTypes.Paragraph)) {
-                const paragraphNode = cell.children[0];
-                return !isInlineOnly(paragraphNode.children);
-            }
-            else {
-                return !isInlineOnly(cell.children);
-            }
-        });
-    });
-    if (isComplexTable)
-        return renderCustomComponent(node);
-    let alignStr = '|';
-    if (node.align) {
-        for (const alignChar of node.align.split('|')) {
-            if (alignChar == 'R') {
-                alignStr += ' ---: |';
-            }
-            else if (alignChar == 'L') {
-                alignStr += ' :--- |';
-            }
-            else {
-                alignStr += ' :---: |';
-            }
-        }
-        const diff = node.children[0].children.length - node.align.split('|').length;
-        if (diff > 0) {
-            for (let index = diff; index < node.align.split('|').length; index++) {
-                alignStr += ' :---: |';
-            }
-        }
+    const element = renderer.document.createElement('table');
+    let headerOffset = 0;
+    if (node.children.length > 1 && node.children[0].header) {
+        headerOffset = 1;
+        const header = renderer.document.createElement('thead');
+        header.append(...renderer.renderComponents([node.children[0]]));
+        element.append(header);
     }
-    else {
-        for (let index = 0; index < node.children[0].children.length; index++) {
-            alignStr += ' :---: |';
-        }
-    }
-    if (node.children[0].header) {
-        const indentation = '\t';
-        const headerChildren = renderer.renderComponents([node.children[0]]).join('').split('\n');
-        let headerVal = '';
-        headerChildren.forEach((child) => {
-            if (child.trim().length > 0) {
-                headerVal += `${indentation.repeat(node.indentation)}${child}\n`;
-            }
-        });
-        headerVal += `${indentation.repeat(node.indentation)}${alignStr}\n`;
-        let finalVal = '';
-        const children = renderer.renderComponents(node.children.slice(1)).join('').split('\n');
-        children.forEach((child, index) => {
-            if (index !== children.length - 1)
-                finalVal += `${indentation.repeat(node.indentation)}${child}\n`;
-            else if (index === children.length - 1 && child.length !== 0)
-                finalVal += `${indentation.repeat(node.indentation)}${child}`;
-        });
-        return `\n${headerVal}${finalVal}`;
-    }
-    else {
-        const indentation = '\t';
-        let finalVal = `${indentation.repeat(node.indentation)}${alignStr}\n`;
-        const children = renderer.renderComponents(node.children).join('').split('\n');
-        children.forEach((child) => {
-            if (child.trim().length > 0) {
-                finalVal += `${indentation.repeat(node.indentation)}${child}\n`;
-            }
-        });
-        return `\n${finalVal}`;
-    }
+    const body = renderer.document.createElement('tbody');
+    element.append(body);
+    body.append(...renderer.renderComponents(node.children.slice(headerOffset)));
+    return element;
 }
 
 function renderTableRowNode(node, renderer) {
-    return `|${renderer.renderComponents(node.children).join('')}\n`;
+    const element = renderer.document.createElement('tr');
+    element.append(...renderer.renderComponents(node.children));
+    return element;
 }
 
 class HTMLRenderer {
     constructor(customRenderers) {
+        this.document = new JSDOM(`...`).window.document;
         this.defaultRenderers = {
             [YeastInlineNodeTypes.Bold]: (node, renderer) => {
                 return renderBoldNode(node, renderer);
@@ -337,7 +240,7 @@ class HTMLRenderer {
                 return renderCalloutNode(node, renderer);
             },
             [YeastBlockNodeTypes.Code]: (node, renderer) => {
-                return renderBlockCodeNode(node);
+                return renderBlockCodeNode(node, renderer);
             },
             [YeastBlockNodeTypes.ContentGroup]: (node, renderer) => {
                 return renderContentGroupNode(node, renderer);
@@ -348,11 +251,11 @@ class HTMLRenderer {
             [YeastBlockNodeTypes.Heading]: (node, renderer) => {
                 return renderHeadingNode(node, renderer);
             },
-            [YeastBlockNodeTypes.HorizontalRule]: () => {
-                return renderHorizontalRuleNode();
+            [YeastBlockNodeTypes.HorizontalRule]: (node, renderer) => {
+                return renderHorizontalRuleNode(node, renderer);
             },
             [YeastInlineNodeTypes.Image]: (node, renderer) => {
-                return renderImageNode(node);
+                return renderImageNode(node, renderer);
             },
             [YeastBlockNodeTypes.List]: (node, renderer) => {
                 return renderListNode(node, renderer);
@@ -380,7 +283,7 @@ class HTMLRenderer {
             if (!!rendered)
                 return rendered;
             rendered = this.renderComponent(node, this.defaultRenderers);
-            if (rendered === '' || !!rendered)
+            if (!!rendered)
                 return rendered;
             if (!rendered && this.unhandledNodeRenderer) {
                 rendered = this.unhandledNodeRenderer(node, this);
@@ -389,12 +292,10 @@ class HTMLRenderer {
             }
             if (!rendered) {
                 if (isYeastTextNode(node) && !isYeastNode(node)) {
-                    const typedNode = node;
-                    return typedNode.text;
+                    return node.text;
                 }
                 else {
-                    console.log('Unhandled node', node);
-                    return renderCustomComponent(node);
+                    return renderCustomComponent(node, this);
                 }
             }
         });
@@ -406,27 +307,24 @@ class HTMLRenderer {
             return;
         const typedNode = node;
         typedNode.children = typedNode.children || [];
-        let markdownString;
+        let nodeElement;
+        const htmlRenderer = this;
         Object.entries(renderers).some(([nodeType, plugin]) => {
             if (typedNode.type === nodeType) {
-                markdownString = plugin(node, this);
+                nodeElement = plugin(node, htmlRenderer);
             }
-            return !!markdownString;
+            return !!nodeElement;
         });
-        return markdownString;
+        return nodeElement;
     }
     renderHTML(astDocument) {
-        let documentChildren = this.renderComponents(astDocument.children).join('');
-        let documentInfo = '---\n';
-        Object.entries(astDocument).forEach(([key, value]) => {
-            if (key !== 'children' && key !== 'type') {
-                documentInfo += `${key}: ${value}\n`;
-            }
-        });
-        documentInfo += '---\n';
-        let markdownVal = '';
-        markdownVal += documentInfo + documentChildren;
-        return markdownVal;
+        let documentChildren = this.renderComponents(astDocument.children);
+        return documentChildren;
+    }
+    renderHTMLString(astDocument) {
+        return this.renderHTML(astDocument)
+            .map((element) => (typeof element === 'string' ? element : element.outerHTML))
+            .join('\n');
     }
 }
 

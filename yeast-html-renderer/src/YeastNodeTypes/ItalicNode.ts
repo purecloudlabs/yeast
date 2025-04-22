@@ -1,6 +1,14 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { ItalicNode } from 'yeast-core';
 
+import { HTMLRenderer } from '../HTMLRenderer';
+
 export default function renderItalicNode(node: ItalicNode, renderer: HTMLRenderer) {
-	return `*${renderer.renderComponents(node.children).join('')}*`;
+	// Create element for node
+	const element = renderer.document.createElement('i');
+
+	// Render children
+	element.append(...renderer.renderComponents(node.children));
+
+	// Return element
+	return element;
 }
