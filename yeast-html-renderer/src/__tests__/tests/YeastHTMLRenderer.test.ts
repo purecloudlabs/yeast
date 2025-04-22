@@ -1,6 +1,6 @@
 import { DocumentNode, isYeastTextNode, isYeastNode, YeastChild, YeastNode, YeastText } from 'yeast-core';
 import { HTMLRenderer } from '../../HTMLRenderer';
-import { GENERAL_DATA } from '../resources/GENERAL_DATA';
+import { GENERAL_DATA, GENERAL_DATA_STRING } from '../resources/GENERAL_DATA';
 import { TABLE_DATA } from '../resources/TABLE_DATA';
 import { EMPTY_ITEM_LIST, EMPTY_ITEM_LIST_RESULT, LIST_DATA } from '../resources/LIST_DATA';
 import { SIMPLE_TABLE_AST, SIMPLE_TABLE_MARKDOWN } from '../resources/SIMPLE_TABLE';
@@ -9,173 +9,175 @@ import { UNDEFINED_DATA_AST, UNDEFINED_DATA_MARKDOWN } from '../resources/UNDEFI
 import { IMAGE_DATA_AST, IMAGE_DATA_MARKDOWN } from '../resources/IMAGE_DATA';
 
 test('testing  bold  node', () => {
-	const boldRegex = /\*\*testing bold\*\*/gi;
-	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
-	expect(markdownString.match(boldRegex).length).toBe(1);
+	const elements = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
+	console.log(elements);
+	const htmlString = new HTMLRenderer().renderHTMLString(GENERAL_DATA as DocumentNode);
+	console.log(htmlString);
+	expect(htmlString).toBe(GENERAL_DATA_STRING);
 });
 
-test('expecting inlinecode node', () => {
-	const regex = /`console.log\('code'\)`/g;
-	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
-	expect(markdownString.match(regex).length).toBe(1);
-});
+// test('expecting inlinecode node', () => {
+// 	const regex = /`console.log\('code'\)`/g;
+// 	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
+// 	expect(markdownString.match(regex).length).toBe(1);
+// });
 
-test('expecting link node', () => {
-	const regex = /[^!]\[(.+?)\]\((.+?)\)/gi;
-	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
-	expect(markdownString.match(regex).length).toBe(1);
-});
+// test('expecting link node', () => {
+// 	const regex = /[^!]\[(.+?)\]\((.+?)\)/gi;
+// 	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
+// 	expect(markdownString.match(regex).length).toBe(1);
+// });
 
-test('expecting strikethrough node', () => {
-	const regex = /~~strikethroughContent~~/gi;
-	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
-	expect(markdownString.match(regex).length).toBe(1);
-});
+// test('expecting strikethrough node', () => {
+// 	const regex = /~~strikethroughContent~~/gi;
+// 	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
+// 	expect(markdownString.match(regex).length).toBe(1);
+// });
 
-//Testing Block types
-test('expecting block code node', () => {
-	const regex = /`{3,}(.*)\n([\s\S]+?\n)\s*`{3,}\n/gi;
-	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
-	expect(markdownString.match(regex).length).toBe(1);
-});
+// //Testing Block types
+// test('expecting block code node', () => {
+// 	const regex = /`{3,}(.*)\n([\s\S]+?\n)\s*`{3,}\n/gi;
+// 	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
+// 	expect(markdownString.match(regex).length).toBe(1);
+// });
 
-test('expecting callout type', () => {
-	const regex = /:{3,}(.*)\n([\s\S]+?\n)\s*:{3,}\n/gi;
-	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
-	expect(markdownString.match(regex).length).toBe(2);
-});
+// test('expecting callout type', () => {
+// 	const regex = /:{3,}(.*)\n([\s\S]+?\n)\s*:{3,}\n/gi;
+// 	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
+// 	expect(markdownString.match(regex).length).toBe(2);
+// });
 
-test('expecting image node', () => {
-	const regex = /!\[(.+?)\]\((.+?)\)/gi;
-	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
-	expect(markdownString.match(regex).length).toBe(1);
-});
+// test('expecting image node', () => {
+// 	const regex = /!\[(.+?)\]\((.+?)\)/gi;
+// 	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
+// 	expect(markdownString.match(regex).length).toBe(1);
+// });
 
-test('expecting list node', () => {
-	const regex = /(\d\.( .{3,}))|(-( .{3,}))/gi;
-	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
-	expect(markdownString.match(regex).length).toBe(6);
-});
+// test('expecting list node', () => {
+// 	const regex = /(\d\.( .{3,}))|(-( .{3,}))/gi;
+// 	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
+// 	expect(markdownString.match(regex).length).toBe(6);
+// });
 
-test('expecting heading node', () => {
-	const regex = /(#{1,7} .+)/gi;
-	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
+// test('expecting heading node', () => {
+// 	const regex = /(#{1,7} .+)/gi;
+// 	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
 
-	expect(markdownString.match(regex).length).toBe(7);
-});
+// 	expect(markdownString.match(regex).length).toBe(7);
+// });
 
-test('expecting custom component', () => {
-	const markdownString = new HTMLRenderer().renderHTML(TABLE_DATA as DocumentNode);
-	const regex = /(<yeast:.*>)dx-ui-text bro(<\/yeast:.*>)/g;
-	expect(markdownString.match(regex).length).toBe(1);
-});
+// test('expecting custom component', () => {
+// 	const markdownString = new HTMLRenderer().renderHTML(TABLE_DATA as DocumentNode);
+// 	const regex = /(<yeast:.*>)dx-ui-text bro(<\/yeast:.*>)/g;
+// 	expect(markdownString.match(regex).length).toBe(1);
+// });
 
-test('table node with header', () => {
-	const markdownString = new HTMLRenderer().renderHTML(TABLE_DATA as DocumentNode);
-	const headerRegex = /\| :--- \| ---: \|/g;
-	const centerRegex = /\| :---: /g;
-	expect(markdownString.match(headerRegex).length).toBe(1);
-	expect(markdownString.match(centerRegex).length).toBe(3);
-});
+// test('table node with header', () => {
+// 	const markdownString = new HTMLRenderer().renderHTML(TABLE_DATA as DocumentNode);
+// 	const headerRegex = /\| :--- \| ---: \|/g;
+// 	const centerRegex = /\| :---: /g;
+// 	expect(markdownString.match(headerRegex).length).toBe(1);
+// 	expect(markdownString.match(centerRegex).length).toBe(3);
+// });
 
-test('special characters in certain nodes', () => {
-	const data = {
-		type: 'document',
-		title: 'Testing Paragraph type in blockquote',
-		author: 'yuri.yetina',
-		children: [
-			{
-				type: 'heading',
-				level: 1,
-				children: [{ text: '##heading node 1' }],
-			},
-			{
-				type: 'strikethrough',
-				children: [{ text: 'strikethrough ~node 1' }],
-			},
-			{
-				type: 'italic',
-				children: [{ text: 'italic **node 1' }],
-			},
-			{
-				type: 'italic',
-				children: [
-					{
-						type: 'bold',
-						children: [
-							{
-								text: 'bold in italic',
-							},
-						],
-					},
-				],
-			},
-			{
-				type: 'table',
-				align: 'L|R',
-				children: [
-					{
-						type: 'tablerow',
-						header: true,
-						children: [
-							{ type: 'tablecell', children: [{ text: 'names' }] },
-							{ type: 'tablecell', children: [{ text: 'use a | pipe character to | define the cells' }] },
-						],
-					},
-					{
-						type: 'tablerow',
-						children: [
-							{ type: 'tablecell', children: [{ text: 'yeti' }] },
-							{ type: 'tablecell', children: [{ text: 'genesys' }] },
-						],
-					},
-				],
-			},
-		],
-	};
-	const markdownString = new HTMLRenderer().renderHTML(data as DocumentNode);
-	const regex = /\\~/g;
-	expect(markdownString.match(regex).length).toBe(1);
-});
+// test('special characters in certain nodes', () => {
+// 	const data = {
+// 		type: 'document',
+// 		title: 'Testing Paragraph type in blockquote',
+// 		author: 'yuri.yetina',
+// 		children: [
+// 			{
+// 				type: 'heading',
+// 				level: 1,
+// 				children: [{ text: '##heading node 1' }],
+// 			},
+// 			{
+// 				type: 'strikethrough',
+// 				children: [{ text: 'strikethrough ~node 1' }],
+// 			},
+// 			{
+// 				type: 'italic',
+// 				children: [{ text: 'italic **node 1' }],
+// 			},
+// 			{
+// 				type: 'italic',
+// 				children: [
+// 					{
+// 						type: 'bold',
+// 						children: [
+// 							{
+// 								text: 'bold in italic',
+// 							},
+// 						],
+// 					},
+// 				],
+// 			},
+// 			{
+// 				type: 'table',
+// 				align: 'L|R',
+// 				children: [
+// 					{
+// 						type: 'tablerow',
+// 						header: true,
+// 						children: [
+// 							{ type: 'tablecell', children: [{ text: 'names' }] },
+// 							{ type: 'tablecell', children: [{ text: 'use a | pipe character to | define the cells' }] },
+// 						],
+// 					},
+// 					{
+// 						type: 'tablerow',
+// 						children: [
+// 							{ type: 'tablecell', children: [{ text: 'yeti' }] },
+// 							{ type: 'tablecell', children: [{ text: 'genesys' }] },
+// 						],
+// 					},
+// 				],
+// 			},
+// 		],
+// 	};
+// 	const markdownString = new HTMLRenderer().renderHTML(data as DocumentNode);
+// 	const regex = /\\~/g;
+// 	expect(markdownString.match(regex).length).toBe(1);
+// });
 
-test('contentgroup titles rendered as json', () => {
-	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
-	const match = markdownString.match(/{"title":"test accordion","type":"accordion"}/gi);
-	expect(match).not.toBeNull();
-	expect(match.length).toBe(1);
-});
+// test('contentgroup titles rendered as json', () => {
+// 	const markdownString = new HTMLRenderer().renderHTML(GENERAL_DATA as DocumentNode);
+// 	const match = markdownString.match(/{"title":"test accordion","type":"accordion"}/gi);
+// 	expect(match).not.toBeNull();
+// 	expect(match.length).toBe(1);
+// });
 
-test('nested lists rendering accurately', () => {
-	const markdownString = new HTMLRenderer().renderHTML(LIST_DATA as DocumentNode);
-	const firstItemRegex = /(.*(?:first item).*)/g;
-	const nestedItemRegex = /(.*(?:first subsecond).*)/g;
-	const nestedDiff = markdownString.match(nestedItemRegex)[0].indexOf('-') - markdownString.match(firstItemRegex)[0].indexOf('-');
-	expect(nestedDiff).toBe(1);
-});
+// test('nested lists rendering accurately', () => {
+// 	const markdownString = new HTMLRenderer().renderHTML(LIST_DATA as DocumentNode);
+// 	const firstItemRegex = /(.*(?:first item).*)/g;
+// 	const nestedItemRegex = /(.*(?:first subsecond).*)/g;
+// 	const nestedDiff = markdownString.match(nestedItemRegex)[0].indexOf('-') - markdownString.match(firstItemRegex)[0].indexOf('-');
+// 	expect(nestedDiff).toBe(1);
+// });
 
-test('a simple table renders simply', () => {
-	const markdownString = new HTMLRenderer().renderHTML(SIMPLE_TABLE_AST as DocumentNode);
-	expect(markdownString).toEqual(SIMPLE_TABLE_MARKDOWN);
-});
+// test('a simple table renders simply', () => {
+// 	const markdownString = new HTMLRenderer().renderHTML(SIMPLE_TABLE_AST as DocumentNode);
+// 	expect(markdownString).toEqual(SIMPLE_TABLE_MARKDOWN);
+// });
 
-test('inline code simple and escaped syntax', () => {
-	const markdownString = new HTMLRenderer().renderHTML(INLINE_CODE_AST as DocumentNode);
-	expect(markdownString).toEqual(INLINE_CODE_MARKDOWN);
-});
+// test('inline code simple and escaped syntax', () => {
+// 	const markdownString = new HTMLRenderer().renderHTML(INLINE_CODE_AST as DocumentNode);
+// 	expect(markdownString).toEqual(INLINE_CODE_MARKDOWN);
+// });
 
-test('undefined in required prop', () => {
-	const markdownString = new HTMLRenderer().renderHTML(UNDEFINED_DATA_AST as DocumentNode);
-	expect(markdownString.trim()).toEqual(UNDEFINED_DATA_MARKDOWN.trim());
-});
+// test('undefined in required prop', () => {
+// 	const markdownString = new HTMLRenderer().renderHTML(UNDEFINED_DATA_AST as DocumentNode);
+// 	expect(markdownString.trim()).toEqual(UNDEFINED_DATA_MARKDOWN.trim());
+// });
 
-test('image alt element undefined', () => {
-	const markdownString = new HTMLRenderer().renderHTML(IMAGE_DATA_AST as DocumentNode);
-	expect(markdownString.trim()).toEqual(IMAGE_DATA_MARKDOWN.trim());
-});
+// test('image alt element undefined', () => {
+// 	const markdownString = new HTMLRenderer().renderHTML(IMAGE_DATA_AST as DocumentNode);
+// 	expect(markdownString.trim()).toEqual(IMAGE_DATA_MARKDOWN.trim());
+// });
 
-test('empty list with space and no space should be same', async () => {
-	const renderer = new HTMLRenderer();
-	const listAst = EMPTY_ITEM_LIST as DocumentNode;
-	const listMarkdown = renderer.renderComponents(listAst.children).join('\n');
-	expect(listMarkdown).toEqual(EMPTY_ITEM_LIST_RESULT);
-});
+// test('empty list with space and no space should be same', async () => {
+// 	const renderer = new HTMLRenderer();
+// 	const listAst = EMPTY_ITEM_LIST as DocumentNode;
+// 	const listMarkdown = renderer.renderComponents(listAst.children).join('\n');
+// 	expect(listMarkdown).toEqual(EMPTY_ITEM_LIST_RESULT);
+// });

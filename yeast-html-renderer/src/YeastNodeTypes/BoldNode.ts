@@ -1,6 +1,14 @@
-import { HTMLRenderer } from '../HTMLRenderer';
 import { BoldNode } from 'yeast-core';
 
-export default function renderBoldNode(node: BoldNode, renderer: HTMLRenderer) {
-	return `**${renderer.renderComponents(node.children).join('').trim()}**`;
+import { HTMLRenderer } from '../HTMLRenderer';
+
+export default function renderBoldNode(node: BoldNode, renderer: HTMLRenderer): HTMLElement {
+	// Create element for node
+	const element = renderer.document.createElement('strong');
+
+	// Render children
+	element.append(...renderer.renderComponents(node.children));
+
+	// Return element
+	return element;
 }

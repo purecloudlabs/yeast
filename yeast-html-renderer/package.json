@@ -33,7 +33,8 @@
 	},
 	"peerDependencies": {
 		"xmlbuilder2": "^3.0.2",
-		"yeast-core": "^1.1.0"
+		"yeast-core": "^1.1.0",
+		"jsdom": "26.1.0"
 	},
 	"jest": {
 		"preset": "ts-jest",

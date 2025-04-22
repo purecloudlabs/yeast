@@ -1,230 +1,478 @@
 export const GENERAL_DATA = {
 	type: 'document',
-	title: "A page's title",
-	className: 'main--container',
+	title: 'Default Page Title',
 	children: [
 		{
-			type: 'paragraph',
-			indentation: 0,
+			type: 'heading',
 			children: [
 				{
-					text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi auctor est eget mollis pharetra. In pretium sagittis lectus, vitae commodo eros varius et. Curabitur aliquet, justo et maximus interdum, ex tortor vehicula erat, et varius nibh dolor ac velit. Pellentesque ultrices sapien vitae ante euismod, vel luctus orci blandit. Phasellus vel nibh a elit faucibus efficitur nec ac sapien. Pellentesque nec iaculis tellus. Proin elit augue, dapibus a neque a, condimentum fermentum est.',
+					text: 'Main Heading',
 				},
 			],
-		},
-		{
-			type: 'heading',
 			level: 1,
-			id: 'level-1-heading',
-			children: [{ text: 'A level 1 heading' }],
+			id: 'main-heading',
 		},
 		{
 			type: 'heading',
-			level: 2,
-			id: 'level-2-heading',
-			children: [{ text: 'A level 2 heading' }],
-		},
-		{
-			type: 'heading',
-			level: 3,
-			id: 'level-3-heading',
-			children: [{ text: 'A level 3 heading' }],
-		},
-		{
-			type: 'heading',
-			level: 4,
-			id: 'level-4-heading',
-			children: [{ text: 'A level 4 heading' }],
-		},
-		{
-			type: 'heading',
-			level: 5,
-			id: 'level-5-heading',
-			children: [{ text: 'A level 5 heading' }],
-		},
-		{
-			type: 'heading',
-			level: 6,
-			id: 'level-6-heading',
-			children: [{ text: 'A level 6 heading' }],
-		},
-		{
-			type: 'heading',
-			level: 7,
-			id: 'level-7-heading',
-			children: [{ text: 'A level 7 heading' }],
-		},
-		{
-			type: 'list',
 			children: [
 				{
-					type: 'listitem',
-					children: [{ text: 'list item 1' }],
+					text: 'Second Level Heading',
 				},
-				{
-					type: 'listitem',
-					children: [{ text: 'list item 2' }],
-				},
-				{
-					type: 'listitem',
-					children: [{ text: 'list item 3' }],
-				},
-				,
 			],
+			level: 2,
+			id: 'second-level-heading',
+		},
+		{
+			type: 'heading',
+			children: [
+				{
+					text: 'Third Level Heading',
+				},
+			],
+			level: 3,
+			id: 'third-level-heading',
+		},
+		{
+			type: 'heading',
+			children: [
+				{
+					text: 'Fourth Level Heading',
+				},
+			],
+			level: 4,
+			id: 'fourth-level-heading',
+		},
+		{
+			type: 'heading',
+			children: [
+				{
+					text: 'Fifth Level Heading',
+				},
+			],
+			level: 5,
+			id: 'fifth-level-heading',
+		},
+		{
+			type: 'heading',
+			children: [
+				{
+					text: 'Sixth Level Heading',
+				},
+			],
+			level: 6,
+			id: 'sixth-level-heading',
+		},
+		{
+			type: 'heading',
+			children: [
+				{
+					text: 'Seventh Level Heading',
+				},
+			],
+			level: 7,
+			id: 'seventh-level-heading',
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					text: 'This is a paragraph with ',
+				},
+				{
+					type: 'bold',
+					children: [
+						{
+							text: 'bold text',
+						},
+					],
+				},
+				{
+					text: ', ',
+				},
+				{
+					type: 'italic',
+					children: [
+						{
+							text: 'italic text',
+						},
+					],
+				},
+				{
+					text: ', and ',
+				},
+				{
+					type: 'bold',
+					children: [
+						{
+							type: 'italic',
+							children: [
+								{
+									text: 'bold italic',
+								},
+							],
+						},
+					],
+				},
+				{
+					text: ' text.',
+				},
+			],
+			indentation: 0,
 		},
 		{
 			type: 'list',
-			ordered: true,
-			start: 1,
 			children: [
 				{
 					type: 'listitem',
-					children: [{ text: 'ordered list item 1' }],
+					level: 0,
+					children: [
+						{
+							text: 'Unordered list item 1',
+						},
+					],
 				},
 				{
 					type: 'listitem',
-					children: [{ text: 'ordered list item 2' }],
+					level: 0,
+					children: [
+						{
+							text: 'Unordered list item 2',
+						},
+					],
+				},
+				{
+					type: 'list',
+					children: [
+						{
+							type: 'listitem',
+							level: 1,
+							children: [
+								{
+									text: 'Nested list item',
+								},
+							],
+						},
+						{
+							type: 'listitem',
+							level: 1,
+							children: [
+								{
+									text: 'Another nested item',
+								},
+							],
+						},
+					],
+					ordered: false,
+					level: 1,
 				},
 				{
 					type: 'listitem',
-					children: [{ text: 'ordered list item 3' }],
+					level: 0,
+					children: [
+						{
+							text: 'Ordered list item 1',
+						},
+					],
 				},
-				,
+				{
+					type: 'listitem',
+					level: 0,
+					children: [
+						{
+							text: 'Ordered list item 2',
+						},
+					],
+				},
+				{
+					type: 'list',
+					children: [
+						{
+							type: 'listitem',
+							level: 1,
+							children: [
+								{
+									text: 'Nested ordered item',
+								},
+							],
+						},
+						{
+							type: 'listitem',
+							level: 1,
+							children: [
+								{
+									text: 'Another nested item',
+								},
+							],
+						},
+					],
+					ordered: true,
+					level: 1,
+				},
+			],
+			ordered: false,
+			level: 0,
+		},
+		{
+			type: 'blockquote',
+			children: [
+				{
+					type: 'paragraph',
+					children: [
+						{
+							text: 'This is a blockquote It can span multiple lines',
+						},
+					],
+					indentation: 0,
+				},
 			],
 		},
 		{
 			type: 'code',
-			language: 'java',
-			indentation: 2,
-			value: "```\n// Code goes here\nString str = \"my string\";\n```",
+			children: [],
+			value: '// This is a code block\nfunction hello(name: string) {\n    console.log(`Hello, ${name}!`);\n}',
+			language: 'typescript',
+			indentation: 0,
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					text: 'This is an ',
+				},
+				{
+					type: 'inlinecode',
+					children: [
+						{
+							text: 'inline code',
+						},
+					],
+				},
+				{
+					text: ' example.',
+				},
+			],
+			indentation: 0,
 		},
 		{
 			type: 'callout',
-			title: 'Test warning',
-			alertType: 'warning',
-			indentation: 0,
 			children: [
-				{ type: 'paragraph', children: [{ text: 'warning you' }] },
-				{ type: 'paragraph', children: [{ text: 'warning you 2' }] },
+				{
+					type: 'paragraph',
+					children: [
+						{
+							text: 'This is a ',
+						},
+						{
+							type: 'italic',
+							children: [
+								{
+									text: 'callout',
+								},
+							],
+						},
+						{
+							text: '.',
+						},
+					],
+					indentation: 0,
+				},
+				{
+					type: 'paragraph',
+					children: [
+						{
+							text: 'With a second line of text.',
+						},
+					],
+					indentation: 0,
+				},
 			],
+			alertType: 'info',
+			indentation: 0,
 		},
 		{
-			type: 'callout',
-			alertType: 'primary',
-			indentation: 1,
-			children: [
-				{ type: 'paragraph', children: [{ text: 'primary warning you' }] },
-				{ type: 'paragraph', children: [{ text: 'primary warning you 2' }] },
-			],
+			type: 'horizontalrule',
 		},
-
+		{
+			type: 'paragraph',
+			children: [
+				{
+					text: 'This is ',
+				},
+				{
+					type: 'link',
+					children: [
+						{
+							text: 'Link text',
+						},
+					],
+					href: 'https://example.com',
+					title: 'Link',
+				},
+				{
+					text: ' to go somewhere.',
+				},
+			],
+			indentation: 0,
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					type: 'image',
+					src: 'https://example.com/image.jpg',
+					title: 'Image alt text',
+				},
+			],
+			indentation: 0,
+		},
 		{
 			type: 'table',
+			children: [
+				{
+					type: 'tablerow',
+					children: [
+						{
+							type: 'tablecell',
+							children: [
+								{
+									type: 'paragraph',
+									children: [
+										{
+											text: 'Table Header 1',
+										},
+									],
+									indentation: 0,
+								},
+							],
+							align: 'left',
+						},
+						{
+							type: 'tablecell',
+							children: [
+								{
+									type: 'paragraph',
+									children: [
+										{
+											text: 'Table Header 2',
+										},
+									],
+									indentation: 0,
+								},
+							],
+							align: 'left',
+						},
+					],
+					header: true,
+				},
+				{
+					type: 'tablerow',
+					children: [
+						{
+							type: 'tablecell',
+							children: [
+								{
+									type: 'paragraph',
+									children: [
+										{
+											text: 'Row 1 Cell 1',
+										},
+									],
+									indentation: 0,
+								},
+							],
+							align: 'left',
+						},
+						{
+							type: 'tablecell',
+							children: [
+								{
+									type: 'paragraph',
+									children: [
+										{
+											text: 'Row 1 Cell 2',
+										},
+									],
+									indentation: 0,
+								},
+							],
+							align: 'left',
+						},
+					],
+				},
+				{
+					type: 'tablerow',
+					children: [
+						{
+							type: 'tablecell',
+							children: [
+								{
+									type: 'paragraph',
+									children: [
+										{
+											text: 'Row 2 Cell 1',
+										},
+									],
+									indentation: 0,
+								},
+							],
+							align: 'left',
+						},
+						{
+							type: 'tablecell',
+							children: [
+								{
+									type: 'paragraph',
+									children: [
+										{
+											text: 'Row 2 Cell 2',
+										},
+									],
+									indentation: 0,
+								},
+							],
+							align: 'left',
+						},
+					],
+				},
+			],
 			indentation: 0,
+			align: 'L|L',
+		},
+		{
+			type: 'paragraph',
 			children: [
 				{
-					type: 'tablerow',
-					header: true,
+					type: 'strikethrough',
 					children: [
-						{ type: 'tablecell', children: [{ text: 'names' }] },
-						{ type: 'tablecell', children: [{ text: 'org' }] },
+						{
+							text: '~Strikethrough text',
+						},
 					],
 				},
 				{
-					type: 'tablerow',
-					children: [
-						{ type: 'tablecell', children: [{ text: 'yeti' }] },
-						{ type: 'tablecell', children: [{ text: 'genesys' }] },
-					],
+					text: '~',
 				},
 			],
-		},
-		{
-			type: 'table',
-			indentation: 1,
-			children: [
-				{
-					type: 'tablerow',
-					header: true,
-					children: [
-						{ type: 'tablecell', children: [{ text: 'yeti names' }] },
-						{ type: 'tablecell', children: [{ text: 'yeti orgs' }] },
-						{ type: 'tablecell', children: [{ text: 'yeti org number' }] },
-					],
-				},
-				{
-					type: 'tablerow',
-					children: [
-						{ type: 'tablecell', children: [{ text: 'yetina' }] },
-						{ type: 'tablecell', children: [{ text: 'genesys' }] },
-						{ type: 'tablecell', children: [{ text: '0009' }] },
-					],
-				},
-			],
-		},
-		{
-			type: 'inlinecode',
-			children: [{ text: "console.log('code')" }],
-		},
-		{
-			type: 'link',
-			href: 'https://developer.genesys.cloud/',
-			title: 'dev center',
-			children: [{ text: 'this is dev center' }],
-		},
-		{ type: 'bold', children: [{ text: 'testing bold' }] },
-		{ type: 'italic', children: [{ text: 'testing italic' }] },
-		{
-			type: 'blockquote',
-			children: [{ text: 'blockquote paragraph 1' }],
-		},
-		{
-			type: 'contentgroup',
-			groupType: 'accordion',
-			children: [
-				{
-					type: 'contentgroupitem',
-					groupType: 'accordion',
-					title: 'test accordion',
-					children: [{ text: 'i am accordion' }],
-				},
-				{
-					type: 'contentgroupitem',
-					groupType: 'accordion',
-					title: 'accordion 2 text',
-					children: [{ text: 'i am accordion 2' }],
-				},
-			],
-		},
-		{
-			type: 'contentgroup',
-			groupType: 'tabbedcontent',
-			children: [
-				{
-					type: 'contentgroupitem',
-					groupType: 'tabbedcontent',
-					title: 'test tabbedcontent',
-					children: [{ text: 'i am tabbedcontent' }],
-				},
-				{
-					type: 'contentgroupitem',
-					groupType: 'tabbedcontent',
-					title: 'test tabbedcontent 2',
-					children: [{ text: 'i am tabbedcontent 2' }],
-				},
-			],
-		},
-		{
-			type: 'strikethrough',
-			children: [{ text: 'strikethroughContent' }],
-		},
-		{
-			type: 'image',
-			src: 'https://i.postimg.cc/1zrNF4sT/images.jpg',
-			alt: 'animated boy with white hair',
-			title: 'killua',
+			indentation: 0,
 		},
 	],
-	author: 'yuri.yeti',
-	customDataOne: 'The first value',
 };
+
+export const GENERAL_DATA_STRING = `<h1>Main Heading</h1>
+<h2>Second Level Heading</h2>
+<h3>Third Level Heading</h3>
+<h4>Fourth Level Heading</h4>
+<h5>Fifth Level Heading</h5>
+<h6>Sixth Level Heading</h6>
+<span class="h7">Seventh Level Heading</span>
+UNHANDLED: paragraph
+UNHANDLED: list
+UNHANDLED: blockquote
+UNHANDLED: code
+UNHANDLED: paragraph
+UNHANDLED: callout
+UNHANDLED: horizontalrule
+UNHANDLED: paragraph
+UNHANDLED: paragraph
+UNHANDLED: table
+UNHANDLED: paragraph`;

@@ -1,9 +1,15 @@
-import { YeastChild, isYeastNode, isYeastTextNode, YeastNode } from 'yeast-core';
+import { YeastChild, isYeastNode, isYeastTextNode, YeastNode, YeastText } from 'yeast-core';
 import { fragment } from 'xmlbuilder2';
 import { XMLBuilder } from 'xmlbuilder2/lib/interfaces';
 
-export default function renderCustomComponent(node: YeastChild): string {
+import { HTMLRenderer, RenderedNode } from '../HTMLRenderer';
+
+export default function renderCustomComponent(node: YeastChild, renderer: HTMLRenderer): RenderedNode {
 	if (!isYeastNode(node) && !isYeastTextNode(node)) return;
+	const codeElement = renderer.document.createElement('code');
+	const preElement = renderer.document.createElement('pre');
+	preElement.appendChild(codeElement);
+
 	const root = fragment();
 
 	const buildTree = (node: YeastChild, parent: XMLBuilder) => {
@@ -31,5 +37,8 @@ export default function renderCustomComponent(node: YeastChild): string {
 	};
 
 	buildTree(node, root);
-	return `\n${root.end({ prettyPrint: true })}\n`;
+
+	codeElement.textContent = root.end({ prettyPrint: true });
+
+	return preElement;
 }
