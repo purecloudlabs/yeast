@@ -475,7 +475,7 @@ function ListNodeRenderer(props) {
     const key = useKey();
     const diffRenderData = getDiffRenderData(props.node);
     let className = diffRenderData ? diffRenderData.diffClass : '';
-    if (props.node.start && props.node.start > 0) {
+    if (props.node.ordered) {
         return (React.createElement("ol", { key: key.current, start: props.node.start || 1, className: className }, props.renderer.renderComponents(props.node.children)));
     }
     else {
