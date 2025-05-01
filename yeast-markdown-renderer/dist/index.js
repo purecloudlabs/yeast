@@ -181,7 +181,7 @@ function renderListNode(node, renderer) {
         let orderedItems = node.children.map((item, index) => {
             if (item.type === 'list')
                 return renderer.renderComponents([item]);
-            return `${indentation.repeat(level)}${node.start !== undefined ? node.start + index : index}. ${renderer
+            return `${indentation.repeat(level)}${node.start !== undefined ? node.start + index : index + 1}. ${renderer
                 .renderComponents([item])
                 .join('')}\n`;
         });
