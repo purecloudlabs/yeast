@@ -6,3 +6,4 @@ app/
 .npmrc
 
 debug/
+local/
