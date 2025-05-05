@@ -17,7 +17,7 @@ export default function ListNodeRenderer(props: IProps) {
 	const diffRenderData: DiffRenderData = getDiffRenderData(props.node);
 	let className: string = diffRenderData ? diffRenderData.diffClass : '';
 
-	if (props.node.start && props.node.start > 0) {
+	if (props.node.ordered) {
 		return (
 			<ol key={key.current} start={props.node.start || 1} className={className}>
 				{props.renderer.renderComponents(props.node.children)}

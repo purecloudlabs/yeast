@@ -181,7 +181,7 @@ function renderListNode(node, renderer) {
         let orderedItems = node.children.map((item, index) => {
             if (item.type === 'list')
                 return renderer.renderComponents([item]);
-            return `${indentation.repeat(level)}${node.start !== undefined ? node.start + index : 1}. ${renderer
+            return `${indentation.repeat(level)}${node.start !== undefined ? node.start + index : index + 1}. ${renderer
                 .renderComponents([item])
                 .join('')}\n`;
         });
@@ -380,7 +380,7 @@ class MarkdownRenderer {
             if (!!rendered)
                 return rendered;
             rendered = this.renderComponent(node, this.defaultRenderers);
-            if (rendered == '' || !!rendered)
+            if (rendered === '' || !!rendered)
                 return rendered;
             if (!rendered && this.unhandledNodeRenderer) {
                 rendered = this.unhandledNodeRenderer(node, this);

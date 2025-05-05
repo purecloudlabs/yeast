@@ -7,7 +7,7 @@ export default function renderListNode(node: ListNode, renderer: MarkdownRendere
 	if (node.ordered) {
 		let orderedItems = node.children.map((item, index) => {
 			if (item.type === 'list') return renderer.renderComponents([item]);
-			return `${indentation.repeat(level)}${node.start !== undefined ? node.start + index : 1}. ${renderer
+			return `${indentation.repeat(level)}${node.start !== undefined ? node.start + index : index + 1}. ${renderer
 				.renderComponents([item])
 				.join('')}\n`;
 		});
