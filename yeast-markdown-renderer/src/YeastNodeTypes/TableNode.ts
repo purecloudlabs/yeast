@@ -35,7 +35,6 @@ export default function renderTableNode(node: TableNode, renderer: MarkdownRende
 			 */
 			if (cell.children.length === 1 && isYeastNodeType(cell.children[0], YeastBlockNodeTypes.Paragraph)) {
 				const paragraphNode = cell.children[0] as ParagraphNode;
-				if (!paragraphNode.children) return false;
 				return !isInlineOnly(paragraphNode.children);
 			} else {
 				// Fall back to checking the cell's contents directly if it wasn't a single paragraph node
