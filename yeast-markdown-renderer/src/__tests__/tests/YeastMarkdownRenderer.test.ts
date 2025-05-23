@@ -2,6 +2,7 @@ import { DocumentNode, isYeastTextNode, isYeastNode, YeastChild, YeastNode, Yeas
 import { MarkdownRenderer } from '../../MarkdownRenderer';
 import { GENERAL_DATA } from '../resources/GENERAL_DATA';
 import { TABLE_DATA } from '../resources/TABLE_DATA';
+import { TABLE_NESTED_BLOCKS_AST, TABLE_NESTED_BLOCKS_MARKDOWN } from '../resources/TABLE_NESTED_BLOCKS';
 import { EMPTY_ITEM_LIST, EMPTY_ITEM_LIST_RESULT, LIST_DATA } from '../resources/LIST_DATA';
 import { SIMPLE_TABLE_AST, SIMPLE_TABLE_MARKDOWN } from '../resources/SIMPLE_TABLE';
 import { INLINE_CODE_AST, INLINE_CODE_MARKDOWN } from '../resources/INLINE_CODE_DATA';
@@ -178,4 +179,9 @@ test('empty list with space and no space should be same', async () => {
 	const listAst = EMPTY_ITEM_LIST as DocumentNode;
 	const listMarkdown = markdownRenderer.renderComponents(listAst.children).join('\n');
 	expect(listMarkdown).toEqual(EMPTY_ITEM_LIST_RESULT);
+});
+
+test('table with nested blocks', () => {
+	const markdownString = new MarkdownRenderer().renderComponents(TABLE_NESTED_BLOCKS_AST as YeastChild[]).join('\n');
+	expect(markdownString).toEqual(TABLE_NESTED_BLOCKS_MARKDOWN);
 });

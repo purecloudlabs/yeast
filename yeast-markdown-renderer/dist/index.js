@@ -238,6 +238,8 @@ function renderTableNode(node, renderer) {
         return row.children.some((cell) => {
             if (cell.children.length === 1 && isYeastNodeType(cell.children[0], YeastBlockNodeTypes.Paragraph)) {
                 const paragraphNode = cell.children[0];
+                if (!paragraphNode.children)
+                    return false;
                 return !isInlineOnly(paragraphNode.children);
             }
             else {
