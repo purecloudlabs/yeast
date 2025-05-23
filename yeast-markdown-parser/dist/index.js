@@ -119,7 +119,7 @@ class HeadingParserPlugin {
     }
 }
 
-const LIST_ITEM_REGEX = /^(\s*)([-*+]|\d+[.)])\s*(.+)\s*$/;
+const LIST_ITEM_REGEX = /^(\s*)([-*+]|\d+[.)])\s+(.+)\s*$/;
 const WHITESPACE_REGEX = /^\s*$/;
 const areYouSureItsNotJustItalicRegex = /^\s*\*(?:[^* ].*\S|[^* ])\*/;
 const areYouSureItsNotJustBoldRegex = /^\s*\*\*(?:[^* ].*\S|[^* ])\*\*/;

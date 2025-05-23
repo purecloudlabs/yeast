@@ -65,6 +65,8 @@ Your scientists were so preoccupied with whether or not you could...
 - <dxui:OpenAPIExplorer verb="GET" path="/api/v2/telephony/providers/edges/phonebasesettings/{phoneBaseId}" />
 
 ...they didn't stop to think if they should.
+
+-this is not a list
 `;
 
 export const LIST_AST = {
@@ -732,6 +734,15 @@ export const LIST_AST = {
 			children: [
 				{
 					text: "...they didn't stop to think if they should.",
+				},
+			],
+			indentation: 0,
+		},
+		{
+			type: 'paragraph',
+			children: [
+				{
+					text: "-this is not a list",
 				},
 			],
 			indentation: 0,
