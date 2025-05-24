@@ -1,6 +1,6 @@
 {
 	"name": "yeast-markdown-renderer",
-	"version": "1.2.2",
+	"version": "1.2.3",
 	"description": "The yeast markdown renderer project provides a class to render yeast documents in markdown ",
 	"exports": {
 		"require": "./src/index.ts",
