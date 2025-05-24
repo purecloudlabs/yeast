@@ -672,8 +672,7 @@ class CustomComponentParserPlugin {
                     children.push(parseXmlJson(childNode, child[rawKey]));
                 }
                 else if (keyExists(keys, '#text')) {
-                    const textChildren = parser.parseBlock(child['#text']);
-                    children.push(...textChildren);
+                    children.push(...parser.parseBlock(child['#text']));
                 }
             }
             if (children.length > 0) {
