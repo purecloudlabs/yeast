@@ -119,7 +119,7 @@ class HeadingParserPlugin {
     }
 }
 
-const LIST_ITEM_REGEX = /^(\s*)([-*+]|\d+[.)])\s*(.+)\s*$/;
+const LIST_ITEM_REGEX = /^(\s*)([-*+]|\d+[.)])\s+(.+)\s*$/;
 const WHITESPACE_REGEX = /^\s*$/;
 const areYouSureItsNotJustItalicRegex = /^\s*\*(?:[^* ].*\S|[^* ])\*/;
 const areYouSureItsNotJustBoldRegex = /^\s*\*\*(?:[^* ].*\S|[^* ])\*\*/;
@@ -672,7 +672,7 @@ class CustomComponentParserPlugin {
                     children.push(parseXmlJson(childNode, child[rawKey]));
                 }
                 else if (keyExists(keys, '#text')) {
-                    parentNode.children = parser.parseBlock(child['#text']);
+                    children.push(...parser.parseBlock(child['#text']));
                 }
             }
             if (children.length > 0) {

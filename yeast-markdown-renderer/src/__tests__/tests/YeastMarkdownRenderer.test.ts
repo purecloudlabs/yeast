@@ -7,6 +7,7 @@ import { SIMPLE_TABLE_AST, SIMPLE_TABLE_MARKDOWN } from '../resources/SIMPLE_TAB
 import { INLINE_CODE_AST, INLINE_CODE_MARKDOWN } from '../resources/INLINE_CODE_DATA';
 import { UNDEFINED_DATA_AST, UNDEFINED_DATA_MARKDOWN } from '../resources/UNDEFINED_DATA';
 import { IMAGE_DATA_AST, IMAGE_DATA_MARKDOWN } from '../resources/IMAGE_DATA';
+import { TABLE_NESTED_BLOCKS_AST, TABLE_NESTED_BLOCKS_MARKDOWN } from '../resources/TABLE_NESTED_BLOCKS';
 
 test('testing  bold  node', () => {
 	const boldRegex = /\*\*testing bold\*\*/gi;
@@ -178,4 +179,9 @@ test('empty list with space and no space should be same', async () => {
 	const listAst = EMPTY_ITEM_LIST as DocumentNode;
 	const listMarkdown = markdownRenderer.renderComponents(listAst.children).join('\n');
 	expect(listMarkdown).toEqual(EMPTY_ITEM_LIST_RESULT);
+});
+
+test('table with nested blocks', () => {
+	const markdownString = new MarkdownRenderer().renderComponents(TABLE_NESTED_BLOCKS_AST as YeastChild[]).join('\n');
+	expect(markdownString).toEqual(TABLE_NESTED_BLOCKS_MARKDOWN);
 });

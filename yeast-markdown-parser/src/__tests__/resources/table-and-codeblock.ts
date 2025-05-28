@@ -154,5 +154,186 @@ export const TABLE_CODE_RESULT = {
 			title: 'Response',
 			indentation: 0,
 		},
+		{
+        	indentation: "0",
+        	align: "C | C | C",
+        	type: "table",
+        	children: [
+        	    {
+        	        type: "tablerow",
+        	        children: [
+        	            {
+        	                "type": "tablecell",
+        	                "align": "center",
+        	                "children": [
+        	                    {
+        	                        "type": "paragraph",
+        	                        "children": [
+        	                            {
+        	                                "text": "a"
+        	                            }
+        	                        ],
+        	                        "indentation": 0
+        	                    }
+        	                ]
+        	            },
+        	            {
+        	                "type": "tablecell",
+        	                "align": "center",
+        	                "children": [
+        	                    {
+        	                        "type": "paragraph",
+        	                        "children": [
+        	                            {
+        	                                "text": "b"
+        	                            }
+        	                        ],
+        	                        "indentation": 0
+        	                    }
+        	                ]
+        	            },
+        	            {
+        	                type: "tablecell",
+        	                align: "center",
+        	                children: [
+        	                    {
+        	                        type: "paragraph",
+        	                        indentation: "0",
+        	                        children: [
+        	                            {
+        	                                type: "paragraph",
+        	                                children: [
+        	                                    {
+        	                                        text: "birb"
+        	                                    }
+        	                                ],
+        	                                indentation: 0
+        	                            },
+        	                            {
+        	                                type: "inlinecode",
+        	                                children: [
+        	                                    {
+        	                                        type: "paragraph",
+        	                                        children: [
+        	                                            {
+        	                                                text: "is the"
+        	                                            }
+        	                                        ],
+        	                                        indentation: 0
+        	                                    }
+        	                                ]
+        	                            },
+										{
+        	                                type: "paragraph",
+        	                                children: [
+        	                                    {
+        	                                        text: "word"
+        	                                    }
+        	                                ],
+        	                                indentation: 0
+        	                            },
+        	                        ]
+        	                    }
+        	                ]
+        	            }
+        	        ]
+        	    },
+        	    {
+        	        type: "tablerow",
+        	        children: [
+        	            {
+        	                type: "tablecell",
+        	                align: "center",
+        	                children: [
+        	                    {
+        	                        type: "paragraph",
+        	                        children: [
+        	                            {
+        	                                text: "1"
+        	                            }
+        	                        ],
+        	                        indentation: 0
+        	                    }
+        	                ]
+        	            },
+        	            {
+        	                type: "tablecell",
+        	                align: "center",
+        	                children: [
+        	                    {
+        	                        type: "paragraph",
+        	                        children: [
+        	                            {
+        	                                text: "2"
+        	                            }
+        	                        ],
+        	                        indentation: 0
+        	                    }
+        	                ]
+        	            },
+        	            {
+        	                type: "tablecell",
+        	                align: "center",
+        	                children: [
+        	                    {
+        	                        type: "list",
+        	                        ordered: "false",
+        	                        level: "0",
+        	                        children: [
+        	                            {
+        	                                type: "listitem",
+        	                                level: "0",
+        	                                children: [
+        	                                    {
+        	                                        type: "paragraph",
+        	                                        children: [
+        	                                            {
+        	                                                text: "3"
+        	                                            }
+        	                                        ],
+        	                                        indentation: 0
+        	                                    }
+        	                                ]
+        	                            }
+        	                        ]
+        	                    }
+        	                ]
+        	            }
+        	        ]
+        	    },
+        	    {
+        	        type: "tablerow",
+        	        children: [
+        	            {
+        	                type: "tablecell",
+        	                align: "center",
+        	                children: [
+        	                    {
+        	                        type: "paragraph"
+        	                    }
+        	                ]
+        	            },
+        	            {
+        	                type: "tablecell",
+        	                align: "center",
+        	                children: [
+        	                    {
+        	                        type: "paragraph"
+        	                    }
+        	                ]
+        	            },
+        	            {
+        	                type: "tablecell",
+        	                align: "center",
+        	                children: [
+        	                    {
+        	                        type: "paragraph"
+        	                    }
+        	                ]
+        	            }
+        	        ]
+        	    }
+        	]
+    	}
 	],
 };

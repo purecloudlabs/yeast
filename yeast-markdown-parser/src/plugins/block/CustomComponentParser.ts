@@ -88,7 +88,7 @@ export class CustomComponentParserPlugin implements BlockParserPlugin {
 					});
 					children.push(parseXmlJson(childNode, child[rawKey]));
 				} else if (keyExists(keys, '#text')) {
-					parentNode.children = parser.parseBlock(child['#text']);
+					children.push(...parser.parseBlock(child['#text']));
 				}
 			}
 
