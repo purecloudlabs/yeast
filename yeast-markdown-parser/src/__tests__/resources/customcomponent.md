@@ -1,3 +1,4 @@
+<yeast:link href="/path/to/page" title="Opens the Display Text page" forceNewTab="false"> <yeast:strikethrough>link</yeast:strikethrough> </yeast:link>
 
 <yeast:table align="L|C|R" sortable="true" filterable="true">
 <yeast:tablerow header="true">
@@ -17,12 +18,23 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu eros vive
 <yeast:tablecell>Quisque elementum neque id quam sodale faucibus.</yeast:tablecell>  
  <yeast:tablecell>Morbi id laoreet tellus, sit amet condimentum ante. Sed et venenatis sapien.</yeast:tablecell>
  <yeast:tablecell>
-    <yeast:paragraph indentation="0">
+       <yeast:paragraph indentation="0">
         birb 
         <yeast:inlinecode>is the</yeast:inlinecode>
-        word
-    </yeast:paragraph>
+         word
+      </yeast:paragraph>
  </yeast:tablecell>
 </yeast:tablerow>
 </yeast:table>
 
+Nam vitae mollis lorem. Vivamus nec arcu in nunc rutrum malesuada aliquet quis purus. Phasellus porttitor sapien nec enim gravida porta. Quisque ullamcorper orci et ultrices laoreet. Fusce vitae maximus lectus, eu convallis ante. Pellentesque vel velit nunc. Quisque sit amet magna at leo sagittis ultrices id ac eros. Ut auctor sem quam, in facilisis erat fringilla id. Fusce faucibus at nibh ut ornare. Quisque elementum neque id quam sodales faucibus. Sed molestie id nulla ac porta. Vestibulum sit amet augue eu tellus finibus ornare. Morbi id laoreet tellus, sit amet condimentum ante. Sed et venenatis sapien.
+
+<yeast:horizontalRule />
+
+<yeast:bold>bold text</yeast:bold>
+
+<yeast:image src="/path/to/source" title="Cool image" alt="image"></yeast:image>
+
+<dxui:OpenAPIExplorer verb="post" path="/api/v2/analytics/conversations/aggregates/query" />
+
+<dxui:QuickHit id="quick-hit-use" title="Use a Quick Hit in a page" />

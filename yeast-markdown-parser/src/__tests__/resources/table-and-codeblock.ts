@@ -118,13 +118,7 @@ export const TABLE_CODE_RESULT = {
 									type: 'bold',
 									children: [
 										{
-											type: 'paragraph',
-											children: [
-												{
-													text: 'bold text',
-												},
-											],
-											indentation: 0,
+											text: 'bold text',
 										},
 									],
 								},
@@ -209,20 +203,14 @@ export const TABLE_CODE_RESULT = {
         	                                ],
         	                                indentation: 0
         	                            },
-        	                            {
-        	                                type: "inlinecode",
-        	                                children: [
-        	                                    {
-        	                                        type: "paragraph",
-        	                                        children: [
-        	                                            {
-        	                                                text: "is the"
-        	                                            }
-        	                                        ],
-        	                                        indentation: 0
-        	                                    }
-        	                                ]
-        	                            },
+                       					{
+                       					  type: "inlinecode",
+                       					  children: [
+                       					    {
+                       					      text: "is the"
+                       					    }
+                       					  ]
+                       					},
 										{
         	                                type: "paragraph",
         	                                children: [

@@ -1,4 +1,4 @@
-import { BlockParserPlugin, YeastParser, BlockParserPluginResult, YeastNode } from 'yeast-core';
+import { BlockParserPlugin, YeastParser, BlockParserPluginResult, YeastNode, isYeastInlineNode, YeastBlockNodeTypes } from 'yeast-core';
 
 import { XMLParser } from 'fast-xml-parser';
 
@@ -90,11 +90,11 @@ export class CustomComponentParserPlugin implements BlockParserPlugin {
 				} else if (keyExists(keys, '#text')) {
 					children.push(
 						...parser.parseBlock(child['#text'])
-							.map((child) => {
-								if (child.type === 'pseudoParagraph' && child.children?.length === 1) {
-									return child.children[0];
+							.map((parsedChild) => {
+								if (isYeastInlineNode(parentNode) && parsedChild.type === YeastBlockNodeTypes.PseudoParagraph && parsedChild.children?.length === 1) {
+									return parsedChild.children[0];
 								}
-								return child;
+								return parsedChild;
 							})
 					);
 				}
