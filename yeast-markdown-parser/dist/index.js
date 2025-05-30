@@ -672,7 +672,14 @@ class CustomComponentParserPlugin {
                     children.push(parseXmlJson(childNode, child[rawKey]));
                 }
                 else if (keyExists(keys, '#text')) {
-                    children.push(...parser.parseBlock(child['#text']));
+                    children.push(...parser.parseBlock(child['#text'])
+                        .map((child) => {
+                        var _a;
+                        if (child.type === 'pseudoParagraph' && ((_a = child.children) === null || _a === void 0 ? void 0 : _a.length) === 1) {
+                            return child.children[0];
+                        }
+                        return child;
+                    }));
                 }
             }
             if (children.length > 0) {
