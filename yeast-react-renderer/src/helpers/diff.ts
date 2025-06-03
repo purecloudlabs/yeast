@@ -143,7 +143,7 @@ function renderNodeSegments(prop: string, modAssignment: ModificationAssignment,
 function escapeHtmlText(s: string): string {
 	let escapedString = s;
 	if (s.trim() === '') {
-		escapedString = s.replace(/\s/g, '{\'\u00A0\'}');
+		escapedString = s.replace(/\s/g, '\u00A0');
 	}
 
 	return escapedString;
