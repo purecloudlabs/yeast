@@ -139,6 +139,16 @@ function renderNodeSegments(prop: string, modAssignment: ModificationAssignment,
 	return renderedSegments;
 }
 
+// escape pure whitespace segments
+function escapeHtmlText(s: string): string {
+	let escapedString = s;
+	if (s.trim() === '') {
+		escapedString = s.replace(/\s/g, '&nbsp;');
+	}
+
+	return escapedString;
+}	
+
 // Processes text modification data, creates and collects react nodes for displaying text diffs
 function processModAssignment(
 	modData: ModificationData[],
@@ -178,7 +188,7 @@ function processModAssignment(
 		const postSegment: ReactNode = React.createElement(
 			'span',
 			{ className: `${modifiedClassPrefix}${outerClassSuffix}` },
-			diffNode[prop].substring(startIndex, endIndex)
+			escapeHtmlText(diffNode[prop].substring(startIndex, endIndex))
 		);
 		renderedSegments.push(postSegment);
 
@@ -194,7 +204,7 @@ function processModAssignment(
 			const preSegment: ReactNode = React.createElement(
 				'span',
 				{ className: `${modifiedClassPrefix}${outerClassSuffix}` },
-				diffNode[prop].substring(startIndex, modData[0].startIndex)
+				escapeHtmlText(diffNode[prop].substring(startIndex, modData[0].startIndex))
 			);
 			renderedSegments.push(preSegment);
 		}
@@ -203,7 +213,7 @@ function processModAssignment(
 		const segment: ReactNode = React.createElement(
 			'span',
 			{ className: `diff-${innerClassSuffix}` },
-			diffNode[prop].substring(modData[i].startIndex, modData[i].endIndex)
+			escapeHtmlText(diffNode[prop].substring(modData[i].startIndex, modData[i].endIndex))
 		);
 		renderedSegments.push(segment);
 
@@ -216,7 +226,7 @@ function processModAssignment(
 			const postSegment: ReactNode = React.createElement(
 				'span',
 				{ className: `${modifiedClassPrefix}${outerClassSuffix}` },
-				diffNode[prop].substring(modData[i].endIndex, endIndex)
+				escapeHtmlText(diffNode[prop].substring(modData[i].endIndex, endIndex))
 			);
 			renderedSegments.push(postSegment);
 		}
@@ -226,7 +236,7 @@ function processModAssignment(
 			const postSegment: ReactNode = React.createElement(
 				'span',
 				{ className: `${modifiedClassPrefix}${outerClassSuffix}` },
-				diffNode[prop].substring(modData[i].endIndex, postSegmentEndIndex)
+				escapeHtmlText(diffNode[prop].substring(modData[i].endIndex, postSegmentEndIndex))
 			);
 			renderedSegments.push(postSegment);
 		}
