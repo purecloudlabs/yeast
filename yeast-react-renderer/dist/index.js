@@ -138,7 +138,7 @@ function renderNodeSegments(prop, modAssignment, diffNode) {
 function escapeHtmlText(s) {
     let escapedString = s;
     if (s.trim() === '') {
-        escapedString = s.replace(/\s/g, '&nbsp;');
+        escapedString = s.replace(/\s/g, '{\'\u00A0\'}');
     }
     return escapedString;
 }
