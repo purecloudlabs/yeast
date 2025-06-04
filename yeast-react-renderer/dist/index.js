@@ -134,7 +134,11 @@ function renderNodeSegments(prop, modAssignment, diffNode) {
     }
     return renderedSegments;
 }
-// escape pure whitespace segments
+/*
+ * Escape pure whitespace segments.
+ * React nodes with inner text containing only whitespace need the whitespace escaped with the html space entity.
+ * This ensures that the whitespace will display in the diff.
+ */
 function escapeHtmlText(s) {
     let escapedString = s;
     if (s.trim() === '') {
@@ -483,8 +487,12 @@ function ListNodeRenderer(props) {
     const key = useKey();
     const diffRenderData = getDiffRenderData(props.node);
     let className = diffRenderData ? diffRenderData.diffClass : '';
-    // The explicit boolean check prevents the case where a custom node has ordered value "false" which evaluates as truthy.
-    if (props.node.ordered === true) {
+    /*
+     * The explicit boolean check prevents the case where a custom node has ordered value "false" which evaluates as truthy.
+     * Custom nodes get parsed from xml and the ordered property is parsed as a string.
+     * This can happen because TypeScript types only exist at compile time.
+     */
+    if (props.node.ordered === true || props.node.ordered === 'true') {
         return (React.createElement("ol", { key: key.current, start: props.node.start || 1, className: className }, props.renderer.renderComponents(props.node.children)));
     }
     else {

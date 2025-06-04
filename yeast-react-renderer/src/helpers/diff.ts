@@ -139,7 +139,11 @@ function renderNodeSegments(prop: string, modAssignment: ModificationAssignment,
 	return renderedSegments;
 }
 
-// escape pure whitespace segments
+/*
+ * Escape pure whitespace segments.
+ * React nodes with inner text containing only whitespace need the whitespace escaped with the html space entity.
+ * This ensures that the whitespace will display in the diff.
+ */
 function escapeHtmlText(s: string): string {
 	let escapedString = s;
 	if (s.trim() === '') {
