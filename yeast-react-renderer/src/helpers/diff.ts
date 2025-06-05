@@ -144,7 +144,7 @@ function renderNodeSegments(prop: string, modAssignment: ModificationAssignment,
  * React nodes with inner text containing only whitespace need the whitespace escaped with the html space entity.
  * This ensures that the whitespace will display in the diff.
  */
-function escapeHtmlText(s: string): string {
+function escapeHtmlWhitespace(s: string): string {
 	let escapedString = s;
 	if (s.trim() === '') {
 		escapedString = s.replace(/\s/g, '\u00A0');
@@ -192,7 +192,7 @@ function processModAssignment(
 		const postSegment: ReactNode = React.createElement(
 			'span',
 			{ className: `${modifiedClassPrefix}${outerClassSuffix}` },
-			escapeHtmlText(diffNode[prop].substring(startIndex, endIndex))
+			escapeHtmlWhitespace(diffNode[prop].substring(startIndex, endIndex))
 		);
 		renderedSegments.push(postSegment);
 
@@ -208,7 +208,7 @@ function processModAssignment(
 			const preSegment: ReactNode = React.createElement(
 				'span',
 				{ className: `${modifiedClassPrefix}${outerClassSuffix}` },
-				escapeHtmlText(diffNode[prop].substring(startIndex, modData[0].startIndex))
+				escapeHtmlWhitespace(diffNode[prop].substring(startIndex, modData[0].startIndex))
 			);
 			renderedSegments.push(preSegment);
 		}
@@ -217,7 +217,7 @@ function processModAssignment(
 		const segment: ReactNode = React.createElement(
 			'span',
 			{ className: `diff-${innerClassSuffix}` },
-			escapeHtmlText(diffNode[prop].substring(modData[i].startIndex, modData[i].endIndex))
+			escapeHtmlWhitespace(diffNode[prop].substring(modData[i].startIndex, modData[i].endIndex))
 		);
 		renderedSegments.push(segment);
 
@@ -230,7 +230,7 @@ function processModAssignment(
 			const postSegment: ReactNode = React.createElement(
 				'span',
 				{ className: `${modifiedClassPrefix}${outerClassSuffix}` },
-				escapeHtmlText(diffNode[prop].substring(modData[i].endIndex, endIndex))
+				escapeHtmlWhitespace(diffNode[prop].substring(modData[i].endIndex, endIndex))
 			);
 			renderedSegments.push(postSegment);
 		}
@@ -240,7 +240,7 @@ function processModAssignment(
 			const postSegment: ReactNode = React.createElement(
 				'span',
 				{ className: `${modifiedClassPrefix}${outerClassSuffix}` },
-				escapeHtmlText(diffNode[prop].substring(modData[i].endIndex, postSegmentEndIndex))
+				escapeHtmlWhitespace(diffNode[prop].substring(modData[i].endIndex, postSegmentEndIndex))
 			);
 			renderedSegments.push(postSegment);
 		}
