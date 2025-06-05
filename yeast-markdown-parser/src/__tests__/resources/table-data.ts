@@ -101,13 +101,7 @@ export const TABLE_AST = {
 									type: 'bold',
 									children: [
 										{
-											type: 'paragraph',
-											children: [
-												{
-													text: 'bold text',
-												},
-											],
-											indentation: 0,
+											text: 'bold text',
 										},
 									],
 								},

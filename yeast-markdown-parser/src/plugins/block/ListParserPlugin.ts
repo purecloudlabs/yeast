@@ -122,6 +122,9 @@ export class ListParserPlugin implements BlockParserPlugin {
 		// Recursively assign items to the list
 		processListItems(listItems, node);
 
+		// This prevents custom node lists with ordered value "false" from evaluating as truthy. 
+		if (node.ordered !== true && node.ordered as any !== 'true') node.ordered === false;
+
 		return {
 			remainingText: lines.join('\n'),
 			nodes: [node],

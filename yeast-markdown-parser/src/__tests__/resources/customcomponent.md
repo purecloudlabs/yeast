@@ -17,6 +17,13 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu eros vive
 </yeast:tablecell>
 <yeast:tablecell>Quisque elementum neque id quam sodale faucibus.</yeast:tablecell>  
  <yeast:tablecell>Morbi id laoreet tellus, sit amet condimentum ante. Sed et venenatis sapien.</yeast:tablecell>
+ <yeast:tablecell>
+       <yeast:paragraph indentation="0">
+        birb 
+        <yeast:inlinecode>is the</yeast:inlinecode>
+         word
+      </yeast:paragraph>
+ </yeast:tablecell>
 </yeast:tablerow>
 </yeast:table>
 

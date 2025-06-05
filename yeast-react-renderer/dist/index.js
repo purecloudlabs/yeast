@@ -134,6 +134,18 @@ function renderNodeSegments(prop, modAssignment, diffNode) {
     }
     return renderedSegments;
 }
+/*
+ * Escape pure whitespace segments.
+ * React nodes with inner text containing only whitespace need the whitespace escaped with the html space entity.
+ * This ensures that the whitespace will display in the diff.
+ */
+function escapeHtmlWhitespace(s) {
+    let escapedString = s;
+    if (s.trim() === '') {
+        escapedString = s.replace(/\s/g, '\u00A0');
+    }
+    return escapedString;
+}
 // Processes text modification data, creates and collects react nodes for displaying text diffs
 function processModAssignment(modData, prop, diffNode, renderedSegments, diffSource) {
     // Initialize css class suffixes.
@@ -164,7 +176,7 @@ function processModAssignment(modData, prop, diffNode, renderedSegments, diffSou
     }
     // If no modification data is present, inject the entire segment into a span and return.
     if (modData.length === 0) {
-        const postSegment = React.createElement('span', { className: `${modifiedClassPrefix}${outerClassSuffix}` }, diffNode[prop].substring(startIndex, endIndex));
+        const postSegment = React.createElement('span', { className: `${modifiedClassPrefix}${outerClassSuffix}` }, escapeHtmlWhitespace(diffNode[prop].substring(startIndex, endIndex)));
         renderedSegments.push(postSegment);
         return;
     }
@@ -173,24 +185,24 @@ function processModAssignment(modData, prop, diffNode, renderedSegments, diffSou
         const isFirstModOffset = i === 0 && modData[0].startIndex > startIndex;
         // If there are characters before the first modification, treat those as the first segment.
         if (isFirstModOffset) {
-            const preSegment = React.createElement('span', { className: `${modifiedClassPrefix}${outerClassSuffix}` }, diffNode[prop].substring(startIndex, modData[0].startIndex));
+            const preSegment = React.createElement('span', { className: `${modifiedClassPrefix}${outerClassSuffix}` }, escapeHtmlWhitespace(diffNode[prop].substring(startIndex, modData[0].startIndex)));
             renderedSegments.push(preSegment);
         }
         // Construct a node for the span indicated by the modification data.
-        const segment = React.createElement('span', { className: `diff-${innerClassSuffix}` }, diffNode[prop].substring(modData[i].startIndex, modData[i].endIndex));
+        const segment = React.createElement('span', { className: `diff-${innerClassSuffix}` }, escapeHtmlWhitespace(diffNode[prop].substring(modData[i].startIndex, modData[i].endIndex)));
         renderedSegments.push(segment);
         const isLastMod = i === modData.length - 1;
         const isLastModOffset = modData[i].endIndex < diffNode[prop].length;
         const isConsecutive = !isLastMod && modData[i + 1].startIndex - modData[i].endIndex === 0;
         // If there are chars remaining after the last modification, treat those as the last segment.
         if (isLastMod && isLastModOffset) {
-            const postSegment = React.createElement('span', { className: `${modifiedClassPrefix}${outerClassSuffix}` }, diffNode[prop].substring(modData[i].endIndex, endIndex));
+            const postSegment = React.createElement('span', { className: `${modifiedClassPrefix}${outerClassSuffix}` }, escapeHtmlWhitespace(diffNode[prop].substring(modData[i].endIndex, endIndex)));
             renderedSegments.push(postSegment);
         }
         // If this is not the last modification, and there are chars between the current and next mod, add a segment for those gap chars.
         else if (!isConsecutive && !isLastMod) {
             const postSegmentEndIndex = modData[i + 1].startIndex;
-            const postSegment = React.createElement('span', { className: `${modifiedClassPrefix}${outerClassSuffix}` }, diffNode[prop].substring(modData[i].endIndex, postSegmentEndIndex));
+            const postSegment = React.createElement('span', { className: `${modifiedClassPrefix}${outerClassSuffix}` }, escapeHtmlWhitespace(diffNode[prop].substring(modData[i].endIndex, postSegmentEndIndex)));
             renderedSegments.push(postSegment);
         }
     }
@@ -475,7 +487,12 @@ function ListNodeRenderer(props) {
     const key = useKey();
     const diffRenderData = getDiffRenderData(props.node);
     let className = diffRenderData ? diffRenderData.diffClass : '';
-    if (props.node.ordered) {
+    /*
+     * The explicit boolean check prevents the case where a custom node has ordered value "false" which evaluates as truthy.
+     * Custom nodes get parsed from xml and the ordered property is parsed as a string.
+     * This can happen because TypeScript types only exist at compile time.
+     */
+    if (props.node.ordered === true || props.node.ordered === 'true') {
         return (React.createElement("ol", { key: key.current, start: props.node.start || 1, className: className }, props.renderer.renderComponents(props.node.children)));
     }
     else {

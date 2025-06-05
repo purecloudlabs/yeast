@@ -1,4 +1,4 @@
-import { YeastBlockNodeTypes, YeastNodeFactory, YeastInlineNodeTypes, isYeastNodeType, scrapeText, ContentGroupType, isYeastTextNode, isYeastNode, YeastParser } from 'yeast-core';
+import { YeastBlockNodeTypes, YeastNodeFactory, YeastInlineNodeTypes, isYeastNodeType, scrapeText, ContentGroupType, isYeastInlineNode, isYeastTextNode, isYeastNode, YeastParser } from 'yeast-core';
 import { parse } from 'yaml';
 import { XMLParser } from 'fast-xml-parser';
 
@@ -188,6 +188,8 @@ class ListParserPlugin {
             node.ordered = true;
         }
         processListItems(listItems, node);
+        if (node.ordered !== true && node.ordered !== 'true')
+            node.ordered === false;
         return {
             remainingText: lines.join('\n'),
             nodes: [node],
@@ -672,7 +674,14 @@ class CustomComponentParserPlugin {
                     children.push(parseXmlJson(childNode, child[rawKey]));
                 }
                 else if (keyExists(keys, '#text')) {
-                    children.push(...parser.parseBlock(child['#text']));
+                    children.push(...parser.parseBlock(child['#text'])
+                        .map((parsedChild) => {
+                        var _a;
+                        if (isYeastInlineNode(parentNode) && parsedChild.type === YeastBlockNodeTypes.PseudoParagraph && ((_a = parsedChild.children) === null || _a === void 0 ? void 0 : _a.length) === 1) {
+                            return parsedChild.children[0];
+                        }
+                        return parsedChild;
+                    }));
                 }
             }
             if (children.length > 0) {
