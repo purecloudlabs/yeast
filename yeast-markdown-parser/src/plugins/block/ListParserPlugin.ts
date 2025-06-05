@@ -123,7 +123,7 @@ export class ListParserPlugin implements BlockParserPlugin {
 		processListItems(listItems, node);
 
 		// This prevents custom node lists with ordered value "false" from evaluating as truthy. 
-		if (node.ordered !== true) node.ordered === false;
+		if (node.ordered !== true && node.ordered as any !== 'true') node.ordered === false;
 
 		return {
 			remainingText: lines.join('\n'),

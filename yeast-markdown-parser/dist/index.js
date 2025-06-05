@@ -188,7 +188,7 @@ class ListParserPlugin {
             node.ordered = true;
         }
         processListItems(listItems, node);
-        if (node.ordered !== true)
+        if (node.ordered !== true && node.ordered !== 'true')
             node.ordered === false;
         return {
             remainingText: lines.join('\n'),

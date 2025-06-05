@@ -22,7 +22,7 @@ export default function ListNodeRenderer(props: IProps) {
 	 * Custom nodes get parsed from xml and the ordered property is parsed as a string.
 	 * This can happen because TypeScript types only exist at compile time.
 	 */ 
-	if (props.node.ordered === true || (props.node.ordered as any) === 'true') {
+	if (props.node.ordered === true || props.node.ordered as any === 'true') {
 		return (
 			<ol key={key.current} start={props.node.start || 1} className={className}>
 				{props.renderer.renderComponents(props.node.children)}
