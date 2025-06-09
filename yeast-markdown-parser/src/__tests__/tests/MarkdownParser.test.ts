@@ -390,7 +390,7 @@ test('MarkdownParser using all inline plugins', () => {
 	// debugAST('everythinginline', ast);
 
 	// Check document
-	checkAstStructureForDefaultDocument(ast, 8);
+	checkAstStructureForDefaultDocument(ast, 9);
 
 	// Validate AST
 	expect(JSON.stringify(ast)).toBe(JSON.stringify(EVERYTHING_INLINE_AST));

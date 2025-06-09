@@ -225,14 +225,32 @@ class InlineStrikeThroughPlugin {
     tokenize(text, parser) {
         const tokens = [];
         for (const match of text.matchAll(STRIKETHROUGH_REGEX)) {
-            const node = YeastNodeFactory.CreateStrikethroughNode();
-            node.children = parser.parseInline(match[1]);
-            tokens.push({
-                start: match.index,
-                end: match.index + match[0].length,
-                from: 'InlineStrikeThroughPlugin',
-                nodes: [node],
-            });
+            if (text.charAt(match.index - 1) === '\\' && text.charAt(match.index + match[0].length - 2) === '\\') {
+                const node = YeastNodeFactory.CreateText();
+                for (let i = 0; i < match[0].length; i++) {
+                    if (text.charAt(match.index + i) === '\\') {
+                        i++;
+                    }
+                    node.text += text.charAt(match.index + i);
+                }
+                console.log(node.text);
+                tokens.push({
+                    start: match.index - 1,
+                    end: match.index + match[0].length,
+                    from: 'InlineStrikeThroughPlugin',
+                    nodes: [node],
+                });
+            }
+            else {
+                const node = YeastNodeFactory.CreateStrikethroughNode();
+                node.children = parser.parseInline(match[1]);
+                tokens.push({
+                    start: match.index,
+                    end: match.index + match[0].length,
+                    from: 'InlineStrikeThroughPlugin',
+                    nodes: [node],
+                });
+            }
         }
         return tokens;
     }

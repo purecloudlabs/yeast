@@ -13,3 +13,5 @@ __bold underscore__ escape use cases 1) __bold text__ 2) __bold\_\_text__ 3) __b
 _italic underscore_ escape use cases 1) _italic text_ 2) _italic\_\_text_ 3) _italic\_text_ 4) \_notitalic_isitalic_ 5) _isitalic_notitalic\_ 6) _b_ _bb_ _bbb_ 7) _\__ 8) _ notitalic_ and _notitalic _ and _  _
 
 *italic asterisk* escape use cases 1) *italic text* 2) *italic\*\*text* 3) *italic\*text* 4) \*notitalic*isitalic* 5) *isitalic*notitalic\* 6) *b* *bb* *bbb* 7) *\** 8) * notitalic* and *notitalic * and *  *
+
+09:00\~17:00\|America/Los\_Angeles", "08:30\~12:30\|\-05:00

@@ -791,5 +791,14 @@ export const EVERYTHING_INLINE_AST = {
 			],
 			indentation: 0,
 		},
+		 {
+            type: 'paragraph',
+            children: [
+                {
+                    text: '09:00~17:00|America/Los_Angeles", "08:30~12:30|\\-05:00',
+                },
+            ],
+            indentation: 0,
+        }
 	],
 };
