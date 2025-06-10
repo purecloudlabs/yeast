@@ -2,8 +2,8 @@ import { MarkdownRenderer } from '../MarkdownRenderer';
 import { BlockCodeNode } from 'yeast-core';
 
 // Matches case when codeblock content is a literal codeblock example
-const LITERAL_BACKTICK_REGEX = /((?:^|\n+)(?:\t+|\s+)*)(`{3})/ig;
-const LITERAL_TILDE_REGEX = /((?:^|\n+)(?:\t+|\s+)*)(~{3})/ig;
+const LITERAL_BACKTICK_REGEX = /((?:^|\n+)(?:\t|\s)*)(`{3})/ig;
+const LITERAL_TILDE_REGEX = /((?:^|\n+)(?:\t|\s)*)(~{3})/ig;
 
 export default function renderBlockCodeNode(node: BlockCodeNode, renderer: MarkdownRenderer) {
 	const jsonOptions = {
