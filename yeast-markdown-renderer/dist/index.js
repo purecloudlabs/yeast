@@ -30,8 +30,8 @@ function renderCustomComponent(node) {
     return `\n${root.end({ prettyPrint: true })}\n`;
 }
 
-const LITERAL_BACKTICK_REGEX = /((?:^|\n+)(?:\t+|\s+)*)(`{3})/ig;
-const LITERAL_TILDE_REGEX = /((?:^|\n+)(?:\t+|\s+)*)(~{3})/ig;
+const LITERAL_BACKTICK_REGEX = /((?:^|\n+)(?:\t|\s)*)(`{3})/ig;
+const LITERAL_TILDE_REGEX = /((?:^|\n+)(?:\t|\s)*)(~{3})/ig;
 function renderBlockCodeNode(node, renderer) {
     const jsonOptions = {
         title: node.title,

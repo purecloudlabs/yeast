@@ -8,6 +8,7 @@ import { INLINE_CODE_AST, INLINE_CODE_MARKDOWN } from '../resources/INLINE_CODE_
 import { UNDEFINED_DATA_AST, UNDEFINED_DATA_MARKDOWN } from '../resources/UNDEFINED_DATA';
 import { IMAGE_DATA_AST, IMAGE_DATA_MARKDOWN } from '../resources/IMAGE_DATA';
 import { TABLE_NESTED_BLOCKS_AST, TABLE_NESTED_BLOCKS_MARKDOWN } from '../resources/TABLE_NESTED_BLOCKS';
+import { BLOCKCODE_DATA } from '../resources/BLOCKCODE_DATA';
 
 test('testing  bold  node', () => {
 	const boldRegex = /\*\*testing bold\*\*/gi;
@@ -37,6 +38,12 @@ test('expecting strikethrough node', () => {
 test('expecting block code node', () => {
 	const regex = /`{3,}(.*)\n([\s\S]+?\n)\s*`{3,}\n/gi;
 	const markdownString = new MarkdownRenderer().renderMarkdown(GENERAL_DATA as DocumentNode);
+	expect(markdownString.match(regex).length).toBe(1);
+});
+
+test('expecting block code node with indentation', () => {
+	const regex = /`{3,}(.*)\n([\s\S]+?\n)\s*`{3,}\n/gi;
+	const markdownString = new MarkdownRenderer().renderMarkdown(BLOCKCODE_DATA as DocumentNode);
 	expect(markdownString.match(regex).length).toBe(1);
 });
 
