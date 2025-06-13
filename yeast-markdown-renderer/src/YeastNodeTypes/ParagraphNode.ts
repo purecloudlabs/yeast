@@ -6,8 +6,10 @@ export default function renderParagraphNode(node: ParagraphNode, renderer: Markd
 	let finalString = '';
 	const indentation = '\t';
 	children.forEach((child, index) => {
-		if (index !== children.length - 1) finalString += `${indentation.repeat(node.indentation)}${child}\n`;
-		else if (index === children.length - 1 && child.length !== 0) finalString += `${indentation.repeat(node.indentation)}${child}`;
+		const escapedChild = child.replace(/(?<![\\])~/g, '\\~');
+		
+		if (index !== children.length - 1) finalString += `${indentation.repeat(node.indentation)}${escapedChild}\n`;
+		else if (index === children.length - 1 && escapedChild.length !== 0) finalString += `${indentation.repeat(node.indentation)}${escapedChild}`;
 	});
 	return `\n${finalString}\n`;
 }

@@ -204,15 +204,17 @@ function renderParagraphNode(node, renderer) {
     let finalString = '';
     const indentation = '\t';
     children.forEach((child, index) => {
+        const escapedChild = child.replace(/(?<![\\])~/g, '\\~');
         if (index !== children.length - 1)
-            finalString += `${indentation.repeat(node.indentation)}${child}\n`;
-        else if (index === children.length - 1 && child.length !== 0)
-            finalString += `${indentation.repeat(node.indentation)}${child}`;
+            finalString += `${indentation.repeat(node.indentation)}${escapedChild}\n`;
+        else if (index === children.length - 1 && escapedChild.length !== 0)
+            finalString += `${indentation.repeat(node.indentation)}${escapedChild}`;
     });
     return `\n${finalString}\n`;
 }
 
 function renderStrikethroughode(node, renderer) {
+    console.log(node.children);
     return `~~${renderer.renderComponents(node.children).join('').replace(/~/g, `\\~`)}~~`;
 }
 
