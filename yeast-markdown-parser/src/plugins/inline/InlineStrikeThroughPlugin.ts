@@ -11,9 +11,10 @@ export class InlineStrikeThroughPlugin implements InlineTokenizerPlugin {
 		var node, startPos;
         for (const match of text.matchAll(STRIKETHROUGH_REGEX)) {
             if(text.charAt(match.index - 1) === '\\' && text.charAt(match.index + match[0].length - 2) === '\\'){
-               node = YeastNodeFactory.CreateText();
+               node = YeastNodeFactory.CreateParagraphNode();
 				node.text = text.substring(match.index, match.index + match[0].length - 2);
 				node.text += '~'
+                node.containsTextModification = true;
 				startPos = match.index - 1
             }else{
                 node = YeastNodeFactory.CreateStrikethroughNode();
