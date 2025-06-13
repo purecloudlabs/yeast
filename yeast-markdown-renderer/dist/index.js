@@ -204,12 +204,15 @@ function renderParagraphNode(node, renderer) {
     let finalString = '';
     const indentation = '\t';
     children.forEach((child, index) => {
-        console.log(child);
-        if (index !== children.length - 1)
+        if (node.containsTextModification === true) {
+            finalString += `${indentation.repeat(node.indentation)}\\~${child}\\~`;
+        }
+        else if (index !== children.length - 1)
             finalString += `${indentation.repeat(node.indentation)}${child}\n`;
         else if (index === children.length - 1 && child.length !== 0)
             finalString += `${indentation.repeat(node.indentation)}${child}`;
     });
+    console.log(finalString);
     return `\n${finalString}\n`;
 }
 

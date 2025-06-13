@@ -65,12 +65,12 @@ test('expecting heading node', () => {
 	expect(markdownString.match(regex).length).toBe(7);
 });
 
-// test('expecting tilde to be escaped', () => {
-// 	const regex = /(?<![\\])~/g;
-// 	const markdownString = new MarkdownRenderer().renderMarkdown(GENERAL_DATA as DocumentNode);
-// 	console.log(markdownString.match(regex));
-// 	expect(markdownString.match(regex).length).toBe(4);
-// });
+test('expecting tilde to be escaped', () => {
+	const regex = /(?<![\\])~/g;
+	const markdownString = new MarkdownRenderer().renderMarkdown(GENERAL_DATA as DocumentNode);
+	console.log(markdownString.match(regex));
+	expect(markdownString.match(regex).length).toBe(4);
+});
 
 test('expecting custom component', () => {
 	const markdownString = new MarkdownRenderer().renderMarkdown(TABLE_DATA as DocumentNode);
