@@ -227,8 +227,9 @@ class InlineStrikeThroughPlugin {
         var node, startPos;
         for (const match of text.matchAll(STRIKETHROUGH_REGEX)) {
             if (text.charAt(match.index - 1) === '\\' && text.charAt(match.index + match[0].length - 2) === '\\') {
-                node = YeastNodeFactory.CreateStrikethroughNode();
-                node.text = text.substring(match.index - 1, match.index + match[0].length);
+                node = YeastNodeFactory.CreateText();
+                node.text = text.substring(match.index, match.index + match[0].length - 2);
+                node.text += '~';
                 startPos = match.index - 1;
             }
             else {
