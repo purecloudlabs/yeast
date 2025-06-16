@@ -199,23 +199,19 @@ function renderListNode(node, renderer) {
     return `\n${items.join('')}`;
 }
 
-const TILDE_REGEX = /\\~(\S.+?)\\~/gi;
+const TILDE_REGEX = /\~(\S.+?)\~/gi;
 function renderParagraphNode(node, renderer) {
     const children = renderer.renderComponents(node.children).join('').split('\n');
     let finalString = '';
     const indentation = '\t';
     children.forEach((child, index) => {
-        for (const match of child.matchAll(TILDE_REGEX)) {
-            child = child.replace(TILDE_REGEX, (match, p1) => {
-                return `\\~${p1}\\~`;
-            });
-        }
+        child = child.replace(TILDE_REGEX, (_, p1) => `\\~${p1}\\~`);
+        console.log(child);
         if (index !== children.length - 1)
             finalString += `${indentation.repeat(node.indentation)}${child}\n`;
         else if (index === children.length - 1 && child.length !== 0)
             finalString += `${indentation.repeat(node.indentation)}${child}`;
     });
-    console.log(finalString);
     return `\n${finalString}\n`;
 }
 
