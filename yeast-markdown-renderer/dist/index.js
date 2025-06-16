@@ -199,15 +199,18 @@ function renderListNode(node, renderer) {
     return `\n${items.join('')}`;
 }
 
+const TILDE_REGEX = /\\~(\S.+?)\\~/gi;
 function renderParagraphNode(node, renderer) {
     const children = renderer.renderComponents(node.children).join('').split('\n');
     let finalString = '';
     const indentation = '\t';
     children.forEach((child, index) => {
-        if (node.containsTextModification === true) {
-            finalString += `${indentation.repeat(node.indentation)}\\~${child}\\~`;
+        for (const match of child.matchAll(TILDE_REGEX)) {
+            child = child.replace(TILDE_REGEX, (match, p1) => {
+                return `\\~${p1}\\~`;
+            });
         }
-        else if (index !== children.length - 1)
+        if (index !== children.length - 1)
             finalString += `${indentation.repeat(node.indentation)}${child}\n`;
         else if (index === children.length - 1 && child.length !== 0)
             finalString += `${indentation.repeat(node.indentation)}${child}`;
@@ -399,7 +402,6 @@ class MarkdownRenderer {
                     return typedNode.text;
                 }
                 else {
-                    console.log('Unhandled node', node);
                     return renderCustomComponent(node);
                 }
             }
