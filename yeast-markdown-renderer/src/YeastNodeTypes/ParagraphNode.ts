@@ -14,7 +14,7 @@ export default function renderParagraphNode(node: ParagraphNode, renderer: Markd
 
 			child = child.replace(TILDE_REGEX, (match, p1) => {
 				
-				return `~${p1}~`;
+				return `\\~${p1}\\~`;
 			});
 		}
 
