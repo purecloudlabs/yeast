@@ -146,7 +146,13 @@ export class ReactRenderer {
 			if ((node as YeastText).text) {
 				const diffRenderData: DiffRenderData = getDiffRenderData(node);
 				const typedNode = node as YeastText;
-				typedNode.text = typedNode.text.replace(/\\~(.*?)\\~/g, (_, p1) => `~${p1}~`);
+				let tempCopy = typedNode.text;
+				if(tempCopy.matchAll(/\\~(.*?)\\~/g)){
+					tempCopy = tempCopy.replace(/\\~(.*?)\\~/g, (_, p1) => `~${p1}~`)
+					return <React.Fragment key = {i}>{tempCopy}</React.Fragment>
+					// let tildeEscapedText = typedNode.text.replace(/\\~(.*?)\\~/g, (_, p1) => `~${p1}~`);
+				}
+				
 				return diffRenderData && diffRenderData.renderedNodes
 					? <React.Fragment key={i}>{diffRenderData.renderedNodes['text']}</React.Fragment>
 					: <React.Fragment key={i}>{typedNode.text}</React.Fragment>;
