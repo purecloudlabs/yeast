@@ -563,8 +563,6 @@ function TableNodeRenderer(props) {
                     let renderedContent;
                     renderedContent = React.createElement(React.Fragment, null, props.renderer.renderComponents(childCell.children));
                     const content = getContent(childCell);
-                    //handle two things, escaped tilde and escaped pipe char
-                    // console.log(content)
                     const cell = {
                         renderedContent,
                         content: content.length == 0 ? 'default content' : content,
