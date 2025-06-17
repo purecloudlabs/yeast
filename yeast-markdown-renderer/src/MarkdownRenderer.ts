@@ -144,7 +144,7 @@ export class MarkdownRenderer {
 					const typedNode = node as YeastText;
 					return typedNode.text;
 				} else {
-					// console.log('Unhandled node', node);
+					console.log('Unhandled node', node);
 					return renderCustomComponent(node); //return custom component
 				}
 			}
