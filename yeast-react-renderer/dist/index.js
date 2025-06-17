@@ -593,7 +593,6 @@ function HorizontalRuleNodeRenderer(props) {
     return React.createElement("hr", { className: className, key: key.current });
 }
 
-const TILDE_REGEX = /\\~(.*?)\\~/g;
 class ReactRenderer {
     constructor(customRenderers) {
         this.defaultRenderers = {
@@ -678,7 +677,8 @@ class ReactRenderer {
             if (node.text) {
                 const diffRenderData = getDiffRenderData(node);
                 const typedNode = node;
-                typedNode.text.replace(TILDE_REGEX, (_, p1) => `\\~${p1}\\~`);
+                typedNode.text = typedNode.text.replace(/\\~(.*?)\\~/g, (_, p1) => `~${p1}~`);
+                console.log(typedNode.text);
                 return diffRenderData && diffRenderData.renderedNodes
                     ? React.createElement(React.Fragment, { key: i }, diffRenderData.renderedNodes['text'])
                     : React.createElement(React.Fragment, { key: i }, typedNode.text);

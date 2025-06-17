@@ -47,8 +47,6 @@ import HorizontalRuleNodeRenderer from './YeastNodeTypes/HorizontalRuleNodeRende
 
 import { DiffRenderData, getDiffRenderData } from './helpers/diff';
 
-const TILDE_REGEX = /\\~(.*?)\\~/g;
-
 export interface NodeRendererPlugin {
 	(node: YeastChild, renderer: ReactRenderer): ReactNode | undefined;
 }
@@ -148,7 +146,7 @@ export class ReactRenderer {
 			if ((node as YeastText).text) {
 				const diffRenderData: DiffRenderData = getDiffRenderData(node);
 				const typedNode = node as YeastText;
-				typedNode.text.replace(TILDE_REGEX, (_, p1) => `~${p1}~`);
+				typedNode.text = typedNode.text.replace(/\\~(.*?)\\~/g, (_, p1) => `~${p1}~`);
 				return diffRenderData && diffRenderData.renderedNodes
 					? <React.Fragment key={i}>{diffRenderData.renderedNodes['text']}</React.Fragment>
 					: <React.Fragment key={i}>{typedNode.text}</React.Fragment>;

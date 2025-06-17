@@ -161,6 +161,10 @@ export default {
 			type: 'strikethrough',
 			children: [{ text: 'strikethroughContent' }],
 		},
+		{
+			type: 'paragraph',
+			children: [{ text: '09:00\\~17:00\|America/Los\_Angeles", "08:30\\~12:30\|\-05:00' }],
+		},
 	],
 	author: 'yuri.yeti',
 	customDataOne: 'The first value',
