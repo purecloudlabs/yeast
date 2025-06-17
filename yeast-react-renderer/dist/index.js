@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 import { CodeFence, AlertBlock, DxAccordionGroup, DxTabbedContent, DataTable, DxAccordion, DxTabPanel } from 'genesys-react-components';
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DiffType, DiffSource, isYeastNode, YeastBlockNodeTypes, YeastInlineNodeTypes } from 'yeast-core';
 
 // import { useRef } from 'react';
@@ -500,43 +500,11 @@ function ListNodeRenderer(props) {
     }
 }
 
-const TILDE_REGEX = /\\~(\S.+?)\\~/gi;
 function ParagraphNodeRenderer(props) {
     const key = useKey();
     const diffRenderData = getDiffRenderData(props.node);
     const baseClass = `${props.node.indentation && props.node.indentation > 0 ? ` indent-${props.node.indentation}` : ''}`;
     let className = diffRenderData ? baseClass + ' ' + diffRenderData.diffClass : baseClass;
-    // Find text that matches the regex
-    const getMatchedText = useCallback(() => {
-        // Check if children exists and is an array
-        if (!props.node.children || !Array.isArray(props.node.children)) {
-            return null;
-        }
-        // Iterate through children
-        for (let i = 0; i < props.node.children.length; i++) {
-            const child = props.node.children[i];
-            if (typeof child === 'string' && TILDE_REGEX.test(child)) {
-                // Reset regex lastIndex
-                TILDE_REGEX.lastIndex = 0;
-                // Extract matched text
-                const matches = [];
-                let match;
-                while ((match = TILDE_REGEX.exec(child)) !== null) {
-                    matches.push(match[1]); // match[1] contains the captured group
-                }
-                if (matches.length > 0) {
-                    return matches.join(' ');
-                }
-            }
-        }
-        return null;
-    }, [props.node.children]);
-    const matchedText = getMatchedText();
-    // If we found matched text, return it in a paragraph
-    if (matchedText) {
-        return (React.createElement("p", { className: className, key: key.current }, matchedText));
-    }
-    // Otherwise return the original rendering
     return (React.createElement("p", { className: className, key: key.current }, props.renderer.renderComponents(props.node.children)));
 }
 
@@ -625,6 +593,7 @@ function HorizontalRuleNodeRenderer(props) {
     return React.createElement("hr", { className: className, key: key.current });
 }
 
+const TILDE_REGEX = /\\~(.*?)\\~/g;
 class ReactRenderer {
     constructor(customRenderers) {
         this.defaultRenderers = {
@@ -709,6 +678,7 @@ class ReactRenderer {
             if (node.text) {
                 const diffRenderData = getDiffRenderData(node);
                 const typedNode = node;
+                typedNode.text.replace(TILDE_REGEX, (_, p1) => `\\~${p1}\\~`);
                 return diffRenderData && diffRenderData.renderedNodes
                     ? React.createElement(React.Fragment, { key: i }, diffRenderData.renderedNodes['text'])
                     : React.createElement(React.Fragment, { key: i }, typedNode.text);
