@@ -13,13 +13,6 @@ export const GENERAL_DATA = {
 			],
 		},
 		{
-			type: 'paragraph',
-			indentation: 0,
-			children: [
-				{text: '09:00\\~17:00\|America/Los\_Angeles", "08:30\\~12:30\|\-05:00'}
-			]
-		},
-		{
 			type: 'heading',
 			level: 1,
 			id: 'level-1-heading',
