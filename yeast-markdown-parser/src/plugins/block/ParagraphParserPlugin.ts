@@ -9,6 +9,7 @@ import {
 } from 'yeast-core';
 
 const REMOVE_PRECEDING_NEWLINE_REGEX = /^\n*([\s\S]*)\s*/i;
+const PIPE_REGEX = /\|/;
 
 /**
  * The paragraph parser plugin functions by ingesting a block of text and generating a pseudoparagraph node for the initial line of the text.
@@ -33,6 +34,12 @@ export class ParagraphParserPlugin implements BlockParserPlugin {
 
 		const nodeChild = YeastNodeFactory.CreateText();
 		nodeChild.text = parseIndentation(firstLine).content;
+
+		// pipe chars need escaping
+		if(PIPE_REGEX.test(nodeChild.text)){
+			PIPE_REGEX.lastIndex = 0;
+			nodeChild.text.replace(PIPE_REGEX, '\|');
+		}
 
 		return {
 			remainingText: lines.join('\n'),

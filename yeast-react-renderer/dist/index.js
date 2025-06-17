@@ -563,6 +563,8 @@ function TableNodeRenderer(props) {
                     let renderedContent;
                     renderedContent = React.createElement(React.Fragment, null, props.renderer.renderComponents(childCell.children));
                     const content = getContent(childCell);
+                    //handle two things, escaped tilde and escaped pipe char
+                    // console.log(content)
                     const cell = {
                         renderedContent,
                         content: content.length == 0 ? 'default content' : content,
@@ -677,8 +679,16 @@ class ReactRenderer {
             if (node.text) {
                 const diffRenderData = getDiffRenderData(node);
                 const typedNode = node;
-                typedNode.text = typedNode.text.replace(/\\~(.*?)\\~/g, (_, p1) => `~${p1}~`);
-                console.log(typedNode.text);
+                // process text with escaped tildes
+                const TILDE_REGEX = /\\~/g;
+                let tempCopy = typedNode.text;
+                if (TILDE_REGEX.test(tempCopy)) {
+                    TILDE_REGEX.lastIndex = 0;
+                    // store it in a temporary copy to keep the text in ast
+                    tempCopy = tempCopy.replace(TILDE_REGEX, '~');
+                    console.log(tempCopy);
+                    return React.createElement(React.Fragment, { key: i }, tempCopy);
+                }
                 return diffRenderData && diffRenderData.renderedNodes
                     ? React.createElement(React.Fragment, { key: i }, diffRenderData.renderedNodes['text'])
                     : React.createElement(React.Fragment, { key: i }, typedNode.text);

@@ -148,12 +148,13 @@ export class ReactRenderer {
 				const typedNode = node as YeastText;
 
 				// process text with escaped tildes
-				const TILDE_REGEX = /\\~(.*?)\\~/g;
+				const TILDE_REGEX = /\\~/g;
 				let tempCopy = typedNode.text
 				if (TILDE_REGEX.test(tempCopy)) {
 					TILDE_REGEX.lastIndex = 0;
 					// store it in a temporary copy to keep the text in ast
-					tempCopy = tempCopy.replace(TILDE_REGEX, (_, p1) => `~${p1}~`);
+					tempCopy = tempCopy.replace(TILDE_REGEX, '~');
+					console.log(tempCopy)
 					return <React.Fragment key={i}>{tempCopy}</React.Fragment>;
 				}
 				
