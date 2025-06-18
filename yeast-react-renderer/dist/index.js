@@ -679,7 +679,6 @@ class ReactRenderer {
                 const diffRenderData = getDiffRenderData(node);
                 const typedNode = node;
                 const processedText = typedNode.text.replace(TILDE_REGEX, '~');
-                console.log(processedText);
                 return diffRenderData && diffRenderData.renderedNodes
                     ? React.createElement(React.Fragment, { key: i }, diffRenderData.renderedNodes['text'])
                     : React.createElement(React.Fragment, { key: i }, processedText);
