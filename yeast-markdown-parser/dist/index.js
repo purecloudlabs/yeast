@@ -224,12 +224,11 @@ const STRIKETHROUGH_REGEX = /~(\S.+?)~/gi;
 class InlineStrikeThroughPlugin {
     tokenize(text, parser) {
         const tokens = [];
-        var node, startPos;
+        let node, startPos;
         for (const match of text.matchAll(STRIKETHROUGH_REGEX)) {
             if (text.charAt(match.index - 1) === '\\' && text.charAt(match.index + match[0].length - 2) === '\\') {
                 node = YeastNodeFactory.CreateText();
-                node.text = text.substring(match.index, match.index + match[0].length - 2);
-                node.text += '~';
+                node.text = text.substring(match.index - 1, match.index + match[0].length);
                 startPos = match.index - 1;
             }
             else {
