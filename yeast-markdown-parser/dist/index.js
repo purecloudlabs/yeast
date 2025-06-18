@@ -39,7 +39,6 @@ function parseIndentation(line) {
 }
 
 const REMOVE_PRECEDING_NEWLINE_REGEX = /^\n*([\s\S]*)\s*/i;
-const PIPE_REGEX = /\|/;
 class ParagraphParserPlugin {
     parse(text, parser) {
         let isLastLine = false;
@@ -53,10 +52,6 @@ class ParagraphParserPlugin {
         }
         const nodeChild = YeastNodeFactory.CreateText();
         nodeChild.text = parseIndentation(firstLine).content;
-        if (PIPE_REGEX.test(nodeChild.text)) {
-            PIPE_REGEX.lastIndex = 0;
-            nodeChild.text.replace(PIPE_REGEX, '\|');
-        }
         return {
             remainingText: lines.join('\n'),
             nodes: [
