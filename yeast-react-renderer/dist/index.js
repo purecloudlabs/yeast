@@ -593,6 +593,7 @@ function HorizontalRuleNodeRenderer(props) {
     return React.createElement("hr", { className: className, key: key.current });
 }
 
+const TILDE_REGEX = /\\~/g;
 class ReactRenderer {
     constructor(customRenderers) {
         this.defaultRenderers = {
@@ -677,19 +678,11 @@ class ReactRenderer {
             if (node.text) {
                 const diffRenderData = getDiffRenderData(node);
                 const typedNode = node;
-                // process text with escaped tildes
-                const TILDE_REGEX = /\\~/g;
-                let tempCopy = typedNode.text;
-                if (TILDE_REGEX.test(tempCopy)) {
-                    TILDE_REGEX.lastIndex = 0;
-                    // store it in a temporary copy to keep the text in ast
-                    tempCopy = tempCopy.replace(TILDE_REGEX, '~');
-                    console.log(tempCopy);
-                    return React.createElement(React.Fragment, { key: i }, tempCopy);
-                }
+                const processedText = typedNode.text.replace(TILDE_REGEX, '~');
+                console.log(processedText);
                 return diffRenderData && diffRenderData.renderedNodes
                     ? React.createElement(React.Fragment, { key: i }, diffRenderData.renderedNodes['text'])
-                    : React.createElement(React.Fragment, { key: i }, typedNode.text);
+                    : React.createElement(React.Fragment, { key: i }, processedText);
             }
             else {
                 console.warn('Unhandled node', node);
