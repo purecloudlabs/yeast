@@ -30,7 +30,7 @@ export default function ImageNodeRenderer(props: IProps) {
 			oldTitle = diffRenderData.renderedStrings['title'].oldString;
 			newTitle = diffRenderData.renderedStrings['title'].newString;
 		}
-		else if (props.node.title) {
+		else if (props.node?.title) {
 			oldTitle = props.node.title;
 			newTitle = oldTitle;
 		}
@@ -38,7 +38,7 @@ export default function ImageNodeRenderer(props: IProps) {
 			oldAlt = diffRenderData.renderedStrings['alt'].oldString;
 			newAlt = diffRenderData.renderedStrings['alt'].newString;
 		}
-		else if (props.node.alt) {
+		else if (props.node?.alt) {
 			oldAlt = props.node.alt;
 			newAlt = oldAlt;
 		}
@@ -46,7 +46,7 @@ export default function ImageNodeRenderer(props: IProps) {
 			oldSrc = diffRenderData.renderedStrings['src'].oldString;
 			newSrc = diffRenderData.renderedStrings['src'].newString;
 		}
-		else if (props.node.src) {
+		else if (props.node?.src) {
 			oldSrc = props.node.src;
 			newSrc = oldSrc;
 		}

@@ -402,6 +402,7 @@ function HeadingNodeRenderer(props) {
 }
 
 function ImageNodeRenderer(props) {
+    var _a, _b, _c;
     const key1 = useKey();
     const key2 = useKey();
     const diffRenderData = getDiffRenderData(props.node);
@@ -417,7 +418,7 @@ function ImageNodeRenderer(props) {
             oldTitle = diffRenderData.renderedStrings['title'].oldString;
             newTitle = diffRenderData.renderedStrings['title'].newString;
         }
-        else if (props.node.title) {
+        else if ((_a = props.node) === null || _a === void 0 ? void 0 : _a.title) {
             oldTitle = props.node.title;
             newTitle = oldTitle;
         }
@@ -425,7 +426,7 @@ function ImageNodeRenderer(props) {
             oldAlt = diffRenderData.renderedStrings['alt'].oldString;
             newAlt = diffRenderData.renderedStrings['alt'].newString;
         }
-        else if (props.node.alt) {
+        else if ((_b = props.node) === null || _b === void 0 ? void 0 : _b.alt) {
             oldAlt = props.node.alt;
             newAlt = oldAlt;
         }
@@ -433,7 +434,7 @@ function ImageNodeRenderer(props) {
             oldSrc = diffRenderData.renderedStrings['src'].oldString;
             newSrc = diffRenderData.renderedStrings['src'].newString;
         }
-        else if (props.node.src) {
+        else if ((_c = props.node) === null || _c === void 0 ? void 0 : _c.src) {
             oldSrc = props.node.src;
             newSrc = oldSrc;
         }
