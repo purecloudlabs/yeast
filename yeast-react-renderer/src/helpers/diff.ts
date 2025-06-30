@@ -72,14 +72,14 @@ export function getDiffRenderData(diffNode: YeastChild): DiffRenderData | undefi
 						React.Fragment,
 						{},
 						React.createElement('span', { className: `${modifiedClassPrefix}old` }, diffNode[prop].substring(0, pivot)),
-						React.createElement('span', { className: `${modifiedClassPrefix}new` }, diffNode[prop].substring(pivot, diffNode[prop.length]))
+						React.createElement('span', { className: `${modifiedClassPrefix}new` }, diffNode[prop].substring(pivot + 1, diffNode[prop.length]))
 					);
 				}
 
 				// The string representation of modified text does not include css styling, so just split the old and new strings off of the concatenated string.
 				renderedStrings[prop] = {
 					oldString: diffNode[prop].substring(0, pivot),
-					newString: diffNode[prop].substring(pivot, diffNode[prop].length),
+					newString: diffNode[prop].substring(pivot + 1, diffNode[prop].length),
 				};
 			}
 

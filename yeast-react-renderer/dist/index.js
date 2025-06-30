@@ -78,12 +78,12 @@ function getDiffRenderData(diffNode) {
                 }
                 // Otherwise, just use the old and new strings in their entirety since no internal divisions are needed for diff display.
                 else {
-                    renderedNodes[prop] = React.createElement(React.Fragment, {}, React.createElement('span', { className: `${modifiedClassPrefix}old` }, diffNode[prop].substring(0, pivot)), React.createElement('span', { className: `${modifiedClassPrefix}new` }, diffNode[prop].substring(pivot, diffNode[prop.length])));
+                    renderedNodes[prop] = React.createElement(React.Fragment, {}, React.createElement('span', { className: `${modifiedClassPrefix}old` }, diffNode[prop].substring(0, pivot)), React.createElement('span', { className: `${modifiedClassPrefix}new` }, diffNode[prop].substring(pivot + 1, diffNode[prop.length])));
                 }
                 // The string representation of modified text does not include css styling, so just split the old and new strings off of the concatenated string.
                 renderedStrings[prop] = {
                     oldString: diffNode[prop].substring(0, pivot),
-                    newString: diffNode[prop].substring(pivot, diffNode[prop].length),
+                    newString: diffNode[prop].substring(pivot + 1, diffNode[prop].length),
                 };
             }
             // Append the rendered nodes and strings to the diff render data.
@@ -402,6 +402,7 @@ function HeadingNodeRenderer(props) {
 }
 
 function ImageNodeRenderer(props) {
+    var _a, _b, _c;
     const key1 = useKey();
     const key2 = useKey();
     const diffRenderData = getDiffRenderData(props.node);
@@ -417,13 +418,25 @@ function ImageNodeRenderer(props) {
             oldTitle = diffRenderData.renderedStrings['title'].oldString;
             newTitle = diffRenderData.renderedStrings['title'].newString;
         }
+        else if ((_a = props.node) === null || _a === void 0 ? void 0 : _a.title) {
+            oldTitle = props.node.title;
+            newTitle = oldTitle;
+        }
         if (diffRenderData.renderedStrings['alt']) {
             oldAlt = diffRenderData.renderedStrings['alt'].oldString;
             newAlt = diffRenderData.renderedStrings['alt'].newString;
         }
+        else if ((_b = props.node) === null || _b === void 0 ? void 0 : _b.alt) {
+            oldAlt = props.node.alt;
+            newAlt = oldAlt;
+        }
         if (diffRenderData.renderedStrings['src']) {
             oldSrc = diffRenderData.renderedStrings['src'].oldString;
             newSrc = diffRenderData.renderedStrings['src'].newString;
+        }
+        else if ((_c = props.node) === null || _c === void 0 ? void 0 : _c.src) {
+            oldSrc = props.node.src;
+            newSrc = oldSrc;
         }
     }
     return diffRenderData && diffRenderData.renderedStrings
