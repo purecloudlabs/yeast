@@ -417,13 +417,25 @@ function ImageNodeRenderer(props) {
             oldTitle = diffRenderData.renderedStrings['title'].oldString;
             newTitle = diffRenderData.renderedStrings['title'].newString;
         }
+        else if (props.node.title) {
+            oldTitle = props.node.title;
+            newTitle = oldTitle;
+        }
         if (diffRenderData.renderedStrings['alt']) {
             oldAlt = diffRenderData.renderedStrings['alt'].oldString;
             newAlt = diffRenderData.renderedStrings['alt'].newString;
         }
+        else if (props.node.alt) {
+            oldAlt = props.node.alt;
+            newAlt = oldAlt;
+        }
         if (diffRenderData.renderedStrings['src']) {
             oldSrc = diffRenderData.renderedStrings['src'].oldString;
             newSrc = diffRenderData.renderedStrings['src'].newString;
+        }
+        else if (props.node.src) {
+            oldSrc = props.node.src;
+            newSrc = oldSrc;
         }
     }
     return diffRenderData && diffRenderData.renderedStrings

@@ -12,6 +12,7 @@ import { default as NestedData } from '../resources/NestedData';
 import { default as TableData } from '../resources/TableData';
 import { default as ContentGroupData } from '../resources/ContentGroup';
 import { default as ParagraphData } from '../resources/ParagraphData';
+import { default as ImageData } from '../resources/ImageData';
 
 test('testing paragraph node', async () => {
 	const IProp = {
@@ -285,4 +286,17 @@ test('indent implemented in paragraph', async () => {
 
 	const paragraphElem = screen.getByText('(end of document)');
 	expect(paragraphElem.className.trim()).toBe('indent-1');
+});
+
+test('accurate src in diff images', async () => {
+	const IProp = {
+		ast: ImageData as DocumentNode,
+	};
+	await act(() => {
+		render(<YeastDocumentRenderer {...IProp} />);
+	});
+
+	const els: HTMLImageElement[] = screen.getAllByAltText('Toaster in Home screen with Launcher, Conversation and Knowledge plugins enabled');
+
+	expect(els.every((el) => el.src === el.src.trim())).toBeTruthy()
 });
