@@ -78,12 +78,12 @@ function getDiffRenderData(diffNode) {
                 }
                 // Otherwise, just use the old and new strings in their entirety since no internal divisions are needed for diff display.
                 else {
-                    renderedNodes[prop] = React.createElement(React.Fragment, {}, React.createElement('span', { className: `${modifiedClassPrefix}old` }, diffNode[prop].substring(0, pivot)), React.createElement('span', { className: `${modifiedClassPrefix}new` }, diffNode[prop].substring(pivot, diffNode[prop.length])));
+                    renderedNodes[prop] = React.createElement(React.Fragment, {}, React.createElement('span', { className: `${modifiedClassPrefix}old` }, diffNode[prop].substring(0, pivot)), React.createElement('span', { className: `${modifiedClassPrefix}new` }, diffNode[prop].substring(pivot + 1, diffNode[prop.length])));
                 }
                 // The string representation of modified text does not include css styling, so just split the old and new strings off of the concatenated string.
                 renderedStrings[prop] = {
                     oldString: diffNode[prop].substring(0, pivot),
-                    newString: diffNode[prop].substring(pivot, diffNode[prop].length),
+                    newString: diffNode[prop].substring(pivot + 1, diffNode[prop].length),
                 };
             }
             // Append the rendered nodes and strings to the diff render data.
