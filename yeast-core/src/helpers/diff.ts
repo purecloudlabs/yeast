@@ -835,7 +835,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 			 */
 			if (diffData.diffType === DiffType.Added) {
 				updatedChildren = correctDiffChildren(newNode.children as YeastNode[], DiffType.Added);
-				const diffNode: YeastNode = Object.assign({}, newNode);
+				const diffNode: YeastNode = JSON.parse(JSON.stringify(newNode));
 				diffNode.diffType = DiffType.Added;
 				diffNode.hasDiff = true;
 				diffNode.children = updatedChildren;
@@ -843,8 +843,9 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 				diffNodes.push(diffNode);
 
 				if (diffData.newMatchIdx) {
+					// add the added nodes to the final diff
 					for (let i = newIdx + 1; i <= diffData.newMatchIdx; i++) {
-						const addedNode: YeastNode = Object.assign({}, newNodes[i]) as YeastNode;
+						const addedNode: YeastNode = JSON.parse(JSON.stringify((newNodes[i]) as YeastNode));
 						if (i === diffData.newMatchIdx) {
 							addedNode.hasDiff = false;
 						} else {
@@ -853,8 +854,21 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 						}
 						diffNodes.push(addedNode);
 					}
+
+					/* 
+					 * Any nodes between the match index and the next index for comparison are matched nodes with no diff.
+					 * Simply set "hasDiff" false and add the nodes to the final diff.
+					 */
+					if (diffData.newMatchIdx + 1 < nextNewIdx) {
+						for (let i = diffData.newMatchIdx + 1; i < nextNewIdx; i++) {
+							const matchingNode: YeastNode = JSON.parse(JSON.stringify((newNodes[i]) as YeastNode));
+							matchingNode.hasDiff = false;
+							diffNodes.push(matchingNode)
+						}
+					}
 				}
 			} else if (diffData.diffType === DiffType.Removed) {
+				// Update the child diffs, now with the context of the parent diff (hindsight is 20/20)
 				updatedChildren = correctDiffChildren(oldNode.children as YeastNode[], DiffType.Removed);
 				const diffNode: YeastNode = Object.assign({}, oldNode);
 				diffNode.diffType = DiffType.Removed;
@@ -864,6 +878,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 				diffNodes.push(diffNode);
 
 				if (diffData.oldMatchIdx) {
+					// add the removed nodes to the final diff
 					for (let i = oldIdx + 1; i <= diffData.oldMatchIdx; i++) {
 						let removedNode: YeastNode;
 						if (i === diffData.oldMatchIdx) {
@@ -875,6 +890,18 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 							removedNode.diffType = DiffType.Removed;
 						}
 						diffNodes.push(removedNode);
+					}
+
+					/* 
+					 * Any nodes between the match index and the next index for parsing ar e matched nodes with no diff.
+					 * Simply set "hasDiff" false and add the nodes to the final diff.
+					 */
+					if (diffData.oldMatchIdx + 1 < nextOldIdx) {
+						for (let i = diffData.oldMatchIdx + 1; i < nextOldIdx; i++) {
+							const matchingNode: YeastNode = JSON.parse(JSON.stringify((oldNodes[i]) as YeastNode));
+							matchingNode.hasDiff = false;
+							diffNodes.push(matchingNode)
+						}
 					}
 				}
 			}
@@ -923,7 +950,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 					diffNode.children = updatedChildren;
 					diffNode.diffMods = modData;
 					diffNode.diffPivots = diffPivots;
-					diffNode.containsTextModification = containsTextModification(diffChildren);
+					diffNode.containsDiff = containsDiff(diffChildren);
 
 					// Add the diff node.
 					diffNodes.push(diffNode);
@@ -934,12 +961,12 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 					 * If the modified node contains a text modification in the child nodes, then add the new node and localize the displayed diff to the modified text.
 					 * If not, add the old and new nodes in order to display them both as before and after.
 					 */
-					if (containsTextModification(diffChildren) && oldNode.type === newNode.type) {
-						const diffNode: YeastNode = Object.assign({}, newNode);
+					if (containsDiff(diffChildren) && oldNode.type === newNode.type) {
+						const diffNode: YeastNode = JSON.parse(JSON.stringify(newNode));
 						diffNode.hasDiff = true;
 						diffNode.diffType = DiffType.Modified;
 						diffNode.children = updatedChildren;
-						diffNode.containsTextModification = true;
+						diffNode.containsDiff = true;
 
 						diffNodes.push(diffNode);
 					} else {
@@ -947,13 +974,13 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 						oldDiffNode.hasDiff = true;
 						oldDiffNode.diffType = DiffType.Modified;
 						oldDiffNode.diffSource = DiffSource.Old;
-						oldDiffNode.containsTextModification = false;
+						oldDiffNode.containsDiff = false;
 
 						const newDiffNode: YeastNode = Object.assign({}, newNode);
 						newDiffNode.hasDiff = true;
 						newDiffNode.diffType = DiffType.Modified;
 						newDiffNode.diffSource = DiffSource.New;
-						newDiffNode.containsTextModification = false;
+						newDiffNode.containsDiff = false;
 
 						diffNodes.push(oldDiffNode);
 						diffNodes.push(newDiffNode);
@@ -972,16 +999,17 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 }
 
 // Returns true if the node contains a text modification via its children.
-function containsTextModification(children: YeastChild[]): boolean {
+function containsDiff(children: YeastChild[]): boolean {
+	if (!children) return false;
+	
 	// If there is some child that is a text modification, the node contains a text modification.
 	// Recursively search through each child's children.
-
 	for (const child of children) {
-		if (child.isTextModification) return true;
+		if (child.isTextModification || child.hasDiff) return true;
 
 		if (isYeastNode(child) && child.children && child.children.length > 0) {
-			const childrenContain: boolean = containsTextModification(child.children);
-			if (childrenContain) return true;
+			const childrenContainInnerDiff: boolean = containsDiff(child.children);
+			if (childrenContainInnerDiff) return true;
 		}
 	}
 

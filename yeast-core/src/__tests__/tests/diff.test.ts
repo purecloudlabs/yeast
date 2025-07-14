@@ -1,3 +1,5 @@
+import * as fs from 'fs-extra';
+
 import {
 	YeastBlockNodeTypes,
 	YeastInlineNodeTypes,
@@ -16,8 +18,10 @@ import {
 	DiffSource,
 	ImageNode,
 } from '../..';
-
 import { diff } from '../../helpers/diff';
+
+const publishedImg = require('../resources/content/published-img.json');
+const draftImg = require('../resources/content/draft-img.json');
 
 const publishedNodeBasic: DocumentNode = {
 	type: YeastBlockNodeTypes.Document,
@@ -440,17 +444,17 @@ test('successfully performs basic diff', () => {
 
 	expect(doc.children[0].type).toBe(YeastBlockNodeTypes.Heading);
 	expect(doc.children[0].hasDiff).toBeTruthy();
-	expect(doc.children[0].containsTextModification).toBeTruthy();
+	expect(doc.children[0].containsDiff).toBeTruthy();
 	expect(doc.children[0].diffType).toBe(DiffType.Modified);
 
 	expect(doc.children[1].type).toBe(YeastBlockNodeTypes.Paragraph);
 	expect(doc.children[1].hasDiff).toBeTruthy();
-	expect(doc.children[1].containsTextModification).toBeTruthy();
+	expect(doc.children[1].containsDiff).toBeTruthy();
 	expect(doc.children[1].diffType).toBe(DiffType.Modified);
 
 	expect(doc.children[2].type).toBe(YeastBlockNodeTypes.Heading);
 	expect(doc.children[2].hasDiff).toBeTruthy();
-	expect(doc.children[2].containsTextModification).toBeTruthy();
+	expect(doc.children[2].containsDiff).toBeTruthy();
 	expect(doc.children[2].diffType).toBe(DiffType.Modified);
 
 	expect(doc.children[3].type).toBe(YeastBlockNodeTypes.Heading);
@@ -506,17 +510,17 @@ test('successfully performs advanced diff', () => {
 	expect(doc.children[3].type).toBe(YeastBlockNodeTypes.Paragraph);
 	expect(doc.children[3].hasDiff).toBeTruthy();
 	expect(doc.children[3].diffType).toBe(DiffType.Modified);
-	expect(doc.children[3].containsTextModification).toBeTruthy();
+	expect(doc.children[3].containsDiff).toBeTruthy();
 
 	expect(doc.children[4].type).toBe(YeastInlineNodeTypes.Code);
 	expect(doc.children[4].hasDiff).toBeTruthy();
 	expect(doc.children[4].diffType).toBe(DiffType.Modified);
-	expect(doc.children[4].containsTextModification).toBeTruthy();
+	expect(doc.children[4].containsDiff).toBeTruthy();
 
 	expect(doc.children[5].type).toBe(YeastBlockNodeTypes.Paragraph);
 	expect(doc.children[5].hasDiff).toBeTruthy();
 	expect(doc.children[5].diffType).toBe(DiffType.Modified);
-	expect(doc.children[5].containsTextModification).toBeTruthy();
+	expect(doc.children[5].containsDiff).toBeTruthy();
 
 	expect(doc.children[6].type).toBe(YeastBlockNodeTypes.HorizontalRule);
 	expect(doc.children[6].hasDiff).toBeTruthy();
@@ -535,7 +539,7 @@ test('successfully performs advanced diff', () => {
 	expect(doc.children[9].type).toBe(YeastBlockNodeTypes.ContentGroup);
 	expect(doc.children[9].hasDiff).toBeTruthy();
 	expect(doc.children[9].diffType).toBe(DiffType.Modified);
-	expect(doc.children[9].containsTextModification).toBeTruthy();
+	expect(doc.children[9].containsDiff).toBeTruthy();
 
 	expect(doc.children[10].type).toBe(YeastBlockNodeTypes.Code);
 	expect(doc.children[10].hasDiff).toBeTruthy();
@@ -556,7 +560,7 @@ test('successfully diffs nodes with images', () => {
 	expect(oldImage.hasDiff).toBeTruthy();
 	expect(oldImage.diffType).toBe('modified');
 	expect(oldImage.diffSource).toBe('old');
-	expect(oldImage.containsTextModification).toBeFalsy();
+	expect(oldImage.containsDiff).toBeFalsy();
 
 	expect(newImage.type).toBe(YeastInlineNodeTypes.Image);
 	expect(newImage.src).toBe('../asset.jpg');
@@ -564,5 +568,28 @@ test('successfully diffs nodes with images', () => {
 	expect(newImage.hasDiff).toBeTruthy();
 	expect(newImage.diffType).toBe('modified');
 	expect(newImage.diffSource).toBe('new');
-	expect(newImage.containsTextModification).toBeFalsy();
+	expect(newImage.containsDiff).toBeFalsy();
 });
+
+test('successfully diffs nodes with image removal', () => {
+	const doc: DocumentNode = diff(publishedImg, draftImg);
+	const children = doc.children;
+
+	expect(children.length).toBe(2)
+	expect(children[0].hasDiff).toBeTruthy();
+	expect(children[0].containsDiff).toBeTruthy();
+	expect(children[0].children[0].hasDiff).toBeTruthy();
+	expect(children[0].children[0].diffType).toBe(DiffType.Removed);
+
+	debugAST('successfully diffs nodes with images 2', doc);
+
+});
+
+// debugAST prints the AST document to the console log and writes it to a local file in the debug directory
+function debugAST(testName: string, ast: DocumentNode) {
+	// console.log(JSON.stringify(ast, null, 2));
+	if (!fs.existsSync('./debug/')) {
+		fs.mkdirSync('debug');
+	}
+	fs.writeFileSync(`./debug/${(testName || 'unnamed').replace(/[^a-z0-9]/gi, '_')}.json`, JSON.stringify(ast, null, 2));
+}

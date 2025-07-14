@@ -955,14 +955,14 @@ function diffInner(oldNodes, newNodes) {
             nextNewIdx = diffData.nextNewIdx;
             if (diffData.diffType === DiffType.Added) {
                 updatedChildren = correctDiffChildren(newNode.children, DiffType.Added);
-                const diffNode = Object.assign({}, newNode);
+                const diffNode = JSON.parse(JSON.stringify(newNode));
                 diffNode.diffType = DiffType.Added;
                 diffNode.hasDiff = true;
                 diffNode.children = updatedChildren;
                 diffNodes.push(diffNode);
                 if (diffData.newMatchIdx) {
                     for (let i = newIdx + 1; i <= diffData.newMatchIdx; i++) {
-                        const addedNode = Object.assign({}, newNodes[i]);
+                        const addedNode = JSON.parse(JSON.stringify((newNodes[i])));
                         if (i === diffData.newMatchIdx) {
                             addedNode.hasDiff = false;
                         }
@@ -971,6 +971,13 @@ function diffInner(oldNodes, newNodes) {
                             addedNode.diffType = DiffType.Added;
                         }
                         diffNodes.push(addedNode);
+                    }
+                    if (diffData.newMatchIdx + 1 < nextNewIdx) {
+                        for (let i = diffData.newMatchIdx + 1; i < nextNewIdx; i++) {
+                            const matchingNode = JSON.parse(JSON.stringify((newNodes[i])));
+                            matchingNode.hasDiff = false;
+                            diffNodes.push(matchingNode);
+                        }
                     }
                 }
             }
@@ -994,6 +1001,13 @@ function diffInner(oldNodes, newNodes) {
                             removedNode.diffType = DiffType.Removed;
                         }
                         diffNodes.push(removedNode);
+                    }
+                    if (diffData.oldMatchIdx + 1 < nextOldIdx) {
+                        for (let i = diffData.oldMatchIdx + 1; i < nextOldIdx; i++) {
+                            const matchingNode = JSON.parse(JSON.stringify((oldNodes[i])));
+                            matchingNode.hasDiff = false;
+                            diffNodes.push(matchingNode);
+                        }
                     }
                 }
             }
@@ -1024,16 +1038,16 @@ function diffInner(oldNodes, newNodes) {
                     diffNode.children = updatedChildren;
                     diffNode.diffMods = modData;
                     diffNode.diffPivots = diffPivots;
-                    diffNode.containsTextModification = containsTextModification(diffChildren);
+                    diffNode.containsDiff = containsDiff(diffChildren);
                     diffNodes.push(diffNode);
                 }
                 else {
-                    if (containsTextModification(diffChildren) && oldNode.type === newNode.type) {
-                        const diffNode = Object.assign({}, newNode);
+                    if (containsDiff(diffChildren) && oldNode.type === newNode.type) {
+                        const diffNode = JSON.parse(JSON.stringify(newNode));
                         diffNode.hasDiff = true;
                         diffNode.diffType = DiffType.Modified;
                         diffNode.children = updatedChildren;
-                        diffNode.containsTextModification = true;
+                        diffNode.containsDiff = true;
                         diffNodes.push(diffNode);
                     }
                     else {
@@ -1041,12 +1055,12 @@ function diffInner(oldNodes, newNodes) {
                         oldDiffNode.hasDiff = true;
                         oldDiffNode.diffType = DiffType.Modified;
                         oldDiffNode.diffSource = DiffSource.Old;
-                        oldDiffNode.containsTextModification = false;
+                        oldDiffNode.containsDiff = false;
                         const newDiffNode = Object.assign({}, newNode);
                         newDiffNode.hasDiff = true;
                         newDiffNode.diffType = DiffType.Modified;
                         newDiffNode.diffSource = DiffSource.New;
-                        newDiffNode.containsTextModification = false;
+                        newDiffNode.containsDiff = false;
                         diffNodes.push(oldDiffNode);
                         diffNodes.push(newDiffNode);
                     }
@@ -1058,13 +1072,15 @@ function diffInner(oldNodes, newNodes) {
     }
     return diffNodes;
 }
-function containsTextModification(children) {
+function containsDiff(children) {
+    if (!children)
+        return false;
     for (const child of children) {
-        if (child.isTextModification)
+        if (child.isTextModification || child.hasDiff)
             return true;
         if (isYeastNode(child) && child.children && child.children.length > 0) {
-            const childrenContain = containsTextModification(child.children);
-            if (childrenContain)
+            const childrenContainInnerDiff = containsDiff(child.children);
+            if (childrenContainInnerDiff)
                 return true;
         }
     }
