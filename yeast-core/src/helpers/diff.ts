@@ -732,7 +732,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 	if (areOldNodesEmpty) {
 		diffNodes = newNodes.map((node: YeastNode) => {
 			let diffChildren: YeastChild[] = [];
-			const diffNode: YeastNode = Object.assign({}, node);
+			const diffNode: YeastNode = JSON.parse(JSON.stringify(node));
 			diffNode.hasDiff = true;
 			diffNode.diffType = DiffType.Added;
 			if (node.children && node.children.length > 0) {
@@ -750,7 +750,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 		diffNodes = oldNodes.map((node: YeastNode) => {
 			let diffChildren: YeastChild[] = [];
 
-			const diffNode: YeastNode = Object.assign({}, node);
+			const diffNode: YeastNode = JSON.parse(JSON.stringify(node));
 			diffNode.hasDiff = true;
 			diffNode.diffType = DiffType.Removed;
 			if (node.children && node.children.length > 0) {
@@ -787,7 +787,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 			updatedChildren = correctDiffChildren(oldNode.children as YeastNode[], DiffType.Removed);
 
 			for (let i = oldIdx; i < oldNodes.length; i++) {
-				const diffNode: YeastNode = Object.assign({}, oldNodes[i]) as YeastNode;
+				const diffNode: YeastNode = JSON.parse(JSON.stringify(oldNodes[i])) as YeastNode;
 				diffNode.hasDiff = true;
 				diffNode.diffType = DiffType.Removed;
 				diffNode.children = correctDiffChildren((oldNodes[i] as YeastNode).children as YeastNode[], DiffType.Removed);
@@ -802,7 +802,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 			updatedChildren = correctDiffChildren(newNode.children as YeastNode[], DiffType.Added);
 
 			for (let i = newIdx; i < newNodes.length; i++) {
-				const diffNode: YeastNode = Object.assign({}, newNodes[i] as YeastNode);
+				const diffNode: YeastNode = JSON.parse(JSON.stringify(newNodes[i] as YeastNode));
 				diffNode.hasDiff = true;
 				diffNode.diffType = DiffType.Added;
 				diffNode.children = correctDiffChildren((newNodes[i] as YeastNode).children as YeastNode[], DiffType.Added);
@@ -818,7 +818,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 		 */
 		const { isMatch, isTextModification = false, textProperties } = isEntityMatch(oldNode, newNode, diffChildren);
 		if (isMatch) {
-			const diffNode: YeastNode = Object.assign({}, newNode);
+			const diffNode: YeastNode = JSON.parse(JSON.stringify(newNode));
 			diffNode.hasDiff = false;
 			diffNode.children = diffChildren;
 
@@ -870,7 +870,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 			} else if (diffData.diffType === DiffType.Removed) {
 				// Update the child diffs, now with the context of the parent diff (hindsight is 20/20)
 				updatedChildren = correctDiffChildren(oldNode.children as YeastNode[], DiffType.Removed);
-				const diffNode: YeastNode = Object.assign({}, oldNode);
+				const diffNode: YeastNode = JSON.parse(JSON.stringify(oldNode));
 				diffNode.diffType = DiffType.Removed;
 				diffNode.hasDiff = true;
 				diffNode.children = updatedChildren;
@@ -882,10 +882,10 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 					for (let i = oldIdx + 1; i <= diffData.oldMatchIdx; i++) {
 						let removedNode: YeastNode;
 						if (i === diffData.oldMatchIdx) {
-							removedNode = Object.assign({}, oldNodes[i]) as YeastNode;
+							removedNode = JSON.parse(JSON.stringify(oldNodes[i])) as YeastNode;
 							removedNode.hasDiff = false;
 						} else {
-							removedNode = Object.assign({}, oldNodes[i]) as YeastNode;
+							removedNode = JSON.parse(JSON.stringify(oldNodes[i])) as YeastNode;
 							removedNode.hasDiff = true;
 							removedNode.diffType = DiffType.Removed;
 						}
@@ -921,7 +921,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 
 				// If there is modified text in the node, append the text mod data to the diff node.
 				if (isTextModification && textProperties) {
-					const diffNode: YeastNode = Object.assign({}, newNode);
+					const diffNode: YeastNode = JSON.parse(JSON.stringify(newNode));
 
 					/*
 					 * For each modified property on the node, append the new string to the old string and assign it to the same property on the diff node.
@@ -932,7 +932,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 					textProperties.forEach((prop: string) => {
 						const modAssignment: ModificationAssignment = getModificationData(oldNode[prop], newNode[prop]);
 						modAssignment.newModData = modAssignment.newModData?.map((md: ModificationData) => {
-							const updatedModData = Object.assign({}, md);
+							const updatedModData = JSON.parse(JSON.stringify(md));
 							updatedModData.startIndex = oldNode[prop] ? md.startIndex + oldNode[prop].length + 1 : md.startIndex;
 							updatedModData.endIndex = oldNode[prop] ? md.endIndex + oldNode[prop].length + 1 : md.endIndex;
 
@@ -970,13 +970,13 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 
 						diffNodes.push(diffNode);
 					} else {
-						const oldDiffNode: YeastNode = Object.assign({}, oldNode);
+						const oldDiffNode: YeastNode = JSON.parse(JSON.stringify(oldNode));
 						oldDiffNode.hasDiff = true;
 						oldDiffNode.diffType = DiffType.Modified;
 						oldDiffNode.diffSource = DiffSource.Old;
 						oldDiffNode.containsDiff = false;
 
-						const newDiffNode: YeastNode = Object.assign({}, newNode);
+						const newDiffNode: YeastNode = JSON.parse(JSON.stringify(newNode));
 						newDiffNode.hasDiff = true;
 						newDiffNode.diffType = DiffType.Modified;
 						newDiffNode.diffSource = DiffSource.New;
@@ -1025,7 +1025,7 @@ function containsDiff(children: YeastChild[]): boolean {
 function correctDiffChildren(children: YeastNode[], diffType: DiffType): YeastNode[] {
 	if (!children || children.length === 0) return [];
 	return children.map((child: YeastNode) => {
-		const updatedChild = Object.assign({}, child);
+		const updatedChild = JSON.parse(JSON.stringify(child));
 		// if (!isYeastTextNode(child)) {
 		updatedChild.hasDiff = true;
 		updatedChild.diffType = diffType;
@@ -1246,19 +1246,19 @@ export function diff(oldNode: DocumentNode | undefined, newNode: DocumentNode | 
 		return undefined;
 	}
 	if (oldNode === undefined) {
-		const diffNode: DocumentNode = Object.assign({}, newNode);
+		const diffNode: DocumentNode = JSON.parse(JSON.stringify(newNode));
 		diffNode.hasDiff = true;
 		diffNode.diffType = DiffType.Added;
 		return diffNode;
 	}
 	if (newNode === undefined) {
-		const diffNode: DocumentNode = Object.assign({}, oldNode);
+		const diffNode: DocumentNode = JSON.parse(JSON.stringify(oldNode));
 		diffNode.hasDiff = true;
 		diffNode.diffType = DiffType.Removed;
 		return diffNode;
 	}
 
-	const diffNode: DocumentNode = Object.assign({}, newNode);
+	const diffNode: DocumentNode = JSON.parse(JSON.stringify(newNode));
 
 	const { isMatch, isTextModification = false, textProperties }: EntityMatchData = isNodeMatch(oldNode, newNode, []);
 	if (!isMatch) {
@@ -1278,7 +1278,7 @@ export function diff(oldNode: DocumentNode | undefined, newNode: DocumentNode | 
 			textProperties.forEach((prop: string) => {
 				const modAssignment: ModificationAssignment = getModificationData(oldNode[prop], newNode[prop]);
 				modAssignment.newModData = modAssignment.newModData?.map((md: ModificationData) => {
-					const updatedModData = Object.assign({}, md);
+					const updatedModData = JSON.parse(JSON.stringify(md));
 					updatedModData.startIndex = oldNode[prop] ? md.startIndex + oldNode[prop].length + 1 : md.startIndex;
 					updatedModData.endIndex = oldNode[prop] ? md.endIndex + oldNode[prop].length + 1 : md.endIndex;
 

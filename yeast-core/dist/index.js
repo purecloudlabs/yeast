@@ -883,7 +883,7 @@ function diffInner(oldNodes, newNodes) {
     if (areOldNodesEmpty) {
         diffNodes = newNodes.map((node) => {
             let diffChildren = [];
-            const diffNode = Object.assign({}, node);
+            const diffNode = JSON.parse(JSON.stringify(node));
             diffNode.hasDiff = true;
             diffNode.diffType = DiffType.Added;
             if (node.children && node.children.length > 0) {
@@ -897,7 +897,7 @@ function diffInner(oldNodes, newNodes) {
     if (areNewNodesEmpty) {
         diffNodes = oldNodes.map((node) => {
             let diffChildren = [];
-            const diffNode = Object.assign({}, node);
+            const diffNode = JSON.parse(JSON.stringify(node));
             diffNode.hasDiff = true;
             diffNode.diffType = DiffType.Removed;
             if (node.children && node.children.length > 0) {
@@ -923,7 +923,7 @@ function diffInner(oldNodes, newNodes) {
         if (oldNodeExists && !newNodeExists) {
             updatedChildren = correctDiffChildren(oldNode.children, DiffType.Removed);
             for (let i = oldIdx; i < oldNodes.length; i++) {
-                const diffNode = Object.assign({}, oldNodes[i]);
+                const diffNode = JSON.parse(JSON.stringify(oldNodes[i]));
                 diffNode.hasDiff = true;
                 diffNode.diffType = DiffType.Removed;
                 diffNode.children = correctDiffChildren(oldNodes[i].children, DiffType.Removed);
@@ -934,7 +934,7 @@ function diffInner(oldNodes, newNodes) {
         if (!oldNodeExists && newNodeExists) {
             updatedChildren = correctDiffChildren(newNode.children, DiffType.Added);
             for (let i = newIdx; i < newNodes.length; i++) {
-                const diffNode = Object.assign({}, newNodes[i]);
+                const diffNode = JSON.parse(JSON.stringify(newNodes[i]));
                 diffNode.hasDiff = true;
                 diffNode.diffType = DiffType.Added;
                 diffNode.children = correctDiffChildren(newNodes[i].children, DiffType.Added);
@@ -944,7 +944,7 @@ function diffInner(oldNodes, newNodes) {
         }
         const { isMatch, isTextModification = false, textProperties } = isEntityMatch(oldNode, newNode, diffChildren);
         if (isMatch) {
-            const diffNode = Object.assign({}, newNode);
+            const diffNode = JSON.parse(JSON.stringify(newNode));
             diffNode.hasDiff = false;
             diffNode.children = diffChildren;
             diffNodes.push(diffNode);
@@ -983,7 +983,7 @@ function diffInner(oldNodes, newNodes) {
             }
             else if (diffData.diffType === DiffType.Removed) {
                 updatedChildren = correctDiffChildren(oldNode.children, DiffType.Removed);
-                const diffNode = Object.assign({}, oldNode);
+                const diffNode = JSON.parse(JSON.stringify(oldNode));
                 diffNode.diffType = DiffType.Removed;
                 diffNode.hasDiff = true;
                 diffNode.children = updatedChildren;
@@ -992,11 +992,11 @@ function diffInner(oldNodes, newNodes) {
                     for (let i = oldIdx + 1; i <= diffData.oldMatchIdx; i++) {
                         let removedNode;
                         if (i === diffData.oldMatchIdx) {
-                            removedNode = Object.assign({}, oldNodes[i]);
+                            removedNode = JSON.parse(JSON.stringify(oldNodes[i]));
                             removedNode.hasDiff = false;
                         }
                         else {
-                            removedNode = Object.assign({}, oldNodes[i]);
+                            removedNode = JSON.parse(JSON.stringify(oldNodes[i]));
                             removedNode.hasDiff = true;
                             removedNode.diffType = DiffType.Removed;
                         }
@@ -1018,12 +1018,12 @@ function diffInner(oldNodes, newNodes) {
                 let modData = {};
                 let diffPivots = {};
                 if (isTextModification && textProperties) {
-                    const diffNode = Object.assign({}, newNode);
+                    const diffNode = JSON.parse(JSON.stringify(newNode));
                     textProperties.forEach((prop) => {
                         var _a, _b;
                         const modAssignment = getModificationData(oldNode[prop], newNode[prop]);
                         modAssignment.newModData = (_a = modAssignment.newModData) === null || _a === void 0 ? void 0 : _a.map((md) => {
-                            const updatedModData = Object.assign({}, md);
+                            const updatedModData = JSON.parse(JSON.stringify(md));
                             updatedModData.startIndex = oldNode[prop] ? md.startIndex + oldNode[prop].length + 1 : md.startIndex;
                             updatedModData.endIndex = oldNode[prop] ? md.endIndex + oldNode[prop].length + 1 : md.endIndex;
                             return updatedModData;
@@ -1051,12 +1051,12 @@ function diffInner(oldNodes, newNodes) {
                         diffNodes.push(diffNode);
                     }
                     else {
-                        const oldDiffNode = Object.assign({}, oldNode);
+                        const oldDiffNode = JSON.parse(JSON.stringify(oldNode));
                         oldDiffNode.hasDiff = true;
                         oldDiffNode.diffType = DiffType.Modified;
                         oldDiffNode.diffSource = DiffSource.Old;
                         oldDiffNode.containsDiff = false;
-                        const newDiffNode = Object.assign({}, newNode);
+                        const newDiffNode = JSON.parse(JSON.stringify(newNode));
                         newDiffNode.hasDiff = true;
                         newDiffNode.diffType = DiffType.Modified;
                         newDiffNode.diffSource = DiffSource.New;
@@ -1090,7 +1090,7 @@ function correctDiffChildren(children, diffType) {
     if (!children || children.length === 0)
         return [];
     return children.map((child) => {
-        const updatedChild = Object.assign({}, child);
+        const updatedChild = JSON.parse(JSON.stringify(child));
         updatedChild.hasDiff = true;
         updatedChild.diffType = diffType;
         if (child.diffMods)
@@ -1275,18 +1275,18 @@ function diff(oldNode, newNode) {
         return undefined;
     }
     if (oldNode === undefined) {
-        const diffNode = Object.assign({}, newNode);
+        const diffNode = JSON.parse(JSON.stringify(newNode));
         diffNode.hasDiff = true;
         diffNode.diffType = DiffType.Added;
         return diffNode;
     }
     if (newNode === undefined) {
-        const diffNode = Object.assign({}, oldNode);
+        const diffNode = JSON.parse(JSON.stringify(oldNode));
         diffNode.hasDiff = true;
         diffNode.diffType = DiffType.Removed;
         return diffNode;
     }
-    const diffNode = Object.assign({}, newNode);
+    const diffNode = JSON.parse(JSON.stringify(newNode));
     const { isMatch, isTextModification = false, textProperties } = isNodeMatch(oldNode, newNode, []);
     if (!isMatch) {
         diffNode.hasDiff = true;
@@ -1303,7 +1303,7 @@ function diff(oldNode, newNode) {
                 var _a, _b;
                 const modAssignment = getModificationData(oldNode[prop], newNode[prop]);
                 modAssignment.newModData = (_a = modAssignment.newModData) === null || _a === void 0 ? void 0 : _a.map((md) => {
-                    const updatedModData = Object.assign({}, md);
+                    const updatedModData = JSON.parse(JSON.stringify(md));
                     updatedModData.startIndex = oldNode[prop] ? md.startIndex + oldNode[prop].length + 1 : md.startIndex;
                     updatedModData.endIndex = oldNode[prop] ? md.endIndex + oldNode[prop].length + 1 : md.endIndex;
                     return updatedModData;
