@@ -35,7 +35,7 @@
 	"peerDependencies": {
 		"fast-xml-parser": "^4.0.13",
 		"yaml": "^2.0.0",
-		"yeast-core": "^1.1.0"
+		"yeast-core": "^1.1.2-DEVENGAGE-3180-diff-img-highlighting.762"
 	},
 	"jest": {
 		"preset": "ts-jest",

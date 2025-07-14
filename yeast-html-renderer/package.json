@@ -1,6 +1,6 @@
 {
 	"name": "yeast-html-renderer",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"description": "The yeast HTML renderer project provides a class to render yeast documents as HTML",
 	"exports": {
 		"require": "./src/index.ts",
@@ -35,7 +35,7 @@
 	"peerDependencies": {
 		"jsdom": "26.1.0",
 		"xmlbuilder2": "^3.0.2",
-		"yeast-core": "^1.1.0"
+		"yeast-core": "^1.1.2-DEVENGAGE-3180-diff-img-highlighting.762"
 	},
 	"jest": {
 		"preset": "ts-jest",
