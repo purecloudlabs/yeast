@@ -962,7 +962,7 @@ function diffInner(oldNodes, newNodes) {
                 diffNodes.push(diffNode);
                 if (diffData.newMatchIdx) {
                     for (let i = newIdx + 1; i <= diffData.newMatchIdx; i++) {
-                        const addedNode = JSON.parse(JSON.stringify((newNodes[i])));
+                        const addedNode = JSON.parse(JSON.stringify(newNodes[i]));
                         if (i === diffData.newMatchIdx) {
                             addedNode.hasDiff = false;
                         }
@@ -974,7 +974,7 @@ function diffInner(oldNodes, newNodes) {
                     }
                     if (diffData.newMatchIdx + 1 < nextNewIdx) {
                         for (let i = diffData.newMatchIdx + 1; i < nextNewIdx; i++) {
-                            const matchingNode = JSON.parse(JSON.stringify((newNodes[i])));
+                            const matchingNode = JSON.parse(JSON.stringify(newNodes[i]));
                             matchingNode.hasDiff = false;
                             diffNodes.push(matchingNode);
                         }
@@ -1004,7 +1004,7 @@ function diffInner(oldNodes, newNodes) {
                     }
                     if (diffData.oldMatchIdx + 1 < nextOldIdx) {
                         for (let i = diffData.oldMatchIdx + 1; i < nextOldIdx; i++) {
-                            const matchingNode = JSON.parse(JSON.stringify((oldNodes[i])));
+                            const matchingNode = JSON.parse(JSON.stringify(oldNodes[i]));
                             matchingNode.hasDiff = false;
                             diffNodes.push(matchingNode);
                         }

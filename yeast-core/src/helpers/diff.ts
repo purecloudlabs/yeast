@@ -845,7 +845,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 				if (diffData.newMatchIdx) {
 					// add the added nodes to the final diff
 					for (let i = newIdx + 1; i <= diffData.newMatchIdx; i++) {
-						const addedNode: YeastNode = JSON.parse(JSON.stringify((newNodes[i]) as YeastNode));
+						const addedNode: YeastNode = JSON.parse(JSON.stringify(newNodes[i] as YeastNode));
 						if (i === diffData.newMatchIdx) {
 							addedNode.hasDiff = false;
 						} else {
@@ -855,15 +855,15 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 						diffNodes.push(addedNode);
 					}
 
-					/* 
+					/*
 					 * Any nodes between the match index and the next index for comparison are matched nodes with no diff.
 					 * Simply set "hasDiff" false and add the nodes to the final diff.
 					 */
 					if (diffData.newMatchIdx + 1 < nextNewIdx) {
 						for (let i = diffData.newMatchIdx + 1; i < nextNewIdx; i++) {
-							const matchingNode: YeastNode = JSON.parse(JSON.stringify((newNodes[i]) as YeastNode));
+							const matchingNode: YeastNode = JSON.parse(JSON.stringify(newNodes[i] as YeastNode));
 							matchingNode.hasDiff = false;
-							diffNodes.push(matchingNode)
+							diffNodes.push(matchingNode);
 						}
 					}
 				}
@@ -892,15 +892,15 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 						diffNodes.push(removedNode);
 					}
 
-					/* 
-					 * Any nodes between the match index and the next index for parsing ar e matched nodes with no diff.
+					/*
+					 * Any nodes between the match index and the next index for parsing are matched nodes with no diff.
 					 * Simply set "hasDiff" false and add the nodes to the final diff.
 					 */
 					if (diffData.oldMatchIdx + 1 < nextOldIdx) {
 						for (let i = diffData.oldMatchIdx + 1; i < nextOldIdx; i++) {
-							const matchingNode: YeastNode = JSON.parse(JSON.stringify((oldNodes[i]) as YeastNode));
+							const matchingNode: YeastNode = JSON.parse(JSON.stringify(oldNodes[i] as YeastNode));
 							matchingNode.hasDiff = false;
-							diffNodes.push(matchingNode)
+							diffNodes.push(matchingNode);
 						}
 					}
 				}
@@ -1001,7 +1001,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 // Returns true if the node contains a text modification via its children.
 function containsDiff(children: YeastChild[]): boolean {
 	if (!children) return false;
-	
+
 	// If there is some child that is a text modification, the node contains a text modification.
 	// Recursively search through each child's children.
 	for (const child of children) {
