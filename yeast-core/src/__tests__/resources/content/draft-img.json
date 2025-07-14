@@ -1,0 +1,48 @@
+{
+  "type": "document",
+  "title": "Default Page Title",
+  "children": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "text": " "
+        },
+        {
+          "type": "image",
+          "src": "./images/toaster-home-screen-launcher-on.png",
+          "alt": "Toaster in Home screen with Launcher, Conversation and Knowledge plugins enabled",
+          "title": "Toaster in Home screen with Launcher, Conversation and Knowledge plugins enabled",
+          "children": []
+        },
+        {
+          "text": " "
+        },
+        {
+          "type": "image",
+          "src": "./images/toaster-conversation-app-launcher-on.png",
+          "alt": "Toaster in Conversation screen with Launcher on",
+          "title": "Toaster in Conversation screen with Launcher on",
+          "children": []
+        },
+        {
+          "text": " "
+        },
+        {
+          "type": "image",
+          "src": "./images/toaster-knowledge-app-launcher-on.png",
+          "alt": "Toaster in Knowledge screen with Launcher on",
+          "title": "Toaster in Knowledge screen with Launcher on",
+          "children": []
+        }
+      ],
+      "indentation": 0
+    },
+    {
+      "type": "paragraph",
+      "children": [{
+        "text": "after"
+      }]
+    }
+  ]
+}

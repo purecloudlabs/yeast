@@ -55,7 +55,7 @@ export interface YeastNode {
     diffMods?: ModificationDiffMap;
     diffPivots?: DiffPivotMap;
     isTextModification?: boolean;
-    containsTextModification?: boolean;
+    containsDiff?: boolean;
     diffSource?: DiffSource;
 }
 export interface ModificationData {
@@ -219,7 +219,7 @@ export interface YeastText {
     diffMods?: ModificationDiffMap;
     diffPivots?: DiffPivotMap;
     isTextModification?: boolean;
-    containsTextModification?: boolean;
+    containsDiff?: boolean;
 }
 export interface RootNodeParserPlugin {
     parse: {
