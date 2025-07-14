@@ -43,7 +43,7 @@ export default {
             diffPivots: {
                 src: 44
             },
-            containsTextModification: false
+            containsDiff: false
         } as YeastNode
 	],
 	author: 'yuri.yeti',
