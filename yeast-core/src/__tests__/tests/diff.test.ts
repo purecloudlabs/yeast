@@ -486,7 +486,7 @@ test('correctly handles documents with no diff', () => {
 test('successfully performs advanced diff', () => {
 	const doc: DocumentNode = diff(publishedNodeAdvanced, draftNodeAdvanced);
 
-	debugAST('successfully performs advanced diff', doc)
+	// debugAST('successfully performs advanced diff', doc)
 
 	expect(doc.hasDiff).toBeTruthy();
 	expect(doc.diffType).toBe(DiffType.Modified);
