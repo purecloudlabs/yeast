@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 import { CodeFence, AlertBlock, DxAccordionGroup, DxTabbedContent, DataTable, DxAccordion, DxTabPanel } from 'genesys-react-components';
 import React, { useState, useEffect } from 'react';
-import { DiffType, DiffSource, isYeastNode, YeastBlockNodeTypes, YeastInlineNodeTypes } from 'yeast-core';
+import { DiffType, DiffSource, isYeastNode, YeastBlockNodeTypes, YeastInlineNodeTypes, isYeastTextNode } from 'yeast-core';
 
 // import { useRef } from 'react';
 function useKey() {
@@ -688,7 +688,7 @@ class ReactRenderer {
                     return rendered;
             }
             // Final fallback to default unhandled renderer
-            if (node.text) {
+            if (isYeastTextNode(node)) {
                 const diffRenderData = getDiffRenderData(node);
                 const typedNode = node;
                 const processedText = typedNode.text.replace(TILDE_REGEX, '~');
