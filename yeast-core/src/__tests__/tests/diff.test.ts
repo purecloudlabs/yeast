@@ -1,3 +1,5 @@
+global.structuredClone = (val) => JSON.parse(JSON.stringify(val))
+
 import * as fs from 'fs-extra';
 
 import {
