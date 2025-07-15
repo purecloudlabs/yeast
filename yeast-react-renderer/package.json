@@ -58,6 +58,6 @@
 		"react-dom": ">=18",
 		"react-syntax-highlighter": "^15.5.0",
 		"uuid": "^9.0.0",
-		"yeast-core": "^1.1.2-DEVENGAGE-3180-diff-img-highlighting.762"
+		"yeast-core": "^1.2.0-devengage-3180-diff-fix-yeast-core.769"
 	}
 }
