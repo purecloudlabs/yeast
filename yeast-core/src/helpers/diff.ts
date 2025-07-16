@@ -732,7 +732,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 	if (areOldNodesEmpty) {
 		diffNodes = newNodes.map((node: YeastNode) => {
 			let diffChildren: YeastChild[] = [];
-			const diffNode: YeastNode = Object.assign({}, node);
+			const diffNode: YeastNode = structuredClone(node);
 			diffNode.hasDiff = true;
 			diffNode.diffType = DiffType.Added;
 			if (node.children && node.children.length > 0) {
@@ -750,7 +750,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 		diffNodes = oldNodes.map((node: YeastNode) => {
 			let diffChildren: YeastChild[] = [];
 
-			const diffNode: YeastNode = Object.assign({}, node);
+			const diffNode: YeastNode = structuredClone(node);
 			diffNode.hasDiff = true;
 			diffNode.diffType = DiffType.Removed;
 			if (node.children && node.children.length > 0) {
@@ -787,7 +787,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 			updatedChildren = correctDiffChildren(oldNode.children as YeastNode[], DiffType.Removed);
 
 			for (let i = oldIdx; i < oldNodes.length; i++) {
-				const diffNode: YeastNode = Object.assign({}, oldNodes[i]) as YeastNode;
+				const diffNode: YeastNode = structuredClone(oldNodes[i]) as YeastNode;
 				diffNode.hasDiff = true;
 				diffNode.diffType = DiffType.Removed;
 				diffNode.children = correctDiffChildren((oldNodes[i] as YeastNode).children as YeastNode[], DiffType.Removed);
@@ -802,7 +802,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 			updatedChildren = correctDiffChildren(newNode.children as YeastNode[], DiffType.Added);
 
 			for (let i = newIdx; i < newNodes.length; i++) {
-				const diffNode: YeastNode = Object.assign({}, newNodes[i] as YeastNode);
+				const diffNode: YeastNode = structuredClone(newNodes[i] as YeastNode);
 				diffNode.hasDiff = true;
 				diffNode.diffType = DiffType.Added;
 				diffNode.children = correctDiffChildren((newNodes[i] as YeastNode).children as YeastNode[], DiffType.Added);
@@ -818,7 +818,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 		 */
 		const { isMatch, isTextModification = false, textProperties } = isEntityMatch(oldNode, newNode, diffChildren);
 		if (isMatch) {
-			const diffNode: YeastNode = Object.assign({}, newNode);
+			const diffNode: YeastNode = structuredClone(newNode);
 			diffNode.hasDiff = false;
 			diffNode.children = diffChildren;
 
@@ -835,7 +835,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 			 */
 			if (diffData.diffType === DiffType.Added) {
 				updatedChildren = correctDiffChildren(newNode.children as YeastNode[], DiffType.Added);
-				const diffNode: YeastNode = Object.assign({}, newNode);
+				const diffNode: YeastNode = structuredClone(newNode);
 				diffNode.diffType = DiffType.Added;
 				diffNode.hasDiff = true;
 				diffNode.children = updatedChildren;
@@ -843,8 +843,9 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 				diffNodes.push(diffNode);
 
 				if (diffData.newMatchIdx) {
+					// add the added nodes to the final diff
 					for (let i = newIdx + 1; i <= diffData.newMatchIdx; i++) {
-						const addedNode: YeastNode = Object.assign({}, newNodes[i]) as YeastNode;
+						const addedNode: YeastNode = structuredClone(newNodes[i] as YeastNode);
 						if (i === diffData.newMatchIdx) {
 							addedNode.hasDiff = false;
 						} else {
@@ -853,10 +854,23 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 						}
 						diffNodes.push(addedNode);
 					}
+
+					/*
+					 * Any nodes between the match index and the next index for comparison are matched nodes with no diff.
+					 * Simply set "hasDiff" false and add the nodes to the final diff.
+					 */
+					if (diffData.newMatchIdx + 1 < nextNewIdx) {
+						for (let i = diffData.newMatchIdx + 1; i < nextNewIdx; i++) {
+							const matchingNode: YeastNode = structuredClone(newNodes[i] as YeastNode);
+							matchingNode.hasDiff = false;
+							diffNodes.push(matchingNode);
+						}
+					}
 				}
 			} else if (diffData.diffType === DiffType.Removed) {
+				// Update the child diffs, now with the context of the parent diff (hindsight is 20/20)
 				updatedChildren = correctDiffChildren(oldNode.children as YeastNode[], DiffType.Removed);
-				const diffNode: YeastNode = Object.assign({}, oldNode);
+				const diffNode: YeastNode = structuredClone(oldNode);
 				diffNode.diffType = DiffType.Removed;
 				diffNode.hasDiff = true;
 				diffNode.children = updatedChildren;
@@ -864,17 +878,30 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 				diffNodes.push(diffNode);
 
 				if (diffData.oldMatchIdx) {
+					// add the removed nodes to the final diff
 					for (let i = oldIdx + 1; i <= diffData.oldMatchIdx; i++) {
 						let removedNode: YeastNode;
 						if (i === diffData.oldMatchIdx) {
-							removedNode = Object.assign({}, oldNodes[i]) as YeastNode;
+							removedNode = structuredClone(oldNodes[i]) as YeastNode;
 							removedNode.hasDiff = false;
 						} else {
-							removedNode = Object.assign({}, oldNodes[i]) as YeastNode;
+							removedNode = structuredClone(oldNodes[i]) as YeastNode;
 							removedNode.hasDiff = true;
 							removedNode.diffType = DiffType.Removed;
 						}
 						diffNodes.push(removedNode);
+					}
+
+					/*
+					 * Any nodes between the match index and the next index for parsing are matched nodes with no diff.
+					 * Simply set "hasDiff" false and add the nodes to the final diff.
+					 */
+					if (diffData.oldMatchIdx + 1 < nextOldIdx) {
+						for (let i = diffData.oldMatchIdx + 1; i < nextOldIdx; i++) {
+							const matchingNode: YeastNode = structuredClone(oldNodes[i] as YeastNode);
+							matchingNode.hasDiff = false;
+							diffNodes.push(matchingNode);
+						}
 					}
 				}
 			}
@@ -894,7 +921,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 
 				// If there is modified text in the node, append the text mod data to the diff node.
 				if (isTextModification && textProperties) {
-					const diffNode: YeastNode = Object.assign({}, newNode);
+					const diffNode: YeastNode = structuredClone(newNode);
 
 					/*
 					 * For each modified property on the node, append the new string to the old string and assign it to the same property on the diff node.
@@ -905,7 +932,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 					textProperties.forEach((prop: string) => {
 						const modAssignment: ModificationAssignment = getModificationData(oldNode[prop], newNode[prop]);
 						modAssignment.newModData = modAssignment.newModData?.map((md: ModificationData) => {
-							const updatedModData = Object.assign({}, md);
+							const updatedModData = structuredClone(md);
 							updatedModData.startIndex = oldNode[prop] ? md.startIndex + oldNode[prop].length + 1 : md.startIndex;
 							updatedModData.endIndex = oldNode[prop] ? md.endIndex + oldNode[prop].length + 1 : md.endIndex;
 
@@ -923,7 +950,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 					diffNode.children = updatedChildren;
 					diffNode.diffMods = modData;
 					diffNode.diffPivots = diffPivots;
-					diffNode.containsTextModification = containsTextModification(diffChildren);
+					diffNode.containsDiff = containsDiff(diffChildren);
 
 					// Add the diff node.
 					diffNodes.push(diffNode);
@@ -934,26 +961,26 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 					 * If the modified node contains a text modification in the child nodes, then add the new node and localize the displayed diff to the modified text.
 					 * If not, add the old and new nodes in order to display them both as before and after.
 					 */
-					if (containsTextModification(diffChildren) && oldNode.type === newNode.type) {
-						const diffNode: YeastNode = Object.assign({}, newNode);
+					if (containsDiff(diffChildren) && oldNode.type === newNode.type) {
+						const diffNode: YeastNode = structuredClone(newNode);
 						diffNode.hasDiff = true;
 						diffNode.diffType = DiffType.Modified;
 						diffNode.children = updatedChildren;
-						diffNode.containsTextModification = true;
+						diffNode.containsDiff = true;
 
 						diffNodes.push(diffNode);
 					} else {
-						const oldDiffNode: YeastNode = Object.assign({}, oldNode);
+						const oldDiffNode: YeastNode = structuredClone(oldNode);
 						oldDiffNode.hasDiff = true;
 						oldDiffNode.diffType = DiffType.Modified;
 						oldDiffNode.diffSource = DiffSource.Old;
-						oldDiffNode.containsTextModification = false;
+						oldDiffNode.containsDiff = false;
 
-						const newDiffNode: YeastNode = Object.assign({}, newNode);
+						const newDiffNode: YeastNode = structuredClone(newNode);
 						newDiffNode.hasDiff = true;
 						newDiffNode.diffType = DiffType.Modified;
 						newDiffNode.diffSource = DiffSource.New;
-						newDiffNode.containsTextModification = false;
+						newDiffNode.containsDiff = false;
 
 						diffNodes.push(oldDiffNode);
 						diffNodes.push(newDiffNode);
@@ -972,16 +999,17 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 }
 
 // Returns true if the node contains a text modification via its children.
-function containsTextModification(children: YeastChild[]): boolean {
+function containsDiff(children: YeastChild[]): boolean {
+	if (!children) return false;
+
 	// If there is some child that is a text modification, the node contains a text modification.
 	// Recursively search through each child's children.
-
 	for (const child of children) {
-		if (child.isTextModification) return true;
+		if (child.isTextModification || child.hasDiff) return true;
 
 		if (isYeastNode(child) && child.children && child.children.length > 0) {
-			const childrenContain: boolean = containsTextModification(child.children);
-			if (childrenContain) return true;
+			const childrenContainInnerDiff: boolean = containsDiff(child.children);
+			if (childrenContainInnerDiff) return true;
 		}
 	}
 
@@ -997,7 +1025,7 @@ function containsTextModification(children: YeastChild[]): boolean {
 function correctDiffChildren(children: YeastNode[], diffType: DiffType): YeastNode[] {
 	if (!children || children.length === 0) return [];
 	return children.map((child: YeastNode) => {
-		const updatedChild = Object.assign({}, child);
+		const updatedChild = structuredClone(child);
 		// if (!isYeastTextNode(child)) {
 		updatedChild.hasDiff = true;
 		updatedChild.diffType = diffType;
@@ -1218,19 +1246,19 @@ export function diff(oldNode: DocumentNode | undefined, newNode: DocumentNode | 
 		return undefined;
 	}
 	if (oldNode === undefined) {
-		const diffNode: DocumentNode = Object.assign({}, newNode);
+		const diffNode: DocumentNode = structuredClone(newNode);
 		diffNode.hasDiff = true;
 		diffNode.diffType = DiffType.Added;
 		return diffNode;
 	}
 	if (newNode === undefined) {
-		const diffNode: DocumentNode = Object.assign({}, oldNode);
+		const diffNode: DocumentNode = structuredClone(oldNode);
 		diffNode.hasDiff = true;
 		diffNode.diffType = DiffType.Removed;
 		return diffNode;
 	}
 
-	const diffNode: DocumentNode = Object.assign({}, newNode);
+	const diffNode: DocumentNode = structuredClone(newNode);
 
 	const { isMatch, isTextModification = false, textProperties }: EntityMatchData = isNodeMatch(oldNode, newNode, []);
 	if (!isMatch) {
@@ -1250,7 +1278,7 @@ export function diff(oldNode: DocumentNode | undefined, newNode: DocumentNode | 
 			textProperties.forEach((prop: string) => {
 				const modAssignment: ModificationAssignment = getModificationData(oldNode[prop], newNode[prop]);
 				modAssignment.newModData = modAssignment.newModData?.map((md: ModificationData) => {
-					const updatedModData = Object.assign({}, md);
+					const updatedModData = structuredClone(md);
 					updatedModData.startIndex = oldNode[prop] ? md.startIndex + oldNode[prop].length + 1 : md.startIndex;
 					updatedModData.endIndex = oldNode[prop] ? md.endIndex + oldNode[prop].length + 1 : md.endIndex;
 
