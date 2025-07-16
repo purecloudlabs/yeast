@@ -35,7 +35,7 @@
 	"peerDependencies": {
 		"jsdom": "26.1.0",
 		"xmlbuilder2": "^3.0.2",
-		"yeast-core": "^1.1.2-DEVENGAGE-3180-diff-img-highlighting.762"
+		"yeast-core": "^1.2.0"
 	},
 	"jest": {
 		"preset": "ts-jest",
