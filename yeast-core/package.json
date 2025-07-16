@@ -39,8 +39,5 @@
 		"roots": [
 			"src/__tests__/tests/"
 		]
-	},
-	"dependencies": {
-		"fs-extra": "^11.3.0"
 	}
 }

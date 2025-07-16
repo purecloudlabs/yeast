@@ -1001,6 +1001,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 // Returns true if the node contains a text modification via its children.
 function containsDiff(children: YeastChild[]): boolean {
 	if (!children) return false;
+	
 	// If there is some child that is a text modification, the node contains a text modification.
 	// Recursively search through each child's children.
 	for (const child of children) {
