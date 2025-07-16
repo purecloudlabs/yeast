@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 import { CodeFence, AlertBlock, DxAccordionGroup, DxTabbedContent, DataTable, DxAccordion, DxTabPanel } from 'genesys-react-components';
 import React, { useState, useEffect } from 'react';
-import { DiffType, DiffSource, isYeastNode, YeastBlockNodeTypes, YeastInlineNodeTypes } from 'yeast-core';
+import { DiffType, DiffSource, isYeastNode, YeastBlockNodeTypes, YeastInlineNodeTypes, isYeastTextNode } from 'yeast-core';
 
 // import { useRef } from 'react';
 function useKey() {
@@ -57,7 +57,7 @@ function getDiffRenderData(diffNode) {
     // Modification diff type requires more processing.
     const isModification = diffNode.diffType === DiffType.Modified;
     const isTextModification = diffNode.isTextModification;
-    const containsTextModification = diffNode.containsTextModification;
+    const containsDiff = diffNode.containsDiff;
     const areDiffPivotsPresent = diffNode.diffPivots && Object.keys(diffNode.diffPivots).length > 0;
     if (isModification) {
         // If the diff node includes text modifications, multiple node segments are needed for display
@@ -91,7 +91,7 @@ function getDiffRenderData(diffNode) {
             data.renderedStrings = renderedStrings;
         }
         // If there is no text modification in either the node or its children, this is the right node depth at which to display the diff.
-        else if (containsTextModification === false) {
+        else if (containsDiff === false) {
             if (diffNode.diffSource === DiffSource.Old) {
                 data.diffClass = `${modifiedClassPrefix}old`;
             }
@@ -228,7 +228,7 @@ function separateDiffChildren(node) {
             let oldChild = Object.assign({}, child);
             let newChild = Object.assign({}, child);
             // If the child has or contains text modifications, further processing is needed.
-            if (child.hasDiff && (child.isTextModification || child.containsTextModification)) {
+            if (child.hasDiff && (child.isTextModification || child.containsDiff)) {
                 // init
                 const mods = child.diffMods;
                 const pivots = child.diffPivots;
@@ -688,7 +688,7 @@ class ReactRenderer {
                     return rendered;
             }
             // Final fallback to default unhandled renderer
-            if (node.text) {
+            if (isYeastTextNode(node)) {
                 const diffRenderData = getDiffRenderData(node);
                 const typedNode = node;
                 const processedText = typedNode.text.replace(TILDE_REGEX, '~');

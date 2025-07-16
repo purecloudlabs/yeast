@@ -45,7 +45,7 @@ export function getDiffRenderData(diffNode: YeastChild): DiffRenderData | undefi
 	// Modification diff type requires more processing.
 	const isModification: boolean = diffNode.diffType === DiffType.Modified;
 	const isTextModification: boolean | undefined = diffNode.isTextModification;
-	const containsTextModification: boolean | undefined = diffNode.containsTextModification;
+	const containsDiff: boolean | undefined = diffNode.containsDiff;
 	const areDiffPivotsPresent: boolean = diffNode.diffPivots && Object.keys(diffNode.diffPivots).length > 0;
 
 	if (isModification) {
@@ -88,7 +88,7 @@ export function getDiffRenderData(diffNode: YeastChild): DiffRenderData | undefi
 			data.renderedStrings = renderedStrings;
 		}
 		// If there is no text modification in either the node or its children, this is the right node depth at which to display the diff.
-		else if (containsTextModification === false) {
+		else if (containsDiff === false) {
 			if (diffNode.diffSource === DiffSource.Old) {
 				data.diffClass = `${modifiedClassPrefix}old`;
 			}
@@ -269,7 +269,7 @@ export function separateDiffChildren(node: YeastNode): { oldChildren: YeastChild
 			let newChild: YeastChild = Object.assign({}, child);
 
 			// If the child has or contains text modifications, further processing is needed.
-			if (child.hasDiff && (child.isTextModification || child.containsTextModification)) {
+			if (child.hasDiff && (child.isTextModification || child.containsDiff)) {
 				// init
 				const mods: ModificationDiffMap = child.diffMods;
 				const pivots: DiffPivotMap = child.diffPivots;

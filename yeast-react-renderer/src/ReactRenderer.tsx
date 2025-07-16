@@ -25,6 +25,7 @@ import {
 	YeastBlockNode,
 	YeastInlineNode,
 	HorizontalRuleNode,
+	isYeastTextNode,
 } from 'yeast-core';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -145,7 +146,7 @@ export class ReactRenderer {
 			}
 
 			// Final fallback to default unhandled renderer
-			if ((node as YeastText).text) {
+			if (isYeastTextNode(node)) {
 				const diffRenderData: DiffRenderData = getDiffRenderData(node);
 				const typedNode = node as YeastText;
 				const processedText = typedNode.text.replace(TILDE_REGEX, '~');
