@@ -20,7 +20,7 @@ import {
 	DiffSource,
 	ImageNode,
 } from '../..';
-import { diff } from '../../helpers/diff';
+import { diff, mapAnchorPath } from '../../helpers/diff';
 
 const publishedImg = require('../resources/content/published-img.json');
 const draftImg = require('../resources/content/draft-img.json');
@@ -483,6 +483,14 @@ test('correctly handles documents with no diff', () => {
 
 	expect(doc.hasDiff).toBeFalsy();
 	expect(doc.children.length).toEqual(4);
+});
+
+test('maps anchor path when node exists in same position', () => {
+	const result = mapAnchorPath('1', publishedNodeBasic, draftNodeBasic);
+	
+	expect(result.oldPath).toBe('1');
+	expect(result.newPath).toBe(undefined);
+	expect(result.isOrphaned).toBe(true); 
 });
 
 test('successfully performs advanced diff', () => {

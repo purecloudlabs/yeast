@@ -56,6 +56,68 @@ interface SpaceDiffData {
 	spaceDiffType: DiffType;
 }
 
+export interface AnchorPathMapping {
+	oldPath: string;
+	newPath?: number;
+	isOrphaned: boolean;
+}
+
+export function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode: DocumentNode): AnchorPathMapping {
+	// Navigate to the target node in old document
+	const oldTargetNode = navigateToNodeByPath(oldNode, Number(anchorPath));
+	if (!oldTargetNode) {
+		return { oldPath: anchorPath, newPath: undefined, isOrphaned: true };
+	}
+
+	// Find the corresponding node in new document
+	const newPathIndices = findCorrespondingPath(oldTargetNode, newNode);
+
+	if (newPathIndices === null) {
+		console.log('newPathIndices is null, returning orphaned');
+		return { oldPath: anchorPath, newPath: undefined, isOrphaned: true };
+	}
+
+	// Generate new anchor path
+	const newPath = newPathIndices;
+
+	return {
+		oldPath: anchorPath,
+		newPath,
+		isOrphaned: false,
+	};
+}
+
+function navigateToNodeByPath(root: DocumentNode, anchorPath: number): YeastNode | null {
+	let currentNode: YeastNode = root;
+
+	// access the child
+	if (!currentNode.children || anchorPath >= currentNode.children.length) {
+		return null; 
+	}
+	currentNode = currentNode.children[anchorPath] as YeastNode;
+
+	return currentNode;
+}
+
+function findCorrespondingPath(oldTargetNode: YeastNode, newNode: DocumentNode): number | null {
+	// Look for the old target node in the new document's children
+	if (!newNode.children) return null;
+	
+	for (let i = 0; i < newNode.children.length; i++) {
+		const newChild = newNode.children[i] as YeastNode;
+		
+		// Use existing diff logic to compare nodes
+		const diffChildren = diffInner(oldTargetNode.children || [], newChild.children || []);
+		const { isMatch } = isNodeMatch(oldTargetNode, newChild, diffChildren);
+		
+		if (isMatch) {
+			return i;
+		}
+	}
+	
+	return null; // Node not found
+}
+
 // Gets the index boundaries for a word in a modified string.
 function getWordBoundaries(s: string, wordPos: number): WordBoundaryData {
 	// init
