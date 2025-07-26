@@ -354,6 +354,46 @@ function applyAttributes(node, attributes) {
         .forEach(([key, value]) => (node[key] = value));
 }
 
+function mapAnchorPath(anchorPath, oldNode, newNode) {
+    const oldTargetNode = navigateToNodeByPath(oldNode, Number(anchorPath));
+    if (!oldTargetNode) {
+        return { oldPath: anchorPath, newPath: undefined, isOrphaned: true };
+    }
+    const newPathIndices = findCorrespondingPath(oldTargetNode, newNode);
+    if (newPathIndices === null) {
+        console.log('newPathIndices is null, returning orphaned');
+        return { oldPath: anchorPath, newPath: undefined, isOrphaned: true };
+    }
+    const newPath = newPathIndices;
+    return {
+        oldPath: anchorPath,
+        newPath,
+        isOrphaned: false,
+    };
+}
+function navigateToNodeByPath(root, anchorPath) {
+    let currentNode = root;
+    if (!currentNode.children || anchorPath >= currentNode.children.length) {
+        return null;
+    }
+    currentNode = currentNode.children[anchorPath];
+    return currentNode;
+}
+function findCorrespondingPath(oldTargetNode, newNode) {
+    if (!newNode.children)
+        return null;
+    for (let i = 0; i < newNode.children.length; i++) {
+        const newChild = newNode.children[i];
+        const diffChildren = diffInner(oldTargetNode.children || [], newChild.children || []);
+        console.log(diffChildren);
+        const { isMatch } = isNodeMatch(oldTargetNode, newChild, diffChildren);
+        console.log(isMatch);
+        if (isMatch) {
+            return i;
+        }
+    }
+    return null;
+}
 function getWordBoundaries(s, wordPos) {
     let boundaries = {};
     let temp = s;
@@ -1395,5 +1435,5 @@ function isYeastNodeType(node, type) {
     return node.hasOwnProperty('type') && node.type.toLowerCase() === type.toLowerCase();
 }
 
-export { ContentGroupType, DiffSource, DiffType, YeastBlockNodeTypes, YeastInlineNodeTypes, YeastNodeFactory$1 as YeastNodeFactory, YeastParser, diff, isMockListItemNode, isYeastBlockNode, isYeastInlineNode, isYeastNode, isYeastNodeType, isYeastTextNode, scrapeText };
+export { ContentGroupType, DiffSource, DiffType, YeastBlockNodeTypes, YeastInlineNodeTypes, YeastNodeFactory$1 as YeastNodeFactory, YeastParser, diff, isMockListItemNode, isYeastBlockNode, isYeastInlineNode, isYeastNode, isYeastNodeType, isYeastTextNode, mapAnchorPath, scrapeText };
 //# sourceMappingURL=index.js.map

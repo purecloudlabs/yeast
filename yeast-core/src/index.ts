@@ -1,8 +1,8 @@
 import { YeastParser } from './YeastParser';
 import YeastNodeFactory from './YeastNodeFactory';
-import { diff } from './helpers/diff';
+import { diff, mapAnchorPath } from './helpers/diff';
 
-export { YeastParser, YeastNodeFactory, diff };
+export { YeastParser, YeastNodeFactory, diff, mapAnchorPath };
 
 // Nodes meant to be displayed as a block element (e.g. div)
 export enum YeastBlockNodeTypes {
