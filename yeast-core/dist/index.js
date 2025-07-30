@@ -357,17 +357,20 @@ function applyAttributes(node, attributes) {
 function mapAnchorPath(anchorPath, oldNode, newNode) {
     const oldTargetNode = navigateToNodeByPath(oldNode, Number(anchorPath));
     if (!oldTargetNode) {
-        return { oldPath: anchorPath, newPath: undefined, isOrphaned: true };
+        return { newPath: undefined, isOrphaned: true };
+    }
+    const oldTargetText = scrapeText(oldTargetNode);
+    const duplicateCount = countSimilarParagraphs(newNode, oldTargetText);
+    if (duplicateCount > 1) {
+        return { newPath: undefined, isOrphaned: true };
     }
     const newPathIndices = findCorrespondingPath(oldTargetNode, newNode);
     if (newPathIndices === null) {
         console.log('newPathIndices is null, returning orphaned');
-        return { oldPath: anchorPath, newPath: undefined, isOrphaned: true };
+        return { newPath: undefined, isOrphaned: true };
     }
-    const newPath = newPathIndices;
     return {
-        oldPath: anchorPath,
-        newPath,
+        newPath: newPathIndices,
         isOrphaned: false,
     };
 }
@@ -379,15 +382,27 @@ function navigateToNodeByPath(root, anchorPath) {
     currentNode = currentNode.children[anchorPath];
     return currentNode;
 }
+function countSimilarParagraphs(node, targetText) {
+    if (!node.children)
+        return 0;
+    let count = 0;
+    for (const child of node.children) {
+        if (isYeastNode(child) && child.type === YeastBlockNodeTypes.Paragraph) {
+            const childText = scrapeText(child);
+            if (childText === targetText) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
 function findCorrespondingPath(oldTargetNode, newNode) {
     if (!newNode.children)
         return null;
     for (let i = 0; i < newNode.children.length; i++) {
         const newChild = newNode.children[i];
         const diffChildren = diffInner(oldTargetNode.children || [], newChild.children || []);
-        console.log(diffChildren);
         const { isMatch } = isNodeMatch(oldTargetNode, newChild, diffChildren);
-        console.log(isMatch);
         if (isMatch) {
             return i;
         }

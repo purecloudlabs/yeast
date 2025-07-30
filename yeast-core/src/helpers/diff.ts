@@ -18,6 +18,7 @@ import {
 	ModificationAssignment,
 	DiffPivotMap,
 	isYeastNode,
+	scrapeText,
 } from '../index';
 
 interface WordBoundaryData {
@@ -57,7 +58,6 @@ interface SpaceDiffData {
 }
 
 export interface AnchorPathMapping {
-	oldPath: string;
 	newPath?: number;
 	isOrphaned: boolean;
 }
@@ -66,23 +66,28 @@ export function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode
 	// Navigate to the target node in old document
 	const oldTargetNode = navigateToNodeByPath(oldNode, Number(anchorPath));
 	if (!oldTargetNode) {
-		return { oldPath: anchorPath, newPath: undefined, isOrphaned: true };
+		return { newPath: undefined, isOrphaned: true };
 	}
 
-	// Find the corresponding node in new document
+	// Check if there are duplicate/similar paragraphs in the new document
+	const oldTargetText = scrapeText(oldTargetNode);
+	const duplicateCount = countSimilarParagraphs(newNode, oldTargetText);
+	
+	// If there are duplicates, mark as orphaned
+	if (duplicateCount > 1) {
+		return { newPath: undefined, isOrphaned: true };
+	}
+
+	// Find the corresponding node in new document using diff logic
 	const newPathIndices = findCorrespondingPath(oldTargetNode, newNode);
 
 	if (newPathIndices === null) {
 		console.log('newPathIndices is null, returning orphaned');
-		return { oldPath: anchorPath, newPath: undefined, isOrphaned: true };
+		return { newPath: undefined, isOrphaned: true };
 	}
 
-	// Generate new anchor path
-	const newPath = newPathIndices;
-
 	return {
-		oldPath: anchorPath,
-		newPath,
+		newPath: newPathIndices,
 		isOrphaned: false,
 	};
 }
@@ -97,6 +102,22 @@ function navigateToNodeByPath(root: DocumentNode, anchorPath: number): YeastNode
 	currentNode = currentNode.children[anchorPath] as YeastNode;
 
 	return currentNode;
+}
+
+// Count how many paragraphs have similar content to the target text
+function countSimilarParagraphs(node: DocumentNode, targetText: string): number {
+	if (!node.children) return 0;
+	
+	let count = 0;
+	for (const child of node.children) {
+		if (isYeastNode(child) && child.type === YeastBlockNodeTypes.Paragraph) {
+			const childText = scrapeText(child);
+			if (childText === targetText) {
+				count++;
+			}
+		}
+	}
+	return count;
 }
 
 function findCorrespondingPath(oldTargetNode: YeastNode, newNode: DocumentNode): number | null {
