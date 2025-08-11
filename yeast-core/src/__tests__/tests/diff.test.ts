@@ -486,8 +486,9 @@ test('correctly handles documents with no diff', () => {
 });
 
 test('maps anchor path when node exists in same position', () => {
-	const result = mapAnchorPath('1', publishedNodeBasic, draftNodeBasic);
-	expect(result.newPath).toBe(undefined);
+	const result = mapAnchorPath('3', draftNodeAdvanced, publishedNodeBasic);
+	expect(result.newPath).toBe(3);
+	expect(result.oldPath).toBe(3);
 	expect(result.isOrphaned).toBe(true); 
 });
 

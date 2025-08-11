@@ -59,84 +59,74 @@ interface SpaceDiffData {
 
 export interface AnchorPathMapping {
 	newPath?: number;
+	oldPath?: number;
 	isOrphaned: boolean;
 }
 
-export function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode: DocumentNode): AnchorPathMapping {
-	// Navigate to the target node in old document
-	const oldTargetNode = navigateToNodeByPath(oldNode, Number(anchorPath));
-	if (!oldTargetNode) {
-		return { newPath: undefined, isOrphaned: true };
+// Recursively search for a diff node with the specified old path
+function findDiffNodeByOldPath(diffNode: YeastNode, targetOldPath: number): YeastNode | null {
+	// Check if this node has the target old path
+	if (diffNode.oldNodePath === targetOldPath) {
+		return diffNode;
 	}
 
-	// Check if there are duplicate/similar paragraphs in the new document
-	const oldTargetText = scrapeText(oldTargetNode);
-	const duplicateCount = countSimilarParagraphs(newNode, oldTargetText);
-	
-	// If there are duplicates, mark as orphaned
-	if (duplicateCount > 1) {
-		return { newPath: undefined, isOrphaned: true };
-	}
-
-	// Find the corresponding node in new document using diff logic
-	const newPathIndices = findCorrespondingPath(oldTargetNode, newNode);
-
-	if (newPathIndices === null) {
-		console.log('newPathIndices is null, returning orphaned');
-		return { newPath: undefined, isOrphaned: true };
-	}
-
-	return {
-		newPath: newPathIndices,
-		isOrphaned: false,
-	};
-}
-
-function navigateToNodeByPath(root: DocumentNode, anchorPath: number): YeastNode | null {
-	let currentNode: YeastNode = root;
-
-	// access the child
-	if (!currentNode.children || anchorPath >= currentNode.children.length) {
-		return null; 
-	}
-	currentNode = currentNode.children[anchorPath] as YeastNode;
-
-	return currentNode;
-}
-
-// Count how many paragraphs have similar content to the target text
-function countSimilarParagraphs(node: DocumentNode, targetText: string): number {
-	if (!node.children) return 0;
-	
-	let count = 0;
-	for (const child of node.children) {
-		if (isYeastNode(child) && child.type === YeastBlockNodeTypes.Paragraph) {
-			const childText = scrapeText(child);
-			if (childText === targetText) {
-				count++;
+	// Recursively search children
+	if (diffNode.children) {
+		for (const child of diffNode.children) {
+			if (isYeastNode(child)) {
+				const found = findDiffNodeByOldPath(child, targetOldPath);
+				if (found) {
+					return found;
+				}
 			}
 		}
 	}
-	return count;
+
+	return null;
 }
 
-function findCorrespondingPath(oldTargetNode: YeastNode, newNode: DocumentNode): number | null {
-	// Look for the old target node in the new document's children
-	if (!newNode.children) return null;
-	
-	for (let i = 0; i < newNode.children.length; i++) {
-		const newChild = newNode.children[i] as YeastNode;
-		
-		// Use existing diff logic to compare nodes
-		const diffChildren = diffInner(oldTargetNode.children || [], newChild.children || []);
-		const { isMatch } = isNodeMatch(oldTargetNode, newChild, diffChildren);
-		
-		if (isMatch) {
-			return i;
-		}
+export function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode: DocumentNode): AnchorPathMapping {
+	// Generate the diff document to get path mapping information
+	const diffDocument = diff(oldNode, newNode);
+	if (!diffDocument) {
+		return { newPath: undefined, isOrphaned: true };
 	}
+
+	// Find the diff node that has the old path matching our anchor path
+	const targetOldPath = Number(anchorPath);
+	const diffNode = findDiffNodeByOldPath(diffDocument, targetOldPath);
 	
-	return null; // Node not found
+	if (!diffNode) {
+		return { newPath: undefined, isOrphaned: true };
+	}
+
+	if (diffNode.diffType === DiffType.Removed) {
+		return { newPath: undefined, oldPath: diffNode.oldNodePath, isOrphaned: true };
+	} else if (diffNode.diffType === DiffType.Added) {
+		return { newPath: diffNode.newNodePath, oldPath: undefined, isOrphaned: true };
+	} else if (diffNode.diffType === DiffType.Modified) {
+		// For modified nodes, we need to handle split nodes properly
+		let actualNewPath: number | undefined;
+		if (diffNode.newNodePath !== undefined) {
+			// If this node has newNodePath, use it directly
+			actualNewPath = diffNode.newNodePath;
+		} else {
+			// The corresponding new pair should be the next node in the array
+			const currentIndex = diffDocument.children.indexOf(diffNode);
+			const nextNode = diffDocument.children[currentIndex + 1];
+			
+			if (nextNode && 
+				nextNode.diffType === DiffType.Modified && 
+				nextNode.diffSource === DiffSource.New &&
+				nextNode.newNodePath !== undefined) {
+				actualNewPath = nextNode.newNodePath;
+			}
+		}
+		
+		return { newPath: actualNewPath, oldPath: diffNode.oldNodePath, isOrphaned: true };
+	} else {
+		return { newPath: diffNode.newNodePath, oldPath: diffNode.oldNodePath, isOrphaned: false };
+	}
 }
 
 // Gets the index boundaries for a word in a modified string.
@@ -799,7 +789,7 @@ function getDiffData(oldIdx: number, newIdx: number, oldEntities: DiffEntity[], 
 }
 
 // Compares two child node arrays and returns a diffed node array
-function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild[] {
+function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[], oldPath?: number, newPath?: number): YeastChild[] {
 	// init
 	let diffNodes: YeastChild[] = [];
 	const areNodesEmpty: boolean = (!oldNodes || oldNodes.length === 0) && (!newNodes || newNodes.length === 0);
@@ -813,13 +803,14 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 
 	// If only new nodes exist, they are additions
 	if (areOldNodesEmpty) {
-		diffNodes = newNodes.map((node: YeastNode) => {
+		diffNodes = newNodes.map((node: YeastNode, index: number) => {
 			let diffChildren: YeastChild[] = [];
 			const diffNode: YeastNode = structuredClone(node);
 			diffNode.hasDiff = true;
 			diffNode.diffType = DiffType.Added;
+			diffNode.newNodePath = (newPath || 0) + index;
 			if (node.children && node.children.length > 0) {
-				diffChildren = diffInner(undefined, node.children);
+				diffChildren = diffInner(undefined, node.children, undefined, diffNode.newNodePath);
 				diffNode.children = diffChildren;
 			}
 			return diffNode;
@@ -830,14 +821,15 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 
 	// If only old nodes exist, they were removed.
 	if (areNewNodesEmpty) {
-		diffNodes = oldNodes.map((node: YeastNode) => {
+		diffNodes = oldNodes.map((node: YeastNode, index: number) => {
 			let diffChildren: YeastChild[] = [];
 
 			const diffNode: YeastNode = structuredClone(node);
 			diffNode.hasDiff = true;
 			diffNode.diffType = DiffType.Removed;
+			diffNode.oldNodePath = (oldPath || 0) + index;
 			if (node.children && node.children.length > 0) {
-				diffChildren = diffInner(undefined, node.children);
+				diffChildren = diffInner(undefined, node.children, diffNode.oldNodePath, undefined);
 				diffNode.children = diffChildren;
 			}
 			return diffNode;
@@ -860,7 +852,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 
 		// Recursively call the diff function on the child node's children
 		let diffChildren: YeastChild[] = [];
-		diffChildren = diffInner(oldNode?.children || [], newNode?.children || []);
+		diffChildren = diffInner(oldNode?.children || [], newNode?.children || [], oldPath, newPath);
 
 		const oldNodeExists: boolean = oldIdx < oldNodes.length;
 		const newNodeExists: boolean = newIdx < newNodes.length;
@@ -873,6 +865,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 				const diffNode: YeastNode = structuredClone(oldNodes[i]) as YeastNode;
 				diffNode.hasDiff = true;
 				diffNode.diffType = DiffType.Removed;
+				diffNode.oldNodePath = (oldPath || 0) + i;
 				diffNode.children = correctDiffChildren((oldNodes[i] as YeastNode).children as YeastNode[], DiffType.Removed);
 				diffNodes.push(diffNode);
 			}
@@ -888,6 +881,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 				const diffNode: YeastNode = structuredClone(newNodes[i] as YeastNode);
 				diffNode.hasDiff = true;
 				diffNode.diffType = DiffType.Added;
+				diffNode.newNodePath = (newPath || 0) + i;
 				diffNode.children = correctDiffChildren((newNodes[i] as YeastNode).children as YeastNode[], DiffType.Added);
 				diffNodes.push(diffNode);
 			}
@@ -903,6 +897,8 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 		if (isMatch) {
 			const diffNode: YeastNode = structuredClone(newNode);
 			diffNode.hasDiff = false;
+			diffNode.oldNodePath = (oldPath || 0) + oldIdx;
+			diffNode.newNodePath = (newPath || 0) + newIdx;
 			diffNode.children = diffChildren;
 
 			diffNodes.push(diffNode);
@@ -921,6 +917,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 				const diffNode: YeastNode = structuredClone(newNode);
 				diffNode.diffType = DiffType.Added;
 				diffNode.hasDiff = true;
+				diffNode.newNodePath = (newPath || 0) + newIdx;
 				diffNode.children = updatedChildren;
 
 				diffNodes.push(diffNode);
@@ -931,9 +928,12 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 						const addedNode: YeastNode = structuredClone(newNodes[i] as YeastNode);
 						if (i === diffData.newMatchIdx) {
 							addedNode.hasDiff = false;
+							addedNode.oldNodePath = (oldPath || 0) + oldIdx;
+							addedNode.newNodePath = (newPath || 0) + i;
 						} else {
 							addedNode.hasDiff = true;
 							addedNode.diffType = DiffType.Added;
+							addedNode.newNodePath = (newPath || 0) + i;
 						}
 						diffNodes.push(addedNode);
 					}
@@ -946,6 +946,8 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 						for (let i = diffData.newMatchIdx + 1; i < nextNewIdx; i++) {
 							const matchingNode: YeastNode = structuredClone(newNodes[i] as YeastNode);
 							matchingNode.hasDiff = false;
+							matchingNode.oldNodePath = (oldPath || 0) + oldIdx;
+							matchingNode.newNodePath = (newPath || 0) + i;
 							diffNodes.push(matchingNode);
 						}
 					}
@@ -956,6 +958,7 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 				const diffNode: YeastNode = structuredClone(oldNode);
 				diffNode.diffType = DiffType.Removed;
 				diffNode.hasDiff = true;
+				diffNode.oldNodePath = (oldPath || 0) + oldIdx;
 				diffNode.children = updatedChildren;
 
 				diffNodes.push(diffNode);
@@ -967,10 +970,13 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 						if (i === diffData.oldMatchIdx) {
 							removedNode = structuredClone(oldNodes[i]) as YeastNode;
 							removedNode.hasDiff = false;
+							removedNode.oldNodePath = (oldPath || 0) + i;
+							removedNode.newNodePath = (newPath || 0) + newIdx;
 						} else {
 							removedNode = structuredClone(oldNodes[i]) as YeastNode;
 							removedNode.hasDiff = true;
 							removedNode.diffType = DiffType.Removed;
+							removedNode.oldNodePath = (oldPath || 0) + i;
 						}
 						diffNodes.push(removedNode);
 					}
@@ -983,6 +989,8 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 						for (let i = diffData.oldMatchIdx + 1; i < nextOldIdx; i++) {
 							const matchingNode: YeastNode = structuredClone(oldNodes[i] as YeastNode);
 							matchingNode.hasDiff = false;
+							matchingNode.oldNodePath = (oldPath || 0) + i;
+							matchingNode.newNodePath = (newPath || 0) + newIdx;
 							diffNodes.push(matchingNode);
 						}
 					}
@@ -1030,6 +1038,8 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 					diffNode.hasDiff = true;
 					diffNode.diffType = DiffType.Modified;
 					diffNode.isTextModification = true;
+					diffNode.oldNodePath = (oldPath || 0) + oldIdx;
+					diffNode.newNodePath = (newPath || 0) + newIdx;
 					diffNode.children = updatedChildren;
 					diffNode.diffMods = modData;
 					diffNode.diffPivots = diffPivots;
@@ -1048,6 +1058,8 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 						const diffNode: YeastNode = structuredClone(newNode);
 						diffNode.hasDiff = true;
 						diffNode.diffType = DiffType.Modified;
+						diffNode.oldNodePath = (oldPath || 0) + oldIdx;
+						diffNode.newNodePath = (newPath || 0) + newIdx;
 						diffNode.children = updatedChildren;
 						diffNode.containsDiff = true;
 
@@ -1057,12 +1069,14 @@ function diffInner(oldNodes?: YeastChild[], newNodes?: YeastChild[]): YeastChild
 						oldDiffNode.hasDiff = true;
 						oldDiffNode.diffType = DiffType.Modified;
 						oldDiffNode.diffSource = DiffSource.Old;
+						oldDiffNode.oldNodePath = (oldPath || 0) + oldIdx;
 						oldDiffNode.containsDiff = false;
 
 						const newDiffNode: YeastNode = structuredClone(newNode);
 						newDiffNode.hasDiff = true;
 						newDiffNode.diffType = DiffType.Modified;
 						newDiffNode.diffSource = DiffSource.New;
+						newDiffNode.newNodePath = (newPath || 0) + newIdx;
 						newDiffNode.containsDiff = false;
 
 						diffNodes.push(oldDiffNode);
@@ -1332,12 +1346,14 @@ export function diff(oldNode: DocumentNode | undefined, newNode: DocumentNode | 
 		const diffNode: DocumentNode = structuredClone(newNode);
 		diffNode.hasDiff = true;
 		diffNode.diffType = DiffType.Added;
+		diffNode.newNodePath = 0;
 		return diffNode;
 	}
 	if (newNode === undefined) {
 		const diffNode: DocumentNode = structuredClone(oldNode);
 		diffNode.hasDiff = true;
 		diffNode.diffType = DiffType.Removed;
+		diffNode.oldNodePath = 0;
 		return diffNode;
 	}
 
@@ -1347,6 +1363,8 @@ export function diff(oldNode: DocumentNode | undefined, newNode: DocumentNode | 
 	if (!isMatch) {
 		diffNode.hasDiff = true;
 		diffNode.diffType = DiffType.Modified;
+		diffNode.oldNodePath = 0;
+		diffNode.newNodePath = 0;
 
 		if (isTextModification && textProperties) {
 			const diffMods: ModificationDiffMap = {};
@@ -1379,9 +1397,13 @@ export function diff(oldNode: DocumentNode | undefined, newNode: DocumentNode | 
 			diffNode.diffMods = diffMods;
 			diffNode.diffPivots = diffPivots;
 		}
+	} else {
+		// No diff - both paths are the same
+		diffNode.oldNodePath = 0;
+		diffNode.newNodePath = 0;
 	}
 
-	const diffChildren: YeastChild[] = diffInner(oldNode.children, newNode.children);
+	const diffChildren: YeastChild[] = diffInner(oldNode.children, newNode.children, 0, 0);
 	diffNode.children = diffChildren as YeastNode[];
 
 	return diffNode;

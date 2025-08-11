@@ -1,6 +1,7 @@
 import { DocumentNode } from '../index';
 export interface AnchorPathMapping {
     newPath?: number;
+    oldPath?: number;
     isOrphaned: boolean;
 }
 export declare function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode: DocumentNode): AnchorPathMapping;
