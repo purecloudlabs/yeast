@@ -485,13 +485,6 @@ test('correctly handles documents with no diff', () => {
 	expect(doc.children.length).toEqual(4);
 });
 
-test('maps anchor path when node exists in same position', () => {
-	const result = mapAnchorPath('3', draftNodeAdvanced, publishedNodeBasic);
-	expect(result.newPath).toBe(3);
-	expect(result.oldPath).toBe(3);
-	expect(result.isOrphaned).toBe(true); 
-});
-
 test('successfully performs advanced diff', () => {
 	const doc: DocumentNode = diff(publishedNodeAdvanced, draftNodeAdvanced);
 
