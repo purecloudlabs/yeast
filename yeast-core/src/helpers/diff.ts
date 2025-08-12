@@ -61,6 +61,7 @@ export interface AnchorPathMapping {
 	newPath?: number;
 	oldPath?: number;
 	isOrphaned: boolean;
+	isOutdated: boolean;
 }
 
 // Recursively search for a diff node with the specified old path
@@ -89,7 +90,7 @@ export function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode
 	// Generate the diff document to get path mapping information
 	const diffDocument = diff(oldNode, newNode);
 	if (!diffDocument) {
-		return { newPath: undefined, isOrphaned: true };
+		return { newPath: undefined, isOrphaned: true, isOutdated: true };
 	}
 
 	// Find the diff node that has the old path matching our anchor path
@@ -97,13 +98,13 @@ export function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode
 	const diffNode = findDiffNodeByOldPath(diffDocument, targetOldPath);
 	
 	if (!diffNode) {
-		return { newPath: undefined, isOrphaned: true };
+		return { newPath: undefined, isOrphaned: true, isOutdated: true };
 	}
 
 	if (diffNode.diffType === DiffType.Removed) {
-		return { newPath: undefined, oldPath: diffNode.oldNodePath, isOrphaned: true };
+		return { newPath: undefined, oldPath: diffNode.oldNodePath, isOrphaned: true, isOutdated: true };
 	} else if (diffNode.diffType === DiffType.Added) {
-		return { newPath: diffNode.newNodePath, oldPath: undefined, isOrphaned: true };
+		return { newPath: diffNode.newNodePath, oldPath: undefined, isOrphaned: true, isOutdated: true };
 	} else if (diffNode.diffType === DiffType.Modified) {
 		// For modified nodes, we need to handle split nodes properly
 		let actualNewPath: number | undefined;
@@ -122,10 +123,9 @@ export function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode
 				actualNewPath = nextNode.newNodePath;
 			}
 		}
-		
-		return { newPath: actualNewPath, oldPath: diffNode.oldNodePath, isOrphaned: true };
+		return { newPath: actualNewPath, oldPath: diffNode.oldNodePath, isOrphaned: false, isOutdated: true };
 	} else {
-		return { newPath: diffNode.newNodePath, oldPath: diffNode.oldNodePath, isOrphaned: false };
+		return { newPath: diffNode.newNodePath, oldPath: diffNode.oldNodePath, isOrphaned: false, isOutdated: false };
 	}
 }
 
