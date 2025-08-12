@@ -51,8 +51,8 @@
 		"uuid": "^9.0.0"
 	},
 	"peerDependencies": {
-		"genesys-dev-icons": "1.5.0",
-		"genesys-react-components": "1.1.1-devengage-3133-table-paragraph-alignment.786",
+		"genesys-dev-icons": "^1.5.0",
+		"genesys-react-components": "^1.0.0",
 		"moment": "^2.29.4",
 		"react": ">=18",
 		"react-dom": ">=18",
