@@ -1,8 +1,9 @@
 import { DocumentNode } from '../index';
 export interface AnchorPathMapping {
-    newPath?: number;
-    oldPath?: number;
+    newPath?: number[];
+    oldPath?: number[];
     isOrphaned: boolean;
+    isOutdated: boolean;
 }
 export declare function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode: DocumentNode): AnchorPathMapping;
 export declare function diff(oldNode: DocumentNode | undefined, newNode: DocumentNode | undefined): DocumentNode | undefined;

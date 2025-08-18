@@ -20,7 +20,7 @@ import {
 	DiffSource,
 	ImageNode,
 } from '../..';
-import { diff, mapAnchorPath } from '../../helpers/diff';
+import { diff } from '../../helpers/diff';
 
 const publishedImg = require('../resources/content/published-img.json');
 const draftImg = require('../resources/content/draft-img.json');

@@ -57,8 +57,8 @@ export interface YeastNode {
     isTextModification?: boolean;
     containsDiff?: boolean;
     diffSource?: DiffSource;
-    oldNodePath?: number;
-    newNodePath?: number;
+    oldNodePath?: number[];
+    newNodePath?: number[];
 }
 export interface ModificationData {
     startIndex: number;

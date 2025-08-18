@@ -77,8 +77,8 @@ export interface YeastNode {
 	isTextModification?: boolean;
 	containsDiff?: boolean;
 	diffSource?: DiffSource;
-	oldNodePath?: number;
-	newNodePath?: number;
+	oldNodePath?: number[];
+	newNodePath?: number[];
 }
 
 // ModificationData contains the start and end indices for a substring that has been modifed. Used by the diff process.
