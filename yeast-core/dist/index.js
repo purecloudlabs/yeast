@@ -375,7 +375,7 @@ function mapAnchorPath(anchorPath, oldNode, newNode) {
     if (!diffDocument) {
         return { newPath: undefined, isOrphaned: true, isOutdated: true };
     }
-    const targetOldPath = [Number(anchorPath)];
+    const targetOldPath = anchorPath.split(',').map(Number);
     const diffNode = findDiffNodeByOldPath(diffDocument, targetOldPath);
     if (!diffNode) {
         return { newPath: undefined, isOrphaned: true, isOutdated: true };
@@ -391,14 +391,13 @@ function mapAnchorPath(anchorPath, oldNode, newNode) {
         if (diffNode.newNodePath !== undefined) {
             actualNewPath = diffNode.newNodePath;
         }
-        else {
-            const currentIndex = diffDocument.children.indexOf(diffNode);
-            const nextNode = diffDocument.children[currentIndex + 1];
-            if (nextNode &&
-                nextNode.diffType === DiffType.Modified &&
-                nextNode.diffSource === DiffSource.New &&
-                nextNode.newNodePath !== undefined) {
-                actualNewPath = nextNode.newNodePath;
+        else if (diffNode.diffSource === DiffSource.Old) {
+            const correspondingNewNode = diffDocument.children.find(child => child.diffType === DiffType.Modified &&
+                child.diffSource === DiffSource.New &&
+                child.oldNodePath &&
+                JSON.stringify(child.oldNodePath) === JSON.stringify(diffNode.oldNodePath));
+            if (correspondingNewNode && correspondingNewNode.newNodePath) {
+                actualNewPath = correspondingNewNode.newNodePath;
             }
         }
         return { newPath: actualNewPath, oldPath: diffNode.oldNodePath, isOrphaned: false, isOutdated: true };
