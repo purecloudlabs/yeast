@@ -93,8 +93,7 @@ export function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode
 		return { newPath: undefined, isOrphaned: true, isOutdated: true };
 	}
 
-	// Find the diff node that has the old path matching our anchor path
-	const targetOldPath = [Number(anchorPath)];
+	const targetOldPath = anchorPath.split(',').map(Number);
 	const diffNode = findDiffNodeByOldPath(diffDocument, targetOldPath);
 	
 	if (!diffNode) {
@@ -106,21 +105,18 @@ export function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode
 	} else if (diffNode.diffType === DiffType.Added) {
 		return { newPath: diffNode.newNodePath, oldPath: undefined, isOrphaned: true, isOutdated: true };
 	} else if (diffNode.diffType === DiffType.Modified) {
-		// For modified nodes, we need to handle split nodes properly
 		let actualNewPath: number[] | undefined;
 		if (diffNode.newNodePath !== undefined) {
-			// If this node has newNodePath, use it directly
 			actualNewPath = diffNode.newNodePath;
-		} else {
-			// The corresponding new pair should be the next node in the array
-			const currentIndex = diffDocument.children.indexOf(diffNode);
-			const nextNode = diffDocument.children[currentIndex + 1];
-			
-			if (nextNode && 
-				nextNode.diffType === DiffType.Modified && 
-				nextNode.diffSource === DiffSource.New &&
-				nextNode.newNodePath !== undefined) {
-				actualNewPath = nextNode.newNodePath;
+		} else if (diffNode.diffSource === DiffSource.Old) {
+			const correspondingNewNode = diffDocument.children.find(child => 
+				child.diffType === DiffType.Modified &&
+				child.diffSource === DiffSource.New &&
+				child.oldNodePath &&
+				JSON.stringify(child.oldNodePath) === JSON.stringify(diffNode.oldNodePath)
+			);
+			if (correspondingNewNode && correspondingNewNode.newNodePath) {
+				actualNewPath = correspondingNewNode.newNodePath;
 			}
 		}
 		return { newPath: actualNewPath, oldPath: diffNode.oldNodePath, isOrphaned: false, isOutdated: true };
