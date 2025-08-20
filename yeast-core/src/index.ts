@@ -1,8 +1,8 @@
 import { YeastParser } from './YeastParser';
 import YeastNodeFactory from './YeastNodeFactory';
-import { diff } from './helpers/diff';
+import { diff, mapAnchorPath } from './helpers/diff';
 
-export { YeastParser, YeastNodeFactory, diff };
+export { YeastParser, YeastNodeFactory, diff, mapAnchorPath };
 
 // Nodes meant to be displayed as a block element (e.g. div)
 export enum YeastBlockNodeTypes {
@@ -77,6 +77,8 @@ export interface YeastNode {
 	isTextModification?: boolean;
 	containsDiff?: boolean;
 	diffSource?: DiffSource;
+	oldNodePath?: number[];
+	newNodePath?: number[];
 }
 
 // ModificationData contains the start and end indices for a substring that has been modifed. Used by the diff process.
@@ -290,6 +292,8 @@ export interface YeastText {
 	diffPivots?: DiffPivotMap;
 	isTextModification?: boolean;
 	containsDiff?: boolean;
+	oldNodePath?: number;
+	newNodePath?: number;
 	// bold?: boolean;
 	// italic?: boolean;
 	// strikethrough?: boolean;

@@ -354,6 +354,58 @@ function applyAttributes(node, attributes) {
         .forEach(([key, value]) => (node[key] = value));
 }
 
+function findDiffNodeByOldPath(diffNode, targetOldPath) {
+    if (diffNode.oldNodePath === targetOldPath) {
+        return diffNode;
+    }
+    if (diffNode.children) {
+        for (const child of diffNode.children) {
+            if (isYeastNode(child)) {
+                const found = findDiffNodeByOldPath(child, targetOldPath);
+                if (found) {
+                    return found;
+                }
+            }
+        }
+    }
+    return null;
+}
+function mapAnchorPath(anchorPath, oldNode, newNode) {
+    const diffDocument = diff(oldNode, newNode);
+    if (!diffDocument) {
+        return { newPath: undefined, isOrphaned: true, isOutdated: true };
+    }
+    const targetOldPath = anchorPath.split(',').map(Number);
+    const diffNode = findDiffNodeByOldPath(diffDocument, targetOldPath);
+    if (!diffNode) {
+        return { newPath: undefined, isOrphaned: true, isOutdated: true };
+    }
+    if (diffNode.diffType === DiffType.Removed) {
+        return { newPath: undefined, oldPath: diffNode.oldNodePath, isOrphaned: true, isOutdated: true };
+    }
+    else if (diffNode.diffType === DiffType.Added) {
+        return { newPath: diffNode.newNodePath, oldPath: undefined, isOrphaned: true, isOutdated: true };
+    }
+    else if (diffNode.diffType === DiffType.Modified) {
+        let actualNewPath;
+        if (diffNode.newNodePath !== undefined) {
+            actualNewPath = diffNode.newNodePath;
+        }
+        else if (diffNode.diffSource === DiffSource.Old) {
+            const correspondingNewNode = diffDocument.children.find(child => child.diffType === DiffType.Modified &&
+                child.diffSource === DiffSource.New &&
+                child.oldNodePath &&
+                JSON.stringify(child.oldNodePath) === JSON.stringify(diffNode.oldNodePath));
+            if (correspondingNewNode && correspondingNewNode.newNodePath) {
+                actualNewPath = correspondingNewNode.newNodePath;
+            }
+        }
+        return { newPath: actualNewPath, oldPath: diffNode.oldNodePath, isOrphaned: false, isOutdated: true };
+    }
+    else {
+        return { newPath: diffNode.newNodePath, oldPath: diffNode.oldNodePath, isOrphaned: false, isOutdated: false };
+    }
+}
 function getWordBoundaries(s, wordPos) {
     let boundaries = {};
     let temp = s;
@@ -872,7 +924,7 @@ function getDiffData(oldIdx, newIdx, oldEntities, newEntities) {
         nextNewIdx: newIdx + 1,
     };
 }
-function diffInner(oldNodes, newNodes) {
+function diffInner(oldNodes, newNodes, oldPath, newPath) {
     let diffNodes = [];
     const areNodesEmpty = (!oldNodes || oldNodes.length === 0) && (!newNodes || newNodes.length === 0);
     const areOldNodesEmpty = (!oldNodes || oldNodes.length === 0) && newNodes && newNodes.length > 0;
@@ -881,13 +933,14 @@ function diffInner(oldNodes, newNodes) {
         return [];
     }
     if (areOldNodesEmpty) {
-        diffNodes = newNodes.map((node) => {
+        diffNodes = newNodes.map((node, index) => {
             let diffChildren = [];
             const diffNode = structuredClone(node);
             diffNode.hasDiff = true;
             diffNode.diffType = DiffType.Added;
+            diffNode.newNodePath = [...(newPath || [0]), index];
             if (node.children && node.children.length > 0) {
-                diffChildren = diffInner(undefined, node.children);
+                diffChildren = diffInner(undefined, node.children, undefined, diffNode.newNodePath);
                 diffNode.children = diffChildren;
             }
             return diffNode;
@@ -895,13 +948,15 @@ function diffInner(oldNodes, newNodes) {
         return diffNodes;
     }
     if (areNewNodesEmpty) {
-        diffNodes = oldNodes.map((node) => {
+        diffNodes = oldNodes.map((node, index) => {
             let diffChildren = [];
             const diffNode = structuredClone(node);
             diffNode.hasDiff = true;
             diffNode.diffType = DiffType.Removed;
+            const currentDiffIndex = diffNodes.length;
+            diffNode.oldNodePath = [...(oldPath || [0]), currentDiffIndex];
             if (node.children && node.children.length > 0) {
-                diffChildren = diffInner(undefined, node.children);
+                diffChildren = diffInner(undefined, node.children, diffNode.oldNodePath, undefined);
                 diffNode.children = diffChildren;
             }
             return diffNode;
@@ -917,27 +972,32 @@ function diffInner(oldNodes, newNodes) {
         const newNode = newNodes[newIdx];
         let updatedChildren;
         let diffChildren = [];
-        diffChildren = diffInner((oldNode === null || oldNode === void 0 ? void 0 : oldNode.children) || [], (newNode === null || newNode === void 0 ? void 0 : newNode.children) || []);
+        const currentOldPath = [...(oldPath || [0]), oldIdx];
+        const currentNewPath = [...(newPath || [0]), newIdx];
+        diffChildren = diffInner((oldNode === null || oldNode === void 0 ? void 0 : oldNode.children) || [], (newNode === null || newNode === void 0 ? void 0 : newNode.children) || [], currentOldPath, currentNewPath);
         const oldNodeExists = oldIdx < oldNodes.length;
         const newNodeExists = newIdx < newNodes.length;
         if (oldNodeExists && !newNodeExists) {
-            updatedChildren = correctDiffChildren(oldNode.children, DiffType.Removed);
+            updatedChildren = correctDiffChildren(oldNode.children, DiffType.Removed, [...(oldPath || [0]), oldIdx]);
             for (let i = oldIdx; i < oldNodes.length; i++) {
                 const diffNode = structuredClone(oldNodes[i]);
                 diffNode.hasDiff = true;
                 diffNode.diffType = DiffType.Removed;
-                diffNode.children = correctDiffChildren(oldNodes[i].children, DiffType.Removed);
+                const currentDiffIndex = diffNodes.length;
+                diffNode.oldNodePath = [...(oldPath || [0]), currentDiffIndex];
+                diffNode.children = correctDiffChildren(oldNodes[i].children, DiffType.Removed, diffNode.oldNodePath);
                 diffNodes.push(diffNode);
             }
             break;
         }
         if (!oldNodeExists && newNodeExists) {
-            updatedChildren = correctDiffChildren(newNode.children, DiffType.Added);
+            updatedChildren = correctDiffChildren(newNode.children, DiffType.Added, [...(newPath || [0]), newIdx]);
             for (let i = newIdx; i < newNodes.length; i++) {
                 const diffNode = structuredClone(newNodes[i]);
                 diffNode.hasDiff = true;
                 diffNode.diffType = DiffType.Added;
-                diffNode.children = correctDiffChildren(newNodes[i].children, DiffType.Added);
+                diffNode.newNodePath = [...(newPath || [0]), i];
+                diffNode.children = correctDiffChildren(newNodes[i].children, DiffType.Added, diffNode.newNodePath);
                 diffNodes.push(diffNode);
             }
             break;
@@ -946,6 +1006,8 @@ function diffInner(oldNodes, newNodes) {
         if (isMatch) {
             const diffNode = structuredClone(newNode);
             diffNode.hasDiff = false;
+            diffNode.oldNodePath = [...(oldPath || [0]), oldIdx];
+            diffNode.newNodePath = [...(newPath || [0]), newIdx];
             diffNode.children = diffChildren;
             diffNodes.push(diffNode);
         }
@@ -954,10 +1016,11 @@ function diffInner(oldNodes, newNodes) {
             nextOldIdx = diffData.nextOldIdx;
             nextNewIdx = diffData.nextNewIdx;
             if (diffData.diffType === DiffType.Added) {
-                updatedChildren = correctDiffChildren(newNode.children, DiffType.Added);
+                updatedChildren = correctDiffChildren(newNode.children, DiffType.Added, [...(newPath || [0]), newIdx]);
                 const diffNode = structuredClone(newNode);
                 diffNode.diffType = DiffType.Added;
                 diffNode.hasDiff = true;
+                diffNode.newNodePath = [...(newPath || [0]), newIdx];
                 diffNode.children = updatedChildren;
                 diffNodes.push(diffNode);
                 if (diffData.newMatchIdx) {
@@ -965,10 +1028,13 @@ function diffInner(oldNodes, newNodes) {
                         const addedNode = structuredClone(newNodes[i]);
                         if (i === diffData.newMatchIdx) {
                             addedNode.hasDiff = false;
+                            addedNode.oldNodePath = [...(oldPath || [0]), oldIdx];
+                            addedNode.newNodePath = [...(newPath || [0]), i];
                         }
                         else {
                             addedNode.hasDiff = true;
                             addedNode.diffType = DiffType.Added;
+                            addedNode.newNodePath = [...(newPath || [0]), i];
                         }
                         diffNodes.push(addedNode);
                     }
@@ -976,16 +1042,19 @@ function diffInner(oldNodes, newNodes) {
                         for (let i = diffData.newMatchIdx + 1; i < nextNewIdx; i++) {
                             const matchingNode = structuredClone(newNodes[i]);
                             matchingNode.hasDiff = false;
+                            matchingNode.oldNodePath = [...(oldPath || [0]), oldIdx];
+                            matchingNode.newNodePath = [...(newPath || [0]), i];
                             diffNodes.push(matchingNode);
                         }
                     }
                 }
             }
             else if (diffData.diffType === DiffType.Removed) {
-                updatedChildren = correctDiffChildren(oldNode.children, DiffType.Removed);
+                updatedChildren = correctDiffChildren(oldNode.children, DiffType.Removed, [...(oldPath || [0]), oldIdx]);
                 const diffNode = structuredClone(oldNode);
                 diffNode.diffType = DiffType.Removed;
                 diffNode.hasDiff = true;
+                diffNode.oldNodePath = [...(oldPath || [0]), oldIdx];
                 diffNode.children = updatedChildren;
                 diffNodes.push(diffNode);
                 if (diffData.oldMatchIdx) {
@@ -994,11 +1063,14 @@ function diffInner(oldNodes, newNodes) {
                         if (i === diffData.oldMatchIdx) {
                             removedNode = structuredClone(oldNodes[i]);
                             removedNode.hasDiff = false;
+                            removedNode.oldNodePath = [...(oldPath || [0]), i];
+                            removedNode.newNodePath = [...(newPath || [0]), newIdx];
                         }
                         else {
                             removedNode = structuredClone(oldNodes[i]);
                             removedNode.hasDiff = true;
                             removedNode.diffType = DiffType.Removed;
+                            removedNode.oldNodePath = [...(oldPath || [0]), i];
                         }
                         diffNodes.push(removedNode);
                     }
@@ -1006,6 +1078,8 @@ function diffInner(oldNodes, newNodes) {
                         for (let i = diffData.oldMatchIdx + 1; i < nextOldIdx; i++) {
                             const matchingNode = structuredClone(oldNodes[i]);
                             matchingNode.hasDiff = false;
+                            matchingNode.oldNodePath = [...(oldPath || [0]), i];
+                            matchingNode.newNodePath = [...(newPath || [0]), newIdx];
                             diffNodes.push(matchingNode);
                         }
                     }
@@ -1035,6 +1109,8 @@ function diffInner(oldNodes, newNodes) {
                     diffNode.hasDiff = true;
                     diffNode.diffType = DiffType.Modified;
                     diffNode.isTextModification = true;
+                    diffNode.oldNodePath = [...(oldPath || [0]), oldIdx];
+                    diffNode.newNodePath = [...(newPath || [0]), newIdx];
                     diffNode.children = updatedChildren;
                     diffNode.diffMods = modData;
                     diffNode.diffPivots = diffPivots;
@@ -1046,6 +1122,8 @@ function diffInner(oldNodes, newNodes) {
                         const diffNode = structuredClone(newNode);
                         diffNode.hasDiff = true;
                         diffNode.diffType = DiffType.Modified;
+                        diffNode.oldNodePath = [...(oldPath || [0]), oldIdx];
+                        diffNode.newNodePath = [...(newPath || [0]), newIdx];
                         diffNode.children = updatedChildren;
                         diffNode.containsDiff = true;
                         diffNodes.push(diffNode);
@@ -1055,11 +1133,15 @@ function diffInner(oldNodes, newNodes) {
                         oldDiffNode.hasDiff = true;
                         oldDiffNode.diffType = DiffType.Modified;
                         oldDiffNode.diffSource = DiffSource.Old;
+                        oldDiffNode.oldNodePath = [...(oldPath || [0]), oldIdx];
+                        oldDiffNode.newNodePath = [...(newPath || [0]), newIdx];
                         oldDiffNode.containsDiff = false;
                         const newDiffNode = structuredClone(newNode);
                         newDiffNode.hasDiff = true;
                         newDiffNode.diffType = DiffType.Modified;
                         newDiffNode.diffSource = DiffSource.New;
+                        newDiffNode.oldNodePath = [...(oldPath || [0]), oldIdx];
+                        newDiffNode.newNodePath = [...(newPath || [0]), newIdx];
                         newDiffNode.containsDiff = false;
                         diffNodes.push(oldDiffNode);
                         diffNodes.push(newDiffNode);
@@ -1086,19 +1168,29 @@ function containsDiff(children) {
     }
     return false;
 }
-function correctDiffChildren(children, diffType) {
+function correctDiffChildren(children, diffType, parentPath) {
     if (!children || children.length === 0)
         return [];
-    return children.map((child) => {
+    return children.map((child, index) => {
         const updatedChild = structuredClone(child);
         updatedChild.hasDiff = true;
         updatedChild.diffType = diffType;
+        if (parentPath) {
+            if (diffType === DiffType.Added) {
+                updatedChild.newNodePath = [...parentPath, index];
+            }
+            else if (diffType === DiffType.Removed) {
+                updatedChild.oldNodePath = [...parentPath, index];
+            }
+        }
         if (child.diffMods)
             updatedChild.diffMods = {};
         if (child.diffPivots)
             updatedChild.diffPivots = {};
-        if (child.children)
-            updatedChild.children = correctDiffChildren(child.children, diffType);
+        if (child.children) {
+            const childPath = parentPath ? [...parentPath, index] : [index];
+            updatedChild.children = correctDiffChildren(child.children, diffType, childPath);
+        }
         return updatedChild;
     });
 }
@@ -1278,12 +1370,14 @@ function diff(oldNode, newNode) {
         const diffNode = structuredClone(newNode);
         diffNode.hasDiff = true;
         diffNode.diffType = DiffType.Added;
+        diffNode.newNodePath = [0];
         return diffNode;
     }
     if (newNode === undefined) {
         const diffNode = structuredClone(oldNode);
         diffNode.hasDiff = true;
         diffNode.diffType = DiffType.Removed;
+        diffNode.oldNodePath = [0];
         return diffNode;
     }
     const diffNode = structuredClone(newNode);
@@ -1291,6 +1385,8 @@ function diff(oldNode, newNode) {
     if (!isMatch) {
         diffNode.hasDiff = true;
         diffNode.diffType = DiffType.Modified;
+        diffNode.oldNodePath = [0];
+        diffNode.newNodePath = [0];
         if (isTextModification && textProperties) {
             const diffMods = {};
             let diffPivots = {};
@@ -1319,7 +1415,11 @@ function diff(oldNode, newNode) {
             diffNode.diffPivots = diffPivots;
         }
     }
-    const diffChildren = diffInner(oldNode.children, newNode.children);
+    else {
+        diffNode.oldNodePath = [0];
+        diffNode.newNodePath = [0];
+    }
+    const diffChildren = diffInner(oldNode.children, newNode.children, [0], [0]);
     diffNode.children = diffChildren;
     return diffNode;
 }
@@ -1395,5 +1495,5 @@ function isYeastNodeType(node, type) {
     return node.hasOwnProperty('type') && node.type.toLowerCase() === type.toLowerCase();
 }
 
-export { ContentGroupType, DiffSource, DiffType, YeastBlockNodeTypes, YeastInlineNodeTypes, YeastNodeFactory$1 as YeastNodeFactory, YeastParser, diff, isMockListItemNode, isYeastBlockNode, isYeastInlineNode, isYeastNode, isYeastNodeType, isYeastTextNode, scrapeText };
+export { ContentGroupType, DiffSource, DiffType, YeastBlockNodeTypes, YeastInlineNodeTypes, YeastNodeFactory$1 as YeastNodeFactory, YeastParser, diff, isMockListItemNode, isYeastBlockNode, isYeastInlineNode, isYeastNode, isYeastNodeType, isYeastTextNode, mapAnchorPath, scrapeText };
 //# sourceMappingURL=index.js.map
