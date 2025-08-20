@@ -33,7 +33,7 @@
 	},
 	"peerDependencies": {
 		"xmlbuilder2": "^3.0.2",
-		"yeast-core": "^1.2.0"
+		"yeast-core": "^1.3.0"
 	},
 	"jest": {
 		"preset": "ts-jest",
