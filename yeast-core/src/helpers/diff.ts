@@ -67,7 +67,9 @@ export interface AnchorPathMapping {
 // Recursively search for a diff node with the specified old path
 function findDiffNodeByOldPath(diffNode: YeastNode, targetOldPath: number[]): YeastNode | null {
 	// Check if this node has the target old path
-	if (diffNode.oldNodePath === targetOldPath) {
+	if (diffNode.oldNodePath && 
+		diffNode.oldNodePath.length === targetOldPath.length &&
+		diffNode.oldNodePath.every((val, index) => val === targetOldPath[index])) {
 		return diffNode;
 	}
 
@@ -87,6 +89,11 @@ function findDiffNodeByOldPath(diffNode: YeastNode, targetOldPath: number[]): Ye
 }
 
 export function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode: DocumentNode): AnchorPathMapping {
+	// Handle edge cases
+	if (!anchorPath || anchorPath.trim() === '') {
+		return { newPath: undefined, isOrphaned: true, isOutdated: true };
+	}
+
 	// Generate the diff document to get path mapping information
 	const diffDocument = diff(oldNode, newNode);
 	if (!diffDocument) {
@@ -94,6 +101,12 @@ export function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode
 	}
 
 	const targetOldPath = anchorPath.split(',').map(Number);
+	
+	// Check if the path contains any invalid numbers
+	if (targetOldPath.some(isNaN)) {
+		return { newPath: undefined, isOrphaned: true, isOutdated: true };
+	}
+	
 	const diffNode = findDiffNodeByOldPath(diffDocument, targetOldPath);
 	
 	if (!diffNode) {
