@@ -113,6 +113,8 @@ export function mapAnchorPath(anchorPath: string, oldNode: DocumentNode, newNode
 		return { newPath: undefined, isOrphaned: true, isOutdated: true };
 	}
 
+	console.log(diffNode.diffType);
+
 	if (diffNode.diffType === DiffType.Removed) {
 		return { newPath: undefined, oldPath: diffNode.oldNodePath, isOrphaned: true, isOutdated: true };
 	} else if (diffNode.diffType === DiffType.Added) {
