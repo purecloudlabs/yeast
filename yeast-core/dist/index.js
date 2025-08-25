@@ -388,7 +388,6 @@ function mapAnchorPath(anchorPath, oldNode, newNode) {
     if (!diffNode) {
         return { newPath: undefined, isOrphaned: true, isOutdated: true };
     }
-    console.log(diffNode.diffType);
     if (diffNode.diffType === DiffType.Removed) {
         return { newPath: undefined, oldPath: diffNode.oldNodePath, isOrphaned: true, isOutdated: true };
     }
