@@ -355,7 +355,9 @@ function applyAttributes(node, attributes) {
 }
 
 function findDiffNodeByOldPath(diffNode, targetOldPath) {
-    if (diffNode.oldNodePath === targetOldPath) {
+    if (diffNode.oldNodePath &&
+        diffNode.oldNodePath.length === targetOldPath.length &&
+        diffNode.oldNodePath.every((val, index) => val === targetOldPath[index])) {
         return diffNode;
     }
     if (diffNode.children) {
@@ -371,11 +373,17 @@ function findDiffNodeByOldPath(diffNode, targetOldPath) {
     return null;
 }
 function mapAnchorPath(anchorPath, oldNode, newNode) {
+    if (!anchorPath || anchorPath.trim() === '') {
+        return { newPath: undefined, isOrphaned: true, isOutdated: true };
+    }
     const diffDocument = diff(oldNode, newNode);
     if (!diffDocument) {
         return { newPath: undefined, isOrphaned: true, isOutdated: true };
     }
     const targetOldPath = anchorPath.split(',').map(Number);
+    if (targetOldPath.some(isNaN)) {
+        return { newPath: undefined, isOrphaned: true, isOutdated: true };
+    }
     const diffNode = findDiffNodeByOldPath(diffDocument, targetOldPath);
     if (!diffNode) {
         return { newPath: undefined, isOrphaned: true, isOutdated: true };
