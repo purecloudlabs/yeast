@@ -32,7 +32,7 @@ export class CustomComponentParserPlugin implements BlockParserPlugin {
 			//Parse line by line
 			const lines = text.trim().split('\n');
 			let i = 0;
-			while (lines[i] && lines[i] !== '\n') {
+			while (i < lines.length && lines[i] !== '\n') {
 				rawXml += lines[i] + '\n';
 				i++;
 			}
