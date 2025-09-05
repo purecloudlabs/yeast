@@ -68,7 +68,7 @@ Nam vitae mollis lorem. Vivamus nec arcu in nunc rutrum malesuada aliquet quis p
     }
   ],
 
-  
+
   &quot;entities&quot;: [
     {
       &quot;name&quot;: &quot;ProductName&quot;,

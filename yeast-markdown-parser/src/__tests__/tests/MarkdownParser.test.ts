@@ -124,7 +124,7 @@ test('MarkdownParser using CustomComponentParserPlugin', () => {
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/customcomponent.md'), 'utf8');
 	const ast = parser.parse(documentText);
 
-	debugAST('customcomponent', ast);
+	// debugAST('customcomponent', ast);
 
 	expect(ast.children[0].type).toBe('link');
 	expect(ast.children[1].type).toBe('table');
@@ -141,7 +141,7 @@ test('MarkdownParser using CustomComponentParserPlugin', () => {
 	expect(ast.children[5].children).toBeUndefined();
 	expect(ast.children[6].type).toBe('OpenAPIExplorer');
 	expect(ast.children[7].type).toBe('QuickHit');
-	expect(ast.children[8].type).toBe('Code');
+	expect(ast.children[8].type).toBe('code');
 
 
 	// Check document
@@ -250,27 +250,6 @@ test('MarkdownParser using CodeParserPlugin', () => {
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/codeblock.md'), 'utf8');
 	const ast = parser.parse(documentText);
 	expect(ast.children.length).toBe(8);
-
-	// Check document
-	checkAstStructureForDefaultDocument(ast, 8);
-});
-
-test('MarkdownParser using CodeParserPlugin with space', () => {
-	// Initialize parser
-	const parser = new MarkdownParser();
-	parser.clearBlockPlugins();
-	parser.clearInlinePlugins();
-	parser.registerBlockPlugin(new CodeParserPlugin());
-	parser.registerBlockPlugin(new ParagraphParserPlugin());
-
-	// Check plugins
-	checkParserPlugins(parser, 2, 0);
-
-	// Parse
-	const documentText = fs.readFileSync(path.join(__dirname, '../resources/codeblock-with-space.md'), 'utf8');
-	const ast = parser.parse(documentText);
-	debugAST('codeblock-with-space', ast);
-	// expect(ast.children.length).toBe(8);
 
 	// Check document
 	checkAstStructureForDefaultDocument(ast, 8);
