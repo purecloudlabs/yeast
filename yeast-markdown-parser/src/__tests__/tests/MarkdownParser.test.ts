@@ -11,18 +11,11 @@ import {
 	ContentGroupNode,
 	DocumentNode,
 	HeadingNode,
-	ImageNode,
 	InlineCodeNode,
-	ItalicNode,
-	LinkNode,
-	ListNode,
 	ParagraphNode,
-	StrikethroughNode,
 	TableNode,
 	TableRowNode,
 	YeastInlineChild,
-	YeastInlineNodeTypes,
-	YeastNode,
 	YeastText,
 } from 'yeast-core';
 
@@ -34,7 +27,6 @@ import { ContentGroupParserPlugin } from '../../plugins/block/ContentGroupParser
 import { CustomComponentParserPlugin } from '../../plugins/block/CustomComponentParser';
 import { HeadingParserPlugin } from '../../plugins/block/HeadingParserPlugin';
 import { HorizontalRuleParserPlugin } from '../../plugins/block/HorizontalRuleParserPlugin';
-import { ListParserPlugin } from '../../plugins/block/ListParserPlugin';
 import { ParagraphParserPlugin } from '../../plugins/block/ParagraphParserPlugin';
 import { TableParserPlugin } from '../../plugins/block/TableParser';
 import { InlineEmphasisPlugin } from '../../plugins/inline/InlineEmphasisPlugin';
@@ -120,14 +112,20 @@ test('MarkdownParser using CustomComponentParserPlugin', () => {
 	parser.clearBlockPlugins();
 	parser.clearInlinePlugins();
 	parser.registerBlockPlugin(new CustomComponentParserPlugin());
+	parser.registerBlockPlugin(new CodeParserPlugin());
+	parser.registerBlockPlugin(new TableParserPlugin());
+
 	parser.registerBlockPlugin(new ParagraphParserPlugin());
 
 	// Check plugins
-	checkParserPlugins(parser, 2, 0);
+	checkParserPlugins(parser, 4, 0);
 
 	// Parse
 	const documentText = fs.readFileSync(path.join(__dirname, '../resources/customcomponent.md'), 'utf8');
 	const ast = parser.parse(documentText);
+
+	// debugAST('customcomponent', ast);
+
 	expect(ast.children[0].type).toBe('link');
 	expect(ast.children[1].type).toBe('table');
 	expect((ast.children[1] as TableNode).align).toBe('L|C|R');
@@ -143,9 +141,11 @@ test('MarkdownParser using CustomComponentParserPlugin', () => {
 	expect(ast.children[5].children).toBeUndefined();
 	expect(ast.children[6].type).toBe('OpenAPIExplorer');
 	expect(ast.children[7].type).toBe('QuickHit');
+	expect(ast.children[8].type).toBe('code');
+
 
 	// Check document
-	checkAstStructureForDefaultDocument(ast, 8);
+	checkAstStructureForDefaultDocument(ast, 9);
 });
 
 test('MarkdownParser using TableParserPlugin', () => {

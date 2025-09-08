@@ -32,7 +32,17 @@ export class CustomComponentParserPlugin implements BlockParserPlugin {
 			//Parse line by line
 			const lines = text.trim().split('\n');
 			let i = 0;
-			while (lines[i] && lines[i] !== '\n') {
+			let isInsideQuotes = false;
+			while (i < lines.length && (lines[i].length > 0 || isInsideQuotes) && lines[i] !== '\n') {
+				if (isInsideQuotes && lines[i].match(/(?<!\\)"/g)) {
+					isInsideQuotes = false;
+				} else {
+					const quoteCount: number = lines[i].match(/(?<!\\)"/g)?.length || 0;
+					const quoteCountIsOdd = quoteCount && quoteCount % 2 > 0;
+					if (quoteCountIsOdd) {
+						isInsideQuotes = true;
+					}
+				}
 				rawXml += lines[i] + '\n';
 				i++;
 			}

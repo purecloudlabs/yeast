@@ -624,6 +624,7 @@ class ContentGroupParserPlugin {
 const CUSTOM_COMPONENT_REGEX = /^\s*(<(?:yeast|dxui):.*)([\s\S]*)$/i;
 class CustomComponentParserPlugin {
     parse(text, parser) {
+        var _a;
         const match = text.match(CUSTOM_COMPONENT_REGEX);
         if (!match)
             return;
@@ -647,7 +648,18 @@ class CustomComponentParserPlugin {
         catch (err) {
             const lines = text.trim().split('\n');
             let i = 0;
-            while (lines[i] && lines[i] !== '\n') {
+            let isInsideQuotes = false;
+            while (i < lines.length && (lines[i].length > 0 || isInsideQuotes) && lines[i] !== '\n') {
+                if (isInsideQuotes && lines[i].match(/(?<!\\)"/g)) {
+                    isInsideQuotes = false;
+                }
+                else {
+                    const quoteCount = ((_a = lines[i].match(/(?<!\\)"/g)) === null || _a === void 0 ? void 0 : _a.length) || 0;
+                    const quoteCountIsOdd = quoteCount && quoteCount % 2 > 0;
+                    if (quoteCountIsOdd) {
+                        isInsideQuotes = true;
+                    }
+                }
                 rawXml += lines[i] + '\n';
                 i++;
             }
