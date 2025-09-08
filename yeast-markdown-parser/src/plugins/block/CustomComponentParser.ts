@@ -33,7 +33,7 @@ export class CustomComponentParserPlugin implements BlockParserPlugin {
 			const lines = text.trim().split('\n');
 			let i = 0;
 			let isInsideQuotes = false;
-			while (i < lines.length && (lines[i].trim().length > 0 || isInsideQuotes) && lines[i] !== '\n') {
+			while (i < lines.length && (lines[i].length > 0 || isInsideQuotes) && lines[i] !== '\n') {
 				if (isInsideQuotes && lines[i].match(/(?<!\\)"/g)) {
 					isInsideQuotes = false;
 				} else {
