@@ -13,7 +13,7 @@ This document exists to test tables. Oh look! Here's one now:
 | Left Aligned | Centered | Right Aligned |
 | :--- | :---: | ---: |
 | Left 1 | Center 1 | Right 1 |
-| Left 2 **looooong** text | Center 2 *looooong* text | Right 2 \`looooong\` text |
+| Left 2 **looooong** text | Center 2 _looooong_ text | Right 2 \`looooong\` text |
 | Left 3 | Center 3 | Right 3 |
 `;
 

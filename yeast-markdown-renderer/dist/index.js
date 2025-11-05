@@ -78,7 +78,7 @@ function renderBlockquoteNode(node, renderer) {
 }
 
 function renderBoldNode(node, renderer) {
-    return `**${renderer.renderComponents(node.children).join('').trim()}**`;
+    return `**${renderer.renderComponents(node.children).join('')}**`;
 }
 
 function renderCalloutNode(node, renderer) {
@@ -160,7 +160,7 @@ function renderInlineCodeNode(node, renderer) {
 }
 
 function renderItalicNode(node, renderer) {
-    return `*${renderer.renderComponents(node.children).join('')}*`;
+    return `_${renderer.renderComponents(node.children).join('')}_`;
 }
 
 function renderLinkNode(node, renderer) {
