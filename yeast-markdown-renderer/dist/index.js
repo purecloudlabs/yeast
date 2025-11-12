@@ -78,7 +78,7 @@ function renderBlockquoteNode(node, renderer) {
 }
 
 function renderBoldNode(node, renderer) {
-    return `**${renderer.renderComponents(node.children).join('')}**`;
+    return `**${renderer.renderComponents(node.children).join('').trim()}**`;
 }
 
 function renderCalloutNode(node, renderer) {
