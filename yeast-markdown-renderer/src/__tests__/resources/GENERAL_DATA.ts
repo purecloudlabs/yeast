@@ -219,6 +219,13 @@ export const GENERAL_DATA = {
 			children: [{ text: 'strikethroughContent' }],
 		},
 		{
+			type: 'bold',
+			children: [{
+				type: 'italic',
+				children: [{ text: 'italic and bold content' }],
+			}],
+		},
+		{
 			type: 'image',
 			src: 'https://i.postimg.cc/1zrNF4sT/images.jpg',
 			alt: 'animated boy with white hair',

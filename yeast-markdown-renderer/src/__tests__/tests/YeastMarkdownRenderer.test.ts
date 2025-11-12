@@ -166,6 +166,12 @@ test('a simple table renders simply', () => {
 	expect(markdownString).toEqual(SIMPLE_TABLE_MARKDOWN);
 });
 
+test('bold and italic nodes render correctly', () => {
+	const markdownString = new MarkdownRenderer().renderMarkdown(GENERAL_DATA as DocumentNode);
+	const boldAndItalicRegex = /\*\*\_italic and bold content\_\*\*/gi;
+	expect(markdownString.match(boldAndItalicRegex).length).toBe(1);
+});
+
 test('inline code simple and escaped syntax', () => {
 	const markdownString = new MarkdownRenderer().renderMarkdown(INLINE_CODE_AST as DocumentNode);
 	expect(markdownString).toEqual(INLINE_CODE_MARKDOWN);

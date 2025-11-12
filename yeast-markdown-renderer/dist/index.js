@@ -160,7 +160,7 @@ function renderInlineCodeNode(node, renderer) {
 }
 
 function renderItalicNode(node, renderer) {
-    return `*${renderer.renderComponents(node.children).join('')}*`;
+    return `_${renderer.renderComponents(node.children).join('')}_`;
 }
 
 function renderLinkNode(node, renderer) {
