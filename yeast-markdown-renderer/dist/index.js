@@ -274,6 +274,7 @@ function renderTableNode(node, renderer) {
             alignStr += ' :---: |';
         }
     }
+    let tableVar = '';
     if (node.children[0].header) {
         const indentation = '\t';
         const headerChildren = renderer.renderComponents([node.children[0]]).join('').split('\n');
@@ -292,7 +293,7 @@ function renderTableNode(node, renderer) {
             else if (index === children.length - 1 && child.length !== 0)
                 finalVal += `${indentation.repeat(node.indentation)}${child}`;
         });
-        return `\n${headerVal}${finalVal}`;
+        tableVar = `\n${headerVal}${finalVal}`;
     }
     else {
         const indentation = '\t';
@@ -303,8 +304,22 @@ function renderTableNode(node, renderer) {
                 finalVal += `${indentation.repeat(node.indentation)}${child}\n`;
             }
         });
-        return `\n${finalVal}`;
+        tableVar = `\n${finalVal}`;
     }
+    if (node.sortable || node.filterable || node.paginated) {
+        let tableClasses = '';
+        if (node.sortable) {
+            tableClasses += ' sortable';
+        }
+        if (node.filterable) {
+            tableClasses += ' filterable';
+        }
+        if (node.paginated) {
+            tableClasses += ' paginated';
+        }
+        tableVar += `{:class ="${tableClasses}"}\n`;
+    }
+    return tableVar;
 }
 
 function renderTableRowNode(node, renderer) {

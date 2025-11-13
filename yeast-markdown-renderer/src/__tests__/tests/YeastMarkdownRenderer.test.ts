@@ -1,7 +1,7 @@
 import { DocumentNode, isYeastTextNode, isYeastNode, YeastChild, YeastNode, YeastText } from 'yeast-core';
 import { MarkdownRenderer } from '../../MarkdownRenderer';
 import { GENERAL_DATA } from '../resources/GENERAL_DATA';
-import { TABLE_DATA } from '../resources/TABLE_DATA';
+import { TABLE_DATA, TABLE_DATA_WITH_CLASSES } from '../resources/TABLE_DATA';
 import { EMPTY_ITEM_LIST, EMPTY_ITEM_LIST_RESULT, LIST_DATA } from '../resources/LIST_DATA';
 import { SIMPLE_TABLE_AST, SIMPLE_TABLE_MARKDOWN } from '../resources/SIMPLE_TABLE';
 import { INLINE_CODE_AST, INLINE_CODE_MARKDOWN } from '../resources/INLINE_CODE_DATA';
@@ -84,6 +84,12 @@ test('table node with header', () => {
 	const centerRegex = /\| :---: /g;
 	expect(markdownString.match(headerRegex).length).toBe(1);
 	expect(markdownString.match(centerRegex).length).toBe(3);
+});
+
+test('table node with sortable, filterable, and paginated', () => {
+	const markdownString = new MarkdownRenderer().renderMarkdown(TABLE_DATA_WITH_CLASSES as DocumentNode);
+	const lastLine = markdownString.split('\n')[markdownString.split('\n').length - 2];
+	expect(lastLine).toBe('{:class =" sortable filterable paginated"}');
 });
 
 test('special characters in certain nodes', () => {
