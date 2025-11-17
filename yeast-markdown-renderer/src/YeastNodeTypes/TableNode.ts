@@ -73,7 +73,7 @@ export default function renderTableNode(node: TableNode, renderer: MarkdownRende
 	}
 
 	// Proceed to render table simply
-
+    let tableVar = ''
 	if (node.children[0].header) {
 		const indentation = '\t';
 
@@ -97,7 +97,7 @@ export default function renderTableNode(node: TableNode, renderer: MarkdownRende
 			else if (index === children.length - 1 && child.length !== 0) finalVal += `${indentation.repeat(node.indentation)}${child}`;
 		});
 
-		return `\n${headerVal}${finalVal}`;
+		tableVar = `\n${headerVal}${finalVal}`;
 	} else {
 		const indentation = '\t';
 		let finalVal = `${indentation.repeat(node.indentation)}${alignStr}\n`; //start off with alignment
@@ -108,6 +108,21 @@ export default function renderTableNode(node: TableNode, renderer: MarkdownRende
 				finalVal += `${indentation.repeat(node.indentation)}${child}\n`;
 			}
 		});
-		return `\n${finalVal}`;
+		tableVar = `\n${finalVal}`;
 	}
+
+	if (node.sortable || node.filterable || node.paginated) {
+		let tableClasses = '';
+		if (node.sortable) {
+			tableClasses += ' sortable';
+		}
+		if (node.filterable) {
+			tableClasses += ' filterable';
+		}
+		if (node.paginated) {
+			tableClasses += ' paginated';
+		}
+		tableVar += `{:class ="${tableClasses}"}\n`;
+	}
+	return tableVar;
 }

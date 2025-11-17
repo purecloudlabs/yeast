@@ -94,3 +94,36 @@ export const TABLE_DATA = {
 		},
 	],
 };
+
+
+export const TABLE_DATA_WITH_CLASSES = {
+	author: 'yuri.yetina',
+	type: 'document',
+	title: 'Table data',
+	children: [
+		{
+			type: 'table',
+			indentation: 0,
+			align: 'L|R',
+			sortable: true,
+			filterable: true,
+			paginated: true,
+			children: [
+				{
+					type: 'tablerow',
+					children: [
+						{ type: 'tablecell', children: [{ text: 'names' }] },
+						{ type: 'tablecell', children: [{ text: 'use a | pipe character to | define the cells' }] },
+					],
+				},
+				{
+					type: 'tablerow',
+					children: [
+						{ type: 'tablecell', children: [{ text: 'yeti' }] },
+						{ type: 'tablecell', children: [{ text: 'genesys' }] },
+					],
+				},
+			],
+		},
+	]
+};
