@@ -46,7 +46,7 @@ export interface DiffPivotMap {
     [textProperty: string]: number;
 }
 export declare type YeastChild = YeastBlockNode | YeastInlineNode | YeastText | YeastNode;
-export declare type YeastInlineChild = YeastInlineNode | YeastText;
+export declare type YeastInlineChild = YeastInlineNode | InlineCustomComponentNode | YeastText;
 export interface YeastNode {
     type: YeastBlockNodeTypes | YeastInlineNodeTypes | string;
     children?: YeastChild[];
@@ -83,6 +83,9 @@ export interface CustomComponentNode extends YeastNode {
     type: string;
     children?: YeastChild[];
     [key: string]: any;
+}
+export interface InlineCustomComponentNode extends CustomComponentNode {
+    inline: true;
 }
 export interface DocumentNode extends YeastBlockNode {
     type: YeastBlockNodeTypes.Document;
@@ -260,7 +263,8 @@ export interface Token {
     nodes: YeastInlineChild[];
 }
 export declare function isYeastNode(node: YeastChild): node is YeastNode;
-export declare function isYeastInlineNode(node: YeastChild): node is YeastInlineNode;
+export declare function isYeastInlineNode(node: YeastChild): node is YeastInlineNode | InlineCustomComponentNode;
+export declare function isInlineCustomComponentNode(node: YeastChild): node is InlineCustomComponentNode;
 export declare function isYeastBlockNode(node: YeastChild): node is YeastBlockNode;
 export declare function isYeastTextNode(node: YeastChild): node is YeastText;
 export declare function isMockListItemNode(node: any): node is MockListItemNode;
