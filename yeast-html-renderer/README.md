@@ -18,6 +18,12 @@ At the time of creation, this is a naieve implementation and not all known node 
 
 Unused properties can be supported in the rendered output in the future, though that is not planned.
 
+### Inline custom components
+
+A custom component node with `inline: true` that has no registered renderer is rendered as inline `<code>` showing the raw tag, for example `<yeastInline:Icon name="gear" />`, so it stays inside its paragraph and a missing registration is easy to spot. Before, such a node was dumped as a `<pre>` block. Children are shown as plain text. Register a custom renderer for the component type to render it as real HTML.
+
+The tag shown follows the same attribute rules as `yeast-markdown-renderer`: `type`, `children`, `inline`, `text`, `__proto__`, diff properties and `undefined`, `null` or function values are left out, and `&`, `"`, `<`, CR and LF are encoded. This needs `yeast-core` 1.4.0 or later.
+
 ## Getting Started
 
 1. Install the package:
