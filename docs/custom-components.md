@@ -10,6 +10,18 @@ A custom component node:
 - may have children
 - has any arbitrary properties on the node used by the component's renderer and parser implementations
 
+### Inline custom components
+
+A custom component is a block element by default. Set the property `inline: true` (the boolean, not the string `"true"`) on the node to mark it as an inline element that sits inside a line of text, such as an icon in a sentence:
+
+```json
+{ "type": "Icon", "inline": true, "name": "chevron-down" }
+```
+
+`isYeastInlineNode` returns `true` for such a node, and `isInlineCustomComponentNode` checks for the marker alone. Built-in types ignore the marker. A node without the marker behaves exactly as before.
+
+This marker lives on the node, not in markdown. In markdown, an inline custom component is written with its own prefix, `<yeastInline:ComponentName ... />`, which the markdown parser turns into a node with `inline: true`. Writing `<yeast:ComponentName inline="true" />` does **not** make a component inline: that tag is still read by the block rule, which stores attribute values as strings, so `inline` becomes `"true"` and the marker does not apply.
+
 ## In Markdown
 
 When a custom component is represented in markdown, it is expected to follow the format of a namespaced XML tag:
