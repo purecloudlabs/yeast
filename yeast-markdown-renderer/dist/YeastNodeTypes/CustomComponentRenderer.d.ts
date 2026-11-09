@@ -1,3 +1,4 @@
 import { YeastChild } from 'yeast-core';
-export default function renderCustomComponent(node: YeastChild): string;
+import type { MarkdownRenderer } from '../MarkdownRenderer';
+export default function renderCustomComponent(node: YeastChild, renderer?: MarkdownRenderer): string;
 //# sourceMappingURL=CustomComponentRenderer.d.ts.map

@@ -145,7 +145,7 @@ export class MarkdownRenderer {
 					return typedNode.text;
 				} else {
 					console.log('Unhandled node', node);
-					return renderCustomComponent(node); //return custom component
+					return renderCustomComponent(node, this); //return custom component
 				}
 			}
 		});
