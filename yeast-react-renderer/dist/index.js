@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 import { CodeFence, AlertBlock, DxAccordionGroup, DxTabbedContent, DataTable, DxAccordion, DxTabPanel } from 'genesys-react-components';
 import React, { useState, useEffect } from 'react';
-import { DiffType, DiffSource, isYeastNode, YeastBlockNodeTypes, YeastInlineNodeTypes, isYeastTextNode } from 'yeast-core';
+import { DiffType, DiffSource, isYeastNode, YeastBlockNodeTypes, isYeastTextNode, YeastInlineNodeTypes, isInlineCustomComponentNode } from 'yeast-core';
 
 // import { useRef } from 'react';
 function useKey() {
@@ -606,6 +606,69 @@ function HorizontalRuleNodeRenderer(props) {
     return React.createElement("hr", { className: className, key: key.current });
 }
 
+/** Inline custom component tag prefix, as written in markdown */
+const INLINE_TAG_PREFIX = 'yeastInline';
+// Structural properties and YEAST internal/diff properties (see YeastNode in yeast-core); never written as attributes
+const SKIPPED_PROPERTIES = new Set([
+    'type',
+    'children',
+    'inline',
+    // The parser keeps a tag with a text attribute as text, and core would treat such a node as text
+    'text',
+    '__proto__',
+    'hasDiff',
+    'diffType',
+    'diffMods',
+    'diffPivots',
+    'isTextModification',
+    'containsDiff',
+    'diffSource',
+    'oldNodePath',
+    'newNodePath',
+]);
+function escapeAttributeValue(value) {
+    // Same encoding as the markdown renderer writes (and the parser reads), so the tag shown is the tag saved
+    return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/\r/g, '&#13;').replace(/\n/g, '&#10;');
+}
+function formatAttributeValue(value) {
+    if (typeof value === 'string')
+        return value;
+    if (typeof value === 'object')
+        return JSON.stringify(value);
+    return String(value);
+}
+/** Concatenates the text of the children, depth first, with no separator */
+function getPlainText(nodes) {
+    if (!Array.isArray(nodes))
+        return '';
+    return nodes
+        .map((node) => {
+        if (!node)
+            return '';
+        if (isYeastTextNode(node))
+            return node.text || '';
+        return getPlainText(node.children);
+    })
+        .join('');
+}
+/**
+ * Builds the raw tag text for an inline custom component, e.g. `<yeastInline:Icon name="x" />`,
+ * or `<yeastInline:Badge color="blue">text</yeastInline:Badge>` when the node has children.
+ * Children are written as plain text. The result is text, to be escaped by React.
+ */
+function formatInlineCustomComponentTag(node) {
+    const tagName = `${INLINE_TAG_PREFIX}:${node.type}`;
+    const attributes = Object.keys(node)
+        .filter((property) => !SKIPPED_PROPERTIES.has(property))
+        .filter((property) => node[property] !== undefined && node[property] !== null && typeof node[property] !== 'function')
+        .map((property) => ` ${property}="${escapeAttributeValue(formatAttributeValue(node[property]))}"`)
+        .join('');
+    const hasChildren = Array.isArray(node.children) && node.children.length > 0;
+    if (!hasChildren)
+        return `<${tagName}${attributes} />`;
+    return `<${tagName}${attributes}>${getPlainText(node.children)}</${tagName}>`;
+}
+
 const TILDE_REGEX = /\\~/g;
 class ReactRenderer {
     constructor(customRenderers) {
@@ -688,13 +751,19 @@ class ReactRenderer {
                     return rendered;
             }
             // Final fallback to default unhandled renderer
-            if (isYeastTextNode(node)) {
+            // An inline custom component with a `text` property is not text: it reaches the fallback below
+            if (isYeastTextNode(node) && !isInlineCustomComponentNode(node)) {
                 const diffRenderData = getDiffRenderData(node);
                 const typedNode = node;
                 const processedText = typedNode.text.replace(TILDE_REGEX, '~');
                 return diffRenderData && diffRenderData.renderedNodes
                     ? React.createElement(React.Fragment, { key: i }, diffRenderData.renderedNodes['text'])
                     : React.createElement(React.Fragment, { key: i }, processedText);
+            }
+            else if (isInlineCustomComponentNode(node)) {
+                // Unregistered inline custom component: show the raw tag as inline code so the sentence stays intact
+                console.warn('Unhandled inline custom component, rendering it as inline code', node);
+                return React.createElement("code", { key: i }, formatInlineCustomComponentTag(node));
             }
             else {
                 console.warn('Unhandled node', node);
