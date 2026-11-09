@@ -16,6 +16,7 @@ import { ContentGroupParserPlugin } from 'plugins/block/ContentGroupParserPlugin
 import { CustomComponentParserPlugin } from 'plugins/block/CustomComponentParser';
 import { TableParserPlugin } from 'plugins/block/TableParser';
 import { InlineImageLinkPlugin } from 'plugins/inline/InlineImageLinkPlugin';
+import { InlineCustomComponentPlugin } from 'plugins/inline/InlineCustomComponentPlugin';
 export {
 	MarkdownParser,
 	FrontmatterParserPlugin,
@@ -27,6 +28,7 @@ export {
 	InlineStrikeThroughPlugin,
 	InlineCodePlugin,
 	InlineImageLinkPlugin,
+	InlineCustomComponentPlugin,
 	InlineLinkPlugin,
 	HorizontalRuleParserPlugin,
 	CalloutParserPlugin,

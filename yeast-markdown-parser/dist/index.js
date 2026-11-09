@@ -322,6 +322,190 @@ class InlineCodePlugin {
     }
 }
 
+const INLINE_CUSTOM_COMPONENT_PREFIX = 'yeastInline';
+const OPEN_MARKER = `<${INLINE_CUSTOM_COMPONENT_PREFIX}:`;
+const CLOSE_MARKER = `</${INLINE_CUSTOM_COMPONENT_PREFIX}:`;
+const RESERVED_ATTRIBUTES = ['type', 'inline', 'children', 'text', '__proto__'];
+const ATTRIBUTE_ENTITY_REGEX = /&(quot|amp|lt|#13|#10);/g;
+const ATTRIBUTE_ENTITIES = { quot: '"', amp: '&', lt: '<', '#13': '\r', '#10': '\n' };
+const isLetter = (c) => (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+const isNameChar = (c) => isLetter(c) || (c >= '0' && c <= '9') || c === '_' || c === '-';
+const isWhitespace = (c) => c === ' ' || c === '\t' || c === '\n' || c === '\r';
+const readName = (text, pos, allowUnderscoreFirst) => {
+    const first = text.charAt(pos);
+    if (!(isLetter(first) || (allowUnderscoreFirst && first === '_')))
+        return pos;
+    let i = pos + 1;
+    while (i < text.length && isNameChar(text.charAt(i)))
+        i++;
+    return i;
+};
+const skipWhitespace = (text, pos) => {
+    while (pos < text.length && isWhitespace(text.charAt(pos)))
+        pos++;
+    return pos;
+};
+const parseOpenTag = (text, start) => {
+    const nameStart = start + OPEN_MARKER.length;
+    const nameEnd = readName(text, nameStart, false);
+    if (nameEnd === nameStart)
+        return;
+    const name = text.substring(nameStart, nameEnd);
+    const attributes = Object.create(null);
+    let pos = nameEnd;
+    while (pos < text.length) {
+        const afterWhitespace = skipWhitespace(text, pos);
+        const c = text.charAt(afterWhitespace);
+        if (c === '>')
+            return { kind: 'open', start, end: afterWhitespace + 1, name, attributes, selfClosing: false };
+        if (c === '/') {
+            if (text.charAt(afterWhitespace + 1) !== '>')
+                return;
+            return { kind: 'open', start, end: afterWhitespace + 2, name, attributes, selfClosing: true };
+        }
+        if (afterWhitespace === pos)
+            return;
+        const attrEnd = readName(text, afterWhitespace, true);
+        if (attrEnd === afterWhitespace)
+            return;
+        const attrName = text.substring(afterWhitespace, attrEnd);
+        if (RESERVED_ATTRIBUTES.includes(attrName) || attrName in attributes)
+            return;
+        let p = skipWhitespace(text, attrEnd);
+        if (text.charAt(p) !== '=')
+            return;
+        p = skipWhitespace(text, p + 1);
+        if (text.charAt(p) !== '"')
+            return;
+        const valueEnd = text.indexOf('"', p + 1);
+        if (valueEnd < 0)
+            return;
+        attributes[attrName] = text.substring(p + 1, valueEnd).replace(ATTRIBUTE_ENTITY_REGEX, (_m, entity) => ATTRIBUTE_ENTITIES[entity]);
+        pos = valueEnd + 1;
+    }
+    return;
+};
+const parseCloseTag = (text, start) => {
+    const nameStart = start + CLOSE_MARKER.length;
+    const nameEnd = readName(text, nameStart, false);
+    if (nameEnd === nameStart)
+        return;
+    const end = skipWhitespace(text, nameEnd);
+    if (text.charAt(end) !== '>')
+        return;
+    return { kind: 'close', start, end: end + 1, name: text.substring(nameStart, nameEnd) };
+};
+const scanTags = (text) => {
+    const events = [];
+    let pos = text.indexOf('<');
+    while (pos >= 0) {
+        let event;
+        if (text.startsWith(OPEN_MARKER, pos))
+            event = parseOpenTag(text, pos);
+        else if (text.startsWith(CLOSE_MARKER, pos))
+            event = parseCloseTag(text, pos);
+        if (event) {
+            events.push(event);
+            pos = text.indexOf('<', event.end);
+        }
+        else {
+            pos = text.indexOf('<', pos + 1);
+        }
+    }
+    return events;
+};
+const createNode = (tag) => (Object.assign({ type: tag.name, inline: true }, tag.attributes));
+const MAX_INLINE_CUSTOM_COMPONENT_DEPTH = 32;
+class InlineCustomComponentPlugin {
+    constructor() {
+        this.depth = 0;
+    }
+    tokenize(text, parser) {
+        if (this.depth >= MAX_INLINE_CUSTOM_COMPONENT_DEPTH || !text.includes(OPEN_MARKER))
+            return [];
+        const pending = findOutermostComponents(text);
+        for (const component of pending) {
+            if (component.childrenStart === undefined)
+                continue;
+            this.depth++;
+            try {
+                component.node.children = parser.parseInline(text.substring(component.childrenStart, component.childrenEnd));
+            }
+            finally {
+                this.depth--;
+            }
+        }
+        return pending.map((component) => component.token);
+    }
+}
+const findOutermostComponents = (text) => {
+    var _a;
+    const events = scanTags(text);
+    const closeFor = new Map();
+    const openStacks = new Map();
+    for (const event of events) {
+        if (event.kind === 'open') {
+            if (event.selfClosing)
+                continue;
+            if (!openStacks.has(event.name))
+                openStacks.set(event.name, []);
+            openStacks.get(event.name).push(event);
+        }
+        else {
+            const open = (_a = openStacks.get(event.name)) === null || _a === void 0 ? void 0 : _a.pop();
+            if (open)
+                closeFor.set(open, event);
+        }
+    }
+    const pending = [];
+    let lastEnd = 0;
+    for (const event of events) {
+        if (event.kind !== 'open' || event.start < lastEnd)
+            continue;
+        const node = createNode(event);
+        const component = {
+            node,
+            token: { start: event.start, end: event.end, from: 'InlineCustomComponentPlugin', nodes: [node] },
+        };
+        if (!event.selfClosing) {
+            const close = closeFor.get(event);
+            if (!close)
+                continue;
+            component.childrenStart = event.end;
+            component.childrenEnd = close.start;
+            component.token.end = close.end;
+        }
+        pending.push(component);
+        lastEnd = component.token.end;
+    }
+    return pending;
+};
+let lastSpanText;
+let lastSpans = [];
+const findComponentSpans = (text) => {
+    if (text !== lastSpanText) {
+        lastSpans = text.includes(OPEN_MARKER)
+            ? findOutermostComponents(text).map(({ token }) => ({ start: token.start, end: token.end }))
+            : [];
+        lastSpanText = text;
+    }
+    return lastSpans;
+};
+class TagPrecedencePlugin {
+    constructor(inner) {
+        this.inner = inner;
+    }
+    tokenize(text, parser) {
+        const tokens = this.inner.tokenize(text, parser);
+        if (!tokens || tokens.length === 0 || !text.includes(OPEN_MARKER))
+            return tokens;
+        const spans = findComponentSpans(text);
+        if (spans.length === 0)
+            return tokens;
+        return tokens.filter((token) => !spans.some((span) => token.start < span.start && token.end > span.start && token.end < span.end));
+    }
+}
+
 const LINK_REGEX = /\[\s*(.*?)\s*\]\(\s*(\S+)(?:\s+["']\s*(.*?)\s*["'])?\s*\)/gi;
 class InlineLinkPlugin {
     tokenize(text, parser) {
@@ -1123,13 +1307,14 @@ class MarkdownParser extends YeastParser {
         this.registerBlockPlugin(new TableParserPlugin());
         this.registerBlockPlugin(new CustomComponentParserPlugin());
         this.registerBlockPlugin(new ParagraphParserPlugin());
-        this.registerInlinePlugin(new InlineCodePlugin());
-        this.registerInlinePlugin(new InlineStrikeThroughPlugin());
-        this.registerInlinePlugin(new InlineEmphasisPlugin());
-        this.registerInlinePlugin(new InlineImageLinkPlugin());
-        this.registerInlinePlugin(new InlineImagePlugin());
-        this.registerInlinePlugin(new InlineLinkPlugin());
-        this.registerInlinePlugin(new InlineTextLinkPlugin());
+        this.registerInlinePlugin(new TagPrecedencePlugin(new InlineCodePlugin()));
+        this.registerInlinePlugin(new InlineCustomComponentPlugin());
+        this.registerInlinePlugin(new TagPrecedencePlugin(new InlineStrikeThroughPlugin()));
+        this.registerInlinePlugin(new TagPrecedencePlugin(new InlineEmphasisPlugin()));
+        this.registerInlinePlugin(new TagPrecedencePlugin(new InlineImageLinkPlugin()));
+        this.registerInlinePlugin(new TagPrecedencePlugin(new InlineImagePlugin()));
+        this.registerInlinePlugin(new TagPrecedencePlugin(new InlineLinkPlugin()));
+        this.registerInlinePlugin(new TagPrecedencePlugin(new InlineTextLinkPlugin()));
     }
 }
 
@@ -1152,5 +1337,5 @@ class ImageParserPlugin {
     }
 }
 
-export { BlockquoteParserPlugin, CalloutParserPlugin, CodeParserPlugin, ContentGroupParserPlugin, CustomComponentParserPlugin, FrontmatterParserPlugin, HeadingParserPlugin, HorizontalRuleParserPlugin, ImageParserPlugin, InlineCodePlugin, InlineEmphasisPlugin, InlineImageLinkPlugin, InlineLinkPlugin, InlineStrikeThroughPlugin, ListParserPlugin, MarkdownParser, ParagraphParserPlugin, TableParserPlugin };
+export { BlockquoteParserPlugin, CalloutParserPlugin, CodeParserPlugin, ContentGroupParserPlugin, CustomComponentParserPlugin, FrontmatterParserPlugin, HeadingParserPlugin, HorizontalRuleParserPlugin, ImageParserPlugin, InlineCodePlugin, InlineCustomComponentPlugin, InlineEmphasisPlugin, InlineImageLinkPlugin, InlineLinkPlugin, InlineStrikeThroughPlugin, ListParserPlugin, MarkdownParser, ParagraphParserPlugin, TableParserPlugin };
 //# sourceMappingURL=index.js.map

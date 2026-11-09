@@ -16,5 +16,6 @@ import { ContentGroupParserPlugin } from 'plugins/block/ContentGroupParserPlugin
 import { CustomComponentParserPlugin } from 'plugins/block/CustomComponentParser';
 import { TableParserPlugin } from 'plugins/block/TableParser';
 import { InlineImageLinkPlugin } from 'plugins/inline/InlineImageLinkPlugin';
-export { MarkdownParser, FrontmatterParserPlugin, ParagraphParserPlugin, InlineEmphasisPlugin, HeadingParserPlugin, ListParserPlugin, ImageParserPlugin, InlineStrikeThroughPlugin, InlineCodePlugin, InlineImageLinkPlugin, InlineLinkPlugin, HorizontalRuleParserPlugin, CalloutParserPlugin, BlockquoteParserPlugin, CodeParserPlugin, ContentGroupParserPlugin, CustomComponentParserPlugin, TableParserPlugin, };
+import { InlineCustomComponentPlugin } from 'plugins/inline/InlineCustomComponentPlugin';
+export { MarkdownParser, FrontmatterParserPlugin, ParagraphParserPlugin, InlineEmphasisPlugin, HeadingParserPlugin, ListParserPlugin, ImageParserPlugin, InlineStrikeThroughPlugin, InlineCodePlugin, InlineImageLinkPlugin, InlineCustomComponentPlugin, InlineLinkPlugin, HorizontalRuleParserPlugin, CalloutParserPlugin, BlockquoteParserPlugin, CodeParserPlugin, ContentGroupParserPlugin, CustomComponentParserPlugin, TableParserPlugin, };
 //# sourceMappingURL=index.d.ts.map

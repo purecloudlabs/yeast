@@ -39,7 +39,7 @@ import { EVERYTHING_INLINE_AST } from '../resources/everythinginline';
 import { TABLE_CODE_RESULT } from '../resources/table-and-codeblock';
 
 const standardBlockPluginCount = 10;
-const standardInlinePluginCount = 7;
+const standardInlinePluginCount = 8;
 
 test('MarkdownParser with no plugins should create root document with frontmatter', () => {
 	// Initialize parser

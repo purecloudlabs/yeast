@@ -7,6 +7,7 @@ import { HeadingParserPlugin } from './plugins/block/HeadingParserPlugin';
 import { ListParserPlugin } from './plugins/block/ListParserPlugin';
 import { InlineStrikeThroughPlugin } from './plugins/inline/InlineStrikeThroughPlugin';
 import { InlineCodePlugin } from './plugins/inline/InlineCodePlugin';
+import { InlineCustomComponentPlugin, TagPrecedencePlugin } from './plugins/inline/InlineCustomComponentPlugin';
 import { InlineLinkPlugin } from './plugins/inline/InlineLinkPlugin';
 import { CodeParserPlugin } from './plugins/block/CodeParserPlugin';
 import { CalloutParserPlugin } from './plugins/block/CalloutParserPlugin';
@@ -45,12 +46,16 @@ export class MarkdownParser extends YeastParser {
 		this.registerBlockPlugin(new CustomComponentParserPlugin());
 		this.registerBlockPlugin(new ParagraphParserPlugin()); // ParagraphParserPlugin must always be last
 
-		this.registerInlinePlugin(new InlineCodePlugin());
-		this.registerInlinePlugin(new InlineStrikeThroughPlugin());
-		this.registerInlinePlugin(new InlineEmphasisPlugin());
-		this.registerInlinePlugin(new InlineImageLinkPlugin());
-		this.registerInlinePlugin(new InlineImagePlugin());
-		this.registerInlinePlugin(new InlineLinkPlugin());
-		this.registerInlinePlugin(new InlineTextLinkPlugin());
+		this.registerInlinePlugin(new TagPrecedencePlugin(new InlineCodePlugin()));
+		// Tokens are ordered by start position, and this order only breaks ties. No other inline token can start at `<`,
+		// so this position is for readability: code first (a tag inside backticks starts later, so code wins), then tags,
+		// then emphasis and links, whose text is re-parsed and so may contain tags.
+		this.registerInlinePlugin(new InlineCustomComponentPlugin());
+		this.registerInlinePlugin(new TagPrecedencePlugin(new InlineStrikeThroughPlugin()));
+		this.registerInlinePlugin(new TagPrecedencePlugin(new InlineEmphasisPlugin()));
+		this.registerInlinePlugin(new TagPrecedencePlugin(new InlineImageLinkPlugin()));
+		this.registerInlinePlugin(new TagPrecedencePlugin(new InlineImagePlugin()));
+		this.registerInlinePlugin(new TagPrecedencePlugin(new InlineLinkPlugin()));
+		this.registerInlinePlugin(new TagPrecedencePlugin(new InlineTextLinkPlugin()));
 	}
 }
