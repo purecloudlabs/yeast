@@ -269,10 +269,26 @@ describe('InlineCustomComponentPlugin: attributes', () => {
 		expect(firstBlockChildren('<yeastInline:Icon title="x />" name="a" /> y')).toEqual([icon('a', { title: 'x />' }), { text: ' y' }]);
 	});
 
-	test('&quot; &amp; &lt; &#13; &#10; are decoded in one pass; other entities are kept', () => {
+	test('the XML entities and numeric references are decoded in one pass; other entities are kept', () => {
 		expect(
-			firstBlockChildren('<yeastInline:Icon title="say &quot;hi&quot; &amp;quot; &amp; &lt;b&gt; a&#13;&#10;b &#39; &copy; R&D" />')
-		).toEqual([{ type: 'Icon', inline: true, title: 'say "hi" &quot; & <b&gt; a\r\nb &#39; &copy; R&D' }]);
+			firstBlockChildren(
+				'<yeastInline:Icon title="say &quot;hi&quot; &amp;quot; &amp; &lt;b&gt; a&#13;&#10;b &#39; &apos; &#x3E; &copy; R&D" />'
+			)
+		).toEqual([{ type: 'Icon', inline: true, title: 'say "hi" &quot; & <b> a\r\nb \' \' > &copy; R&D' }]);
+	});
+
+	test('&gt; is decoded (DEVENGAGE-3892 test report, T09)', () => {
+		expect(firstBlockChildren('a <yeastInline:icon name="x &amp; &quot;y&quot; &lt;z&gt;" /> b')).toEqual([
+			{ text: 'a ' },
+			{ type: 'icon', inline: true, name: 'x & "y" <z>' },
+			{ text: ' b' },
+		]);
+	});
+
+	test('numeric references that are not valid code points are kept as written', () => {
+		expect(firstBlockChildren('<yeastInline:Icon title="&#0; &#xD800; &#x110000; &#65;" />')).toEqual([
+			{ type: 'Icon', inline: true, title: '&#0; &#xD800; &#x110000; A' },
+		]);
 	});
 
 	test('a raw < in a value is allowed', () => {

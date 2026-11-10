@@ -18,11 +18,20 @@ const RESERVED_ATTRIBUTES = ['type', 'inline', 'children', 'text', '__proto__'];
 
 /**
  * Entities decoded in attribute values, in a single pass (so `&amp;quot;` becomes the literal text `&quot;`).
- * This is the set yeast-markdown-renderer encodes: `&` as `&amp;` (first), `"` as `&quot;`, `<` as `&lt;`, CR as `&#13;`, LF as `&#10;`.
- * Any other `&` sequence is kept as written.
+ * These are the five XML entities (`&quot;`, `&amp;`, `&lt;`, `&gt;`, `&apos;`) and numeric references (`&#62;`, `&#x3E;`).
+ * yeast-markdown-renderer only writes `&amp;`, `&quot;`, `&lt;`, `&#13;` and `&#10;`; the rest are decoded so hand-written
+ * markdown reads the same as it would in XML. Any other `&` sequence (for example `&copy;`) is kept as written.
  */
-const ATTRIBUTE_ENTITY_REGEX = /&(quot|amp|lt|#13|#10);/g;
-const ATTRIBUTE_ENTITIES: { [entity: string]: string } = { quot: '"', amp: '&', lt: '<', '#13': '\r', '#10': '\n' };
+const ATTRIBUTE_ENTITY_REGEX = /&(quot|amp|lt|gt|apos|#[0-9]+|#[xX][0-9a-fA-F]+);/g;
+const ATTRIBUTE_ENTITIES: { [entity: string]: string } = { quot: '"', amp: '&', lt: '<', gt: '>', apos: "'" };
+
+const decodeAttributeEntity = (match: string, entity: string): string => {
+	if (entity[0] !== '#') return ATTRIBUTE_ENTITIES[entity];
+	const codePoint = entity[1] === 'x' || entity[1] === 'X' ? parseInt(entity.slice(2), 16) : parseInt(entity.slice(1), 10);
+	// Keep references that are not valid code points as written.
+	if (!(codePoint > 0 && codePoint <= 0x10ffff) || (codePoint >= 0xd800 && codePoint <= 0xdfff)) return match;
+	return String.fromCodePoint(codePoint);
+};
 
 interface OpenTag {
 	kind: 'open';
@@ -96,7 +105,7 @@ const parseOpenTag = (text: string, start: number): OpenTag | undefined => {
 		if (text.charAt(p) !== '"') return;
 		const valueEnd = text.indexOf('"', p + 1);
 		if (valueEnd < 0) return;
-		attributes[attrName] = text.substring(p + 1, valueEnd).replace(ATTRIBUTE_ENTITY_REGEX, (_m, entity) => ATTRIBUTE_ENTITIES[entity]);
+		attributes[attrName] = text.substring(p + 1, valueEnd).replace(ATTRIBUTE_ENTITY_REGEX, decodeAttributeEntity);
 		pos = valueEnd + 1;
 	}
 	return;

@@ -21,7 +21,7 @@ Each tag becomes a node with the tag name as its `type` and `inline: true`. Attr
 Rules to know:
 
 - The prefix is case-sensitive: `<yeastinline:Icon />` stays text. Tag names start with a letter and may contain letters, digits, `_` and `-`.
-- Attribute values are double-quoted. These entities are decoded: `&quot;`, `&amp;`, `&lt;`, `&#13;` and `&#10;`. Any other `&` sequence is kept as written.
+- Attribute values are double-quoted. The five XML entities (`&quot;`, `&amp;`, `&lt;`, `&gt;`, `&apos;`) and numeric references (`&#10;`, `&#x3E;`) are decoded. Any other `&` sequence (for example `&copy;`) is kept as written.
 - `type`, `inline`, `children`, `text` and `__proto__` are reserved. A tag that uses one of them as an attribute name, or repeats an attribute, stays text. In particular, a component cannot carry an attribute named `text`.
 - Unclosed open tags, stray or mismatched close tags and malformed tags stay text.
 - Only backticks protect a tag. Inline code and fenced code blocks keep it as literal text. An indented paragraph is not code, and a backslash does not escape a tag.
