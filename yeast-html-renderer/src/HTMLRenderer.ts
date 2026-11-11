@@ -10,6 +10,7 @@ import {
 	HorizontalRuleNode,
 	ImageNode,
 	InlineCodeNode,
+	isInlineCustomComponentNode,
 	isYeastNode,
 	isYeastTextNode,
 	ItalicNode,
@@ -30,6 +31,7 @@ import {
 import { JSDOM } from 'jsdom';
 
 import renderCustomComponent from './YeastNodeTypes/CustomComponentRenderer';
+import renderInlineCustomComponent from './YeastNodeTypes/InlineCustomComponentRenderer';
 import renderBlockCodeNode from './YeastNodeTypes/BlockCodeNode';
 import renderBlockquoteNode from './YeastNodeTypes/BlockquoteNode';
 import renderBoldNode from './YeastNodeTypes/BoldNode';
@@ -146,6 +148,9 @@ export class HTMLRenderer {
 			if (!rendered) {
 				if (isYeastTextNode(node) && !isYeastNode(node)) {
 					return node.text;
+				} else if (isInlineCustomComponentNode(node)) {
+					// Unregistered inline custom component (boolean `inline: true`): inline code showing the raw tag
+					return renderInlineCustomComponent(node, this);
 				} else {
 					// Fallback to rendering the unhandled node as a custom component (dumps the yeast XML in a code fence)
 					return renderCustomComponent(node, this);

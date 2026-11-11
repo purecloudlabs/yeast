@@ -1,4 +1,4 @@
-import { isYeastNode, isYeastTextNode, scrapeText, YeastInlineNodeTypes, YeastBlockNodeTypes } from 'yeast-core';
+import { isYeastNode, isYeastTextNode, scrapeText, YeastInlineNodeTypes, YeastBlockNodeTypes, isInlineCustomComponentNode } from 'yeast-core';
 import { JSDOM } from 'jsdom';
 import { fragment } from 'xmlbuilder2';
 
@@ -33,6 +33,61 @@ function renderCustomComponent(node, renderer) {
     buildTree(node, root);
     codeElement.textContent = root.end({ prettyPrint: true });
     return preElement;
+}
+
+const SKIPPED_PROPERTIES = new Set([
+    'type',
+    'children',
+    'inline',
+    'text',
+    '__proto__',
+    'hasDiff',
+    'diffType',
+    'diffMods',
+    'diffPivots',
+    'isTextModification',
+    'containsDiff',
+    'diffSource',
+    'oldNodePath',
+    'newNodePath',
+]);
+function plainText(nodes) {
+    if (!Array.isArray(nodes))
+        return '';
+    return nodes
+        .map((child) => {
+        if (!child)
+            return '';
+        const childNodes = child.children;
+        if (Array.isArray(childNodes) && childNodes.length > 0)
+            return plainText(childNodes);
+        return isYeastTextNode(child) && typeof child.text === 'string' ? child.text : '';
+    })
+        .join('');
+}
+function attributeValue(value) {
+    const text = typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value);
+    return text.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/\r/g, '&#13;').replace(/\n/g, '&#10;');
+}
+function formatInlineCustomComponentTag(node) {
+    let attributes = '';
+    for (const property of Object.keys(node)) {
+        if (SKIPPED_PROPERTIES.has(property))
+            continue;
+        const value = node[property];
+        if (value === undefined || value === null || typeof value === 'function')
+            continue;
+        attributes += ` ${property}="${attributeValue(value)}"`;
+    }
+    const tagName = `yeastInline:${node.type}`;
+    if (!Array.isArray(node.children) || node.children.length === 0)
+        return `<${tagName}${attributes} />`;
+    return `<${tagName}${attributes}>${plainText(node.children)}</${tagName}>`;
+}
+function renderInlineCustomComponent(node, renderer) {
+    const codeElement = renderer.document.createElement('code');
+    codeElement.textContent = formatInlineCustomComponentTag(node);
+    return codeElement;
 }
 
 function renderBlockCodeNode(node, renderer) {
@@ -293,6 +348,9 @@ class HTMLRenderer {
             if (!rendered) {
                 if (isYeastTextNode(node) && !isYeastNode(node)) {
                     return node.text;
+                }
+                else if (isInlineCustomComponentNode(node)) {
+                    return renderInlineCustomComponent(node, this);
                 }
                 else {
                     return renderCustomComponent(node, this);
