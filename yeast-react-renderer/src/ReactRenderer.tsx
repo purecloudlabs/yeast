@@ -26,6 +26,7 @@ import {
 	YeastInlineNode,
 	HorizontalRuleNode,
 	isYeastTextNode,
+	isInlineCustomComponentNode,
 } from 'yeast-core';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -47,6 +48,7 @@ import TableNodeRenderer from './YeastNodeTypes/TableNodeRenderer';
 import HorizontalRuleNodeRenderer from './YeastNodeTypes/HorizontalRuleNodeRenderer';
 
 import { DiffRenderData, getDiffRenderData } from './helpers/diff';
+import { formatInlineCustomComponentTag } from './helpers/inlineCustomComponent';
 
 const TILDE_REGEX = /\\~/g;
 
@@ -146,13 +148,18 @@ export class ReactRenderer {
 			}
 
 			// Final fallback to default unhandled renderer
-			if (isYeastTextNode(node)) {
+			// An inline custom component with a `text` property is not text: it reaches the fallback below
+			if (isYeastTextNode(node) && !isInlineCustomComponentNode(node)) {
 				const diffRenderData: DiffRenderData = getDiffRenderData(node);
 				const typedNode = node as YeastText;
 				const processedText = typedNode.text.replace(TILDE_REGEX, '~');
 				return diffRenderData && diffRenderData.renderedNodes
 					? <React.Fragment key={i}>{diffRenderData.renderedNodes['text']}</React.Fragment>
 					: <React.Fragment key={i}>{processedText}</React.Fragment>;
+			} else if (isInlineCustomComponentNode(node)) {
+				// Unregistered inline custom component: show the raw tag as inline code so the sentence stays intact
+				console.warn('Unhandled inline custom component, rendering it as inline code', node);
+				return <code key={i}>{formatInlineCustomComponentTag(node)}</code>;
 			} else {
 				console.warn('Unhandled node', node);
 				return;
