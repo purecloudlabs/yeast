@@ -1,9 +1,55 @@
-import { isYeastNode, isYeastTextNode, ContentGroupType, YeastBlockNodeTypes, isYeastInlineNode, YeastInlineNodeTypes } from 'yeast-core';
+import { isYeastNode, isYeastTextNode, isInlineCustomComponentNode, ContentGroupType, YeastBlockNodeTypes, isYeastInlineNode, YeastInlineNodeTypes } from 'yeast-core';
 import { fragment } from 'xmlbuilder2';
 
-function renderCustomComponent(node) {
+const INLINE_SKIPPED_PROPERTIES = new Set([
+    'type',
+    'children',
+    'inline',
+    'text',
+    '__proto__',
+    'hasDiff',
+    'diffType',
+    'diffMods',
+    'diffPivots',
+    'isTextModification',
+    'containsDiff',
+    'diffSource',
+    'oldNodePath',
+    'newNodePath',
+]);
+const VALID_TAG_NAME = /^[A-Za-z][\w-]*$/;
+const VALID_ATTRIBUTE_NAME = /^[A-Za-z_][\w-]*$/;
+const RESERVED_ATTRIBUTE_NAMES = new Set(['type', 'inline', 'children', 'text', '__proto__']);
+const canWriteAsInlineTag = (node) => {
+    if (!VALID_TAG_NAME.test(node.type))
+        return false;
+    return Object.keys(node).every((property) => INLINE_SKIPPED_PROPERTIES.has(property) ||
+        node[property] === undefined ||
+        node[property] === null ||
+        typeof node[property] === 'function' ||
+        (VALID_ATTRIBUTE_NAME.test(property) && !RESERVED_ATTRIBUTE_NAMES.has(property)));
+};
+const escapeAttributeValue = (value) => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/\r/g, '&#13;').replace(/\n/g, '&#10;');
+const stringifyAttributeValue = (value) => (typeof value === 'object' ? JSON.stringify(value) : String(value));
+function renderInlineCustomComponent(node, renderer) {
+    let attributes = '';
+    for (const property of Object.keys(node)) {
+        const value = node[property];
+        if (INLINE_SKIPPED_PROPERTIES.has(property) || value === undefined || value === null || typeof value === 'function')
+            continue;
+        attributes += ` ${property}="${escapeAttributeValue(stringifyAttributeValue(value))}"`;
+    }
+    const tagName = `yeastInline:${node.type}`;
+    if (!node.children || node.children.length === 0)
+        return `<${tagName}${attributes} />`;
+    const children = renderer.renderComponents(node.children).join('');
+    return `<${tagName}${attributes}>${children}</${tagName}>`;
+}
+function renderCustomComponent(node, renderer) {
     if (!isYeastNode(node) && !isYeastTextNode(node))
         return;
+    if (renderer && isInlineCustomComponentNode(node) && canWriteAsInlineTag(node))
+        return renderInlineCustomComponent(node, renderer);
     const root = fragment();
     const buildTree = (node, parent) => {
         if (!node)
@@ -109,8 +155,20 @@ function renderContentGroupNode(node, renderer) {
     return `\n${renderer.renderComponents(node.children).join('').trim()}\n%%%\n`;
 }
 
+const INLINE_TAG_MARKUP = /<\/?yeastInline:[A-Za-z][\w-]*(?:\s+[A-Za-z_][\w-]*\s*=\s*"[^"]*")*\s*\/?>/g;
+function escapeOutsideInlineTags(content, escape) {
+    let result = '';
+    let last = 0;
+    for (const match of content.matchAll(INLINE_TAG_MARKUP)) {
+        result += escape(content.substring(last, match.index)) + match[0];
+        last = match.index + match[0].length;
+    }
+    return result + escape(content.substring(last));
+}
+
 function renderHeadingNode(node, renderer) {
-    const content = renderer.renderComponents(node.children).join('').replace(/#/g, `\\#`);
+    const rendered = renderer.renderComponents(node.children).join('');
+    const content = escapeOutsideInlineTags(rendered, (text) => text.replace(/#/g, `\\#`));
     switch (node.level) {
         case 1: {
             return `\n# ${content} \n`;
@@ -213,7 +271,7 @@ function renderParagraphNode(node, renderer) {
 }
 
 function renderStrikethroughode(node, renderer) {
-    return `~~${renderer.renderComponents(node.children).join('').replace(/~/g, `\\~`)}~~`;
+    return `~~${escapeOutsideInlineTags(renderer.renderComponents(node.children).join(''), (text) => text.replace(/~/g, `\\~`))}~~`;
 }
 
 function renderTableCellNode(node, renderer) {
@@ -411,7 +469,7 @@ class MarkdownRenderer {
                 }
                 else {
                     console.log('Unhandled node', node);
-                    return renderCustomComponent(node);
+                    return renderCustomComponent(node, this);
                 }
             }
         });

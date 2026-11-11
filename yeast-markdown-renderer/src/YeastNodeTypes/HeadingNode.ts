@@ -1,8 +1,10 @@
 import { MarkdownRenderer } from '../MarkdownRenderer';
 import { HeadingNode } from 'yeast-core';
+import escapeOutsideInlineTags from './escapeOutsideInlineTags';
 
 export default function renderHeadingNode(node: HeadingNode, renderer: MarkdownRenderer) {
-	const content = renderer.renderComponents(node.children).join('').replace(/#/g, `\\#`);
+	const rendered = renderer.renderComponents(node.children).join('');
+	const content = escapeOutsideInlineTags(rendered, (text) => text.replace(/#/g, `\\#`));
 	switch (node.level) {
 		case 1: {
 			return `\n# ${content} \n`;
