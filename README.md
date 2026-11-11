@@ -32,7 +32,7 @@ renders a yeast document to react
 
 See the README in each package's folder for package-specific instructions.
 
-_Coming Soon™_
+- [Custom components](docs/custom-components.md): block and inline custom components in yeast documents and markdown, and how to render them
 
 ## Contributing
 

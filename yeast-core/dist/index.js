@@ -1480,7 +1480,16 @@ function isYeastNode(node) {
     return node.type !== undefined;
 }
 function isYeastInlineNode(node) {
-    return Object.values(YeastInlineNodeTypes).includes(node.type);
+    return Object.values(YeastInlineNodeTypes).includes(node.type) || isInlineCustomComponentNode(node);
+}
+function isInlineCustomComponentNode(node) {
+    const candidate = node;
+    return (candidate !== null &&
+        typeof candidate === 'object' &&
+        typeof candidate.type === 'string' &&
+        candidate.inline === true &&
+        !Object.values(YeastBlockNodeTypes).includes(candidate.type) &&
+        !Object.values(YeastInlineNodeTypes).includes(candidate.type));
 }
 function isYeastBlockNode(node) {
     return Object.values(YeastBlockNodeTypes).includes(node.type);
@@ -1503,5 +1512,5 @@ function isYeastNodeType(node, type) {
     return node.hasOwnProperty('type') && node.type.toLowerCase() === type.toLowerCase();
 }
 
-export { ContentGroupType, DiffSource, DiffType, YeastBlockNodeTypes, YeastInlineNodeTypes, YeastNodeFactory$1 as YeastNodeFactory, YeastParser, diff, isMockListItemNode, isYeastBlockNode, isYeastInlineNode, isYeastNode, isYeastNodeType, isYeastTextNode, mapAnchorPath, scrapeText };
+export { ContentGroupType, DiffSource, DiffType, YeastBlockNodeTypes, YeastInlineNodeTypes, YeastNodeFactory$1 as YeastNodeFactory, YeastParser, diff, isInlineCustomComponentNode, isMockListItemNode, isYeastBlockNode, isYeastInlineNode, isYeastNode, isYeastNodeType, isYeastTextNode, mapAnchorPath, scrapeText };
 //# sourceMappingURL=index.js.map

@@ -64,7 +64,7 @@ export interface DiffPivotMap {
 // YeastChild is the most permissive definition for a child
 export type YeastChild = YeastBlockNode | YeastInlineNode | YeastText | YeastNode;
 // YeastInlineChild is any child type that is an inline element
-export type YeastInlineChild = YeastInlineNode | YeastText;
+export type YeastInlineChild = YeastInlineNode | InlineCustomComponentNode | YeastText;
 
 // YeastNode is the root interface for all nodes
 export interface YeastNode {
@@ -114,6 +114,11 @@ export interface CustomComponentNode extends YeastNode {
 	children?: YeastChild[];
 	// Generic accessor for arbitrary attributes used by custom component implementations
 	[key: string]: any;
+}
+// InlineCustomComponentNode is a custom component that sits inside a line of text (e.g. an icon in a sentence).
+// The boolean marker inline: true is what makes it inline; any other value leaves the node as it was.
+export interface InlineCustomComponentNode extends CustomComponentNode {
+	inline: true;
 }
 
 // DocumentNode is the singular root element for all yeast documents; it's not valid as a child of anything
@@ -357,8 +362,22 @@ export function isYeastNode(node: YeastChild): node is YeastNode {
 	return (node as YeastNode).type !== undefined;
 }
 
-export function isYeastInlineNode(node: YeastChild): node is YeastInlineNode {
-	return Object.values(YeastInlineNodeTypes).includes((node as YeastInlineNode).type);
+export function isYeastInlineNode(node: YeastChild): node is YeastInlineNode | InlineCustomComponentNode {
+	return Object.values(YeastInlineNodeTypes).includes((node as YeastInlineNode).type) || isInlineCustomComponentNode(node);
+}
+
+// A custom component is inline only when it carries the boolean marker inline: true.
+// Built-in block types never count as inline, whatever properties they carry.
+export function isInlineCustomComponentNode(node: YeastChild): node is InlineCustomComponentNode {
+	const candidate = node as InlineCustomComponentNode;
+	return (
+		candidate !== null &&
+		typeof candidate === 'object' &&
+		typeof candidate.type === 'string' &&
+		candidate.inline === true &&
+		!Object.values(YeastBlockNodeTypes).includes(candidate.type as YeastBlockNodeTypes) &&
+		!Object.values(YeastInlineNodeTypes).includes(candidate.type as YeastInlineNodeTypes)
+	);
 }
 
 export function isYeastBlockNode(node: YeastChild): node is YeastBlockNode {
